@@ -1,0 +1,79 @@
+workflows:
+  ios-workflow:
+    name: "iOS Build"
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    environment:
+      flutter: stable
+      xcode: latest
+      vars:
+        FLUTTER_BUILD_MODE: "release"
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+      groups:
+        - Assistify
+
+    integrations:
+      app_store_connect: assistifyaibo
+
+    scripts:
+      - name: Instalar dependencias
+        script: |
+          flutter clean
+          flutter pub get
+          cd ios
+          pod install
+          cd ..
+
+      - name: Inicializar llavero y configurar perfil
+        script: |
+          keychain initialize
+          xcode-project use-profiles
+
+      - name: Verificar esquemas disponibles
+        script: |
+          xcodebuild -list -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE"
+
+      - name: Verificar configuración del esquema
+        script: |
+          xcodebuild -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -configuration Release \
+            -showBuildSettings | grep -i configuration
+
+      - name: Mostrar configuración de Xcode
+        script: |
+          xcodebuild -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" -showBuildSettings
+
+      - name: Compilar Flutter para iOS
+        script: |
+          flutter build ios --release --build-name=2.0.14 --build-number=82
+
+      - name: Compilar y exportar IPA para App Store
+        script: |
+          set -e
+          xcodebuild -workspace "$CM_BUILD_DIR/$XCODE_WORKSPACE" \
+            -scheme "$XCODE_SCHEME" \
+            -archivePath build/ios/archive/Runner.xcarchive \
+            -configuration Release \
+            COMPILER_INDEX_STORE_ENABLE=NO | tee build.log
+
+          EXIT_CODE=$?
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "🔴 ERROR al compilar:"
+            tail -n 100 build.log
+            exit $EXIT_CODE
+          fi
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - build/ios/archive/*.xcarchive
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
+        code_signing: automatic

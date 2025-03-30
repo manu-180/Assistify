@@ -1,0 +1,2 @@
+C:/Users/Manuel/Desktop/Folder/taller_ceramica/android/app/.cxx/Debug/40573y4h/x86/CMakeFiles/edit_cache.dir
+C:/Users/Manuel/Desktop/Folder/taller_ceramica/android/app/.cxx/Debug/40573y4h/x86/CMakeFiles/rebuild_cache.dir
