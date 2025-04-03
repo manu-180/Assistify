@@ -10,7 +10,6 @@ import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
 import 'package:taller_ceramica/supabase/utiles/generar_id.dart';
-import 'package:taller_ceramica/utils/generar_id.dart';
 import 'package:taller_ceramica/utils/utils_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:intl/intl.dart';

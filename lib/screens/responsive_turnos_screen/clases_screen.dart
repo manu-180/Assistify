@@ -6,7 +6,6 @@ import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_capacidad_clase.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_lugar_disponible.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/main.dart';
@@ -24,46 +23,60 @@ class ClasesScreen extends ConsumerStatefulWidget {
 }
 
 class ClasesScreenState extends ConsumerState<ClasesScreen> {
-  List<String> fechasDisponibles = [];
+
+  bool isLoading = true;
+  int mesActual = 1;
   String semanaSeleccionada = 'semana1';
   String? diaSeleccionado;
+
+  List<String> fechasDisponibles = [];
   final List<String> semanas = [
     'semana1',
     'semana2',
     'semana3',
     'semana4',
-    'semana5'
+    'semana5',
   ];
-  int mesActual = 1;
-  bool isLoading = true;
+
   List<ClaseModels> diasUnicos = [];
   Map<String, List<ClaseModels>> horariosPorDia = {};
-  String? avisoDeClasesDisponibles;
   Map<int, int> capacidadCache = {};
-  final Map<String, Map<String, dynamic>> _cachePorSemana = {};
+  final Map<String, List<ClaseModels>> _cachePorSemana = {};
+
+  String? avisoDeClasesDisponibles;
+  String? avisoAnterior;
+  bool esAdmin = false;
+
+
+
+  
 
   Future<void> cargarDatos() async {
-  // ⚠️ Si ya existe en caché, usarlo
-  if (_cachePorSemana.containsKey(semanaSeleccionada)) {
-    final cache = _cachePorSemana[semanaSeleccionada]!;
-
-    setState(() {
-      diasUnicos = cache['diasUnicos'];
-      horariosPorDia = cache['horariosPorDia'];
-      avisoDeClasesDisponibles = cache['aviso'];
-      isLoading = false;
-    });
-
-    return;
-  }
-
   final usuarioActivo = Supabase.instance.client.auth.currentUser;
   final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-  setState(() {
-    isLoading = true;
-  });
+  setState(() => isLoading = true);
 
+  // ✅ Si la semana ya está cacheada, usarla directamente
+  if (_cachePorSemana.containsKey(semanaSeleccionada)) {
+
+  final datosSemana = _cachePorSemana[semanaSeleccionada]!;
+
+  _procesarDatosSemana(datosSemana);
+
+  // 🧠 Mostrar aviso lo antes posible
+  _generarAvisoConDatosLocales();
+
+  setState(() => isLoading = false);
+
+  // 🔄 Luego actualizamos el aviso con info real (Supabase)
+  _actualizarClasesDisponibles();
+
+  return;
+}
+
+
+  // 🚨 Si no está cacheada, seguimos con el flujo normal
   final capacidades =
       await ObtenerCapacidadClase().cargarTodasLasCapacidades();
   for (var capacidad in capacidades) {
@@ -79,20 +92,27 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   final datosSemana =
       datos.where((clase) => clase.semana == semanaSeleccionada).toList();
 
+  _cachePorSemana[semanaSeleccionada] = datosSemana;
+
+  _procesarDatosSemana(datosSemana);
+  await _actualizarClasesDisponibles();
+  setState(() => isLoading = false);
+
+}
+
+
+
+void _procesarDatosSemana(List<ClaseModels> datosSemana) {
   final dateFormat = DateFormat("dd/MM/yyyy HH:mm");
 
   datosSemana.sort((a, b) {
-    String fechaA = '${a.fecha} ${a.hora}';
-    String fechaB = '${b.fecha} ${b.hora}';
-
-    DateTime parsedFechaA = dateFormat.parse(fechaA);
-    DateTime parsedFechaB = dateFormat.parse(fechaB);
-
-    return parsedFechaA.compareTo(parsedFechaB);
+    final fechaA = dateFormat.parse('${a.fecha} ${a.hora}');
+    final fechaB = dateFormat.parse('${b.fecha} ${b.hora}');
+    return fechaA.compareTo(fechaB);
   });
 
   final diasSet = <String>{};
-  final diasUnicosTemp = datosSemana.where((clase) {
+  diasUnicos = datosSemana.where((clase) {
     final diaFecha = '${clase.dia} - ${clase.fecha}';
     if (diasSet.contains(diaFecha)) {
       return false;
@@ -102,42 +122,76 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     }
   }).toList();
 
-  final horariosPorDiaTemp = <String, List<ClaseModels>>{};
+  horariosPorDia = {};
   for (var clase in datosSemana) {
     final diaFecha = '${clase.dia} - ${clase.fecha}';
-    horariosPorDiaTemp.putIfAbsent(diaFecha, () => []).add(clase);
+    horariosPorDia.putIfAbsent(diaFecha, () => []).add(clase);
   }
+}
 
-  // 🔹 Obtener aviso de clases disponibles
+
+
+
+void precargarTodasLasSemanas() async {
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+
+  final datos = await ObtenerTotalInfo(
+    supabase: supabase,
+    usuariosTable: 'usuarios',
+    clasesTable: taller,
+  ).obtenerClases();
+
+  for (var semana in semanas) {
+    if (!_cachePorSemana.containsKey(semana)) {
+      final datosSemana =
+          datos.where((clase) => clase.semana == semana).toList();
+      _cachePorSemana[semana] = datosSemana;
+    }
+  }
+}
+
+  Future<void> _actualizarClasesDisponibles() async {
   final diasConClasesDisponibles = await obtenerDiasConClasesDisponibles();
-  String aviso;
+
+  avisoAnterior = avisoDeClasesDisponibles; // 💾 guardamos el valor viejo
+
   if (diasConClasesDisponibles.isEmpty) {
-    aviso = AppLocalizations.of(context).translate('noAvailableClasses');
+    avisoDeClasesDisponibles =
+        AppLocalizations.of(context).translate('noAvailableClasses');
   } else {
-    aviso = AppLocalizations.of(context).translate('availableClasses', params: {
+    avisoDeClasesDisponibles =
+        AppLocalizations.of(context).translate('availableClasses', params: {
       'days': diasConClasesDisponibles.join(', ')
     });
   }
 
-  // 🔹 Guardar en caché
-  _cachePorSemana[semanaSeleccionada] = {
-    'diasUnicos': diasUnicosTemp,
-    'horariosPorDia': horariosPorDiaTemp,
-    'aviso': aviso,
-  };
+  // ⚠️ Requiere rebuild para reflejar el cambio
+  if (mounted) setState(() {});
+}
 
-  if (mounted) {
-    setState(() {
-      diasUnicos = diasUnicosTemp;
-      horariosPorDia = horariosPorDiaTemp;
-      avisoDeClasesDisponibles = aviso;
-      isLoading = false;
+
+void _generarAvisoConDatosLocales() {
+  final dias = horariosPorDia.keys.map((e) => e.split(' - ')[0]).toSet().toList();
+
+  if (dias.isEmpty) {
+    avisoDeClasesDisponibles =
+        AppLocalizations.of(context).translate('noAvailableClasses');
+  } else {
+    avisoDeClasesDisponibles =
+        AppLocalizations.of(context).translate('availableClasses', params: {
+      'days': dias.join(', ')
     });
   }
 }
 
 
+
+
+
+
   Future<List<String>> obtenerDiasConClasesDisponibles() async {
+
   final diasConClases = <String>{};
   final usuarioActivo = Supabase.instance.client.auth.currentUser;
   final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
@@ -193,11 +247,17 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
 
 
   @override
-  void initState() {
-    super.initState();
-    inicializarDatos();
-    SubscriptionVerifier.verificarAdminYSuscripcion(context);
-  }
+void initState() {
+  super.initState();
+  inicializarDatos();
+  SubscriptionVerifier.verificarAdminYSuscripcion(context);
+  _cargarEsAdmin(); 
+}
+
+void _cargarEsAdmin() async {
+  esAdmin = await IsAdmin().admin();
+  if (mounted) setState(() {}); // para que actualice si cambia algo
+}
 
   Future<void> inicializarDatos() async {
     try {
@@ -209,6 +269,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
       });
 
       await cargarDatos();
+      precargarTodasLasSemanas(); // precarga las demás semanas en segundo plano
+
     } catch (e) {
       debugPrint('Error al inicializar los datos: $e');
     }
@@ -380,11 +442,15 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   }
 
   void manejarSeleccionClase(ClaseModels clase, String user) async {
-    await AgregarUsuario(supabase)
-        .agregarUsuarioAClase(clase.id, user, false, clase);
+  await AgregarUsuario(supabase)
+      .agregarUsuarioAClase(clase.id, user, false, clase);
 
-    cargarDatos();
-  }
+  // Borrar solo el caché de la semana actual
+  _cachePorSemana.remove(semanaSeleccionada);
+
+  await cargarDatos();
+}
+
 
   String _obtenerTituloDialogo(String mensaje) {
     if (mensaje ==
@@ -504,27 +570,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                                 itemBuilder: (context, index) {
                                   final clase =
                                       horariosPorDia[diaSeleccionado]![index];
-                                  return FutureBuilder<Widget>(
-                                    future: construirBotonHorario(
-                                        clase, capacidadCache),
-                                    builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return const CircularProgressIndicator(
-                                          strokeWidth: 2.2,
-                                        );
-                                      } else if (snapshot.hasError) {
-                                        return Text(AppLocalizations.of(context)
-                                            .translate('errorMessage',
-                                                params: {
-                                              'error': snapshot.error.toString()
-                                            }));
-                                      } else {
-                                        return snapshot.data ??
-                                            const SizedBox();
-                                      }
-                                    },
-                                  );
+                                  return construirBotonHorario(clase, capacidadCache);
+
                                 },
                               )
                         : const SizedBox(),
@@ -534,29 +581,29 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
             ),
           ),
           Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: paddingSize, vertical: 20),
-            child: avisoDeClasesDisponibles != null && !isLoading
-                ? _AvisoDeClasesDisponibles(
-                    colors: colors,
-                    color: color,
-                    text: avisoDeClasesDisponibles!,
-                  )
-                : ShimmerLoading(
-                    brillo: colors.primary.withAlpha(40),
-                    color: colors.primary.withAlpha(120),
-                    height: screenWidth * 0.19,
-                    width: screenWidth * 0.9,
-                  ),
-          ),
+  padding: EdgeInsets.symmetric(horizontal: paddingSize, vertical: 20),
+  child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
+      ? _AvisoDeClasesDisponibles(
+          colors: colors,
+          color: color,
+          text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
+        )
+      : ShimmerLoading(
+          brillo: colors.primary.withAlpha(40),
+          color: colors.primary.withAlpha(120),
+          height: screenWidth * 0.19,
+          width: screenWidth * 0.9,
+        ),
+),
+
           const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  Future<Widget> construirBotonHorario(
-    ClaseModels clase, Map<int, int> capacidadCache) async {
+  Widget construirBotonHorario(
+    ClaseModels clase, Map<int, int> capacidadCache) {
   final partesFecha = clase.fecha.split('/');
   final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
   final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
@@ -565,7 +612,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   final estaLlena = clase.mails.length >= capacidad;
 
   final screenWidth = MediaQuery.of(context).size.width;
-  final esAdmin = await IsAdmin().admin();
 
   return Column(
     children: [
@@ -642,6 +688,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   );
 }
 }
+
+
 
 class _AvisoDeClasesDisponibles extends StatelessWidget {
   const _AvisoDeClasesDisponibles({

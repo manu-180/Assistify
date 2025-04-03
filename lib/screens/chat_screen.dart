@@ -1,17 +1,20 @@
+// ignore_for_file: prefer_final_fields
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:taller_ceramica/widgets/custom_appbar.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 
 class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  ChatScreenState createState() => ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   List<Map<String, String>> _messages = []; // Solo almacena los mensajes visibles en la UI
   bool _isLoading = false;
@@ -167,7 +170,6 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
         },
       );
     } catch (e) {
-      print("Error al decodificar texto: $e");
       return text;
     }
   }

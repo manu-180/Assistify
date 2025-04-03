@@ -165,7 +165,6 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
         },
       );
     } catch (e) {
-      print("Error al decodificar texto: $e");
       return text;
     }
   }
