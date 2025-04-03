@@ -122,12 +122,13 @@ class TabletAppBarState extends State<TabletAppBar> {
           },
           {
             'value': '/gestionhorarios${taller ?? ''}',
-            'label': AppLocalizations.of(context)
-                .translate('manageSchedulesLabel')
+            'label':
+                AppLocalizations.of(context).translate('manageSchedulesLabel')
           },
           {
             'value': '/gestionclases${taller ?? ''}',
-            'label': AppLocalizations.of(context).translate('manageClassesLabel')
+            'label':
+                AppLocalizations.of(context).translate('manageClassesLabel')
           },
           {
             'value': '/usuarios${taller ?? ''}',
@@ -170,15 +171,20 @@ class TabletAppBarState extends State<TabletAppBar> {
                   context.push("/home${taller ?? ''}");
                 },
                 child: Row(
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('appTitle'),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-              SizedBox(width: 7),
-              FaIcon(FontAwesomeIcons.fileLines, color: Colors.white, size: size.width * 0.055,),
-            ],
-          ),
+                  children: [
+                    Text(
+                      AppLocalizations.of(context).translate('appTitle'),
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.w500),
+                    ),
+                    SizedBox(width: 7),
+                    FaIcon(
+                      FontAwesomeIcons.fileLines,
+                      color: Colors.white,
+                      size: size.width * 0.055,
+                    ),
+                  ],
+                ),
               ),
               SizedBox(width: size.width * 0.02),
               PopupMenuButton<String>(

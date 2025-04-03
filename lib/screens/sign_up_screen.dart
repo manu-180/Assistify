@@ -22,7 +22,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController emailController = TextEditingController();
   final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
-
   String passwordError = '';
   String confirmPasswordError = '';
   String mailError = '';
@@ -37,9 +36,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     final localizations = AppLocalizations.of(context);
 
     String formatName(String fullName) {
-    // Eliminar los espacios y convertir a minúsculas
-    return fullName.replaceAll(' ', '').toLowerCase();
-  }
+      // Eliminar los espacios y convertir a minúsculas
+      return fullName.replaceAll(' ', '').toLowerCase();
+    }
 
     return Scaffold(
       appBar:
@@ -47,7 +46,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-    
             Padding(
               padding: EdgeInsets.fromLTRB(
                   size.width * 0.05, 20, size.width * 0.05, 0),
@@ -68,31 +66,32 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ),
             SizedBox(height: size.height * 0.02),
             ElevatedButton.icon(
-          icon: const Icon(Icons.info_outline), // Icono en el botón
-                  label: Text(AppLocalizations.of(context).translate('moreInfoButton')),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Atención'),
-                  content: Text(
-                    'Asegúrese de ingresar correctamente el nombre completo y el correo electrónico, ya que serán fundamentales para el inicio de sesión del usuario. La contraseña inicial se generará automáticamente, utilizando el nombre completo en minúsculas y sin espacios. Por ejemplo, si el nombre completo es "Manuel Navarro", la contraseña será "manuelnavarro". Posteriormente, el usuario podrá modificar estos datos según sus preferencias dentro de la aplicación.',
-                  ),
-                  actions: [
-                    TextButton(
-                      child: Text('Entendido'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
+              icon: const Icon(Icons.info_outline), // Icono en el botón
+              label: Text(
+                  AppLocalizations.of(context).translate('moreInfoButton')),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Atención'),
+                      content: Text(
+                        'Asegúrese de ingresar correctamente el nombre completo y el correo electrónico, ya que serán fundamentales para el inicio de sesión del usuario. La contraseña inicial se generará automáticamente, utilizando el nombre completo en minúsculas y sin espacios. Por ejemplo, si el nombre completo es "Manuel Navarro", la contraseña será "manuelnavarro". Posteriormente, el usuario podrá modificar estos datos según sus preferencias dentro de la aplicación.',
+                      ),
+                      actions: [
+                        TextButton(
+                          child: Text('Entendido'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
-            );
-          },
-        ),
-        SizedBox(height: size.height * 0.02),
+            ),
+            SizedBox(height: size.height * 0.02),
             Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
@@ -127,21 +126,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         const SizedBox(height: 16),
                         TextField(
-  controller: emailController,
-  decoration: InputDecoration(
-    labelText: localizations.translate('emailLabel'),
-    border: const OutlineInputBorder(),
-    errorText: mailError.isEmpty ? null : mailError,
-  ),
-  keyboardType: TextInputType.emailAddress,
-  onChanged: (value) {
-    setState(() {
-      mailError = !emailRegex.hasMatch(emailController.text.trim())
-          ? localizations.translate('invalidEmail')
-          : '';
-    });
-  },
-),
+                          controller: emailController,
+                          decoration: InputDecoration(
+                            labelText: localizations.translate('emailLabel'),
+                            border: const OutlineInputBorder(),
+                            errorText: mailError.isEmpty ? null : mailError,
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (value) {
+                            setState(() {
+                              mailError = !emailRegex
+                                      .hasMatch(emailController.text.trim())
+                                  ? localizations.translate('invalidEmail')
+                                  : '';
+                            });
+                          },
+                        ),
                         const SizedBox(height: 16),
                         FilledButton(
                           onPressed: () async {
@@ -153,9 +153,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             final fullname = fullnameController.text.trim();
                             final email = emailController.text.trim();
 
-                            if (fullname.isEmpty ||
-                                email.isEmpty
-                               ) {
+                            if (fullname.isEmpty || email.isEmpty) {
                               setState(() {
                                 isLoading = false;
                               });
@@ -273,7 +271,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 SnackBar(
                                   content: Text(localizations.translate(
                                       'registrationError',
-                                      params: {'error': e.message })),
+                                      params: {'error': e.message})),
                                   backgroundColor: Colors.red,
                                 ),
                               );
@@ -294,15 +292,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             }
                           },
                           child: isLoading
-                                  ? const CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.white),
-                                    )
-                                  : Text(AppLocalizations.of(context)
-                                      .translate('registerUserButton')),
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : Text(AppLocalizations.of(context)
+                                  .translate('registerUserButton')),
                         ),
-                   
-        
                       ],
                     ),
                   ),

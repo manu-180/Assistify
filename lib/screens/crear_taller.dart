@@ -23,8 +23,6 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
 
   final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
-   
-
   final List<String> rubros = [
     "Clases de cerámica",
     "Clases de pintura",
@@ -78,41 +76,38 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
     });
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
-
     final color = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
       appBar: AppBar(
-  automaticallyImplyLeading: false,
-  iconTheme: const IconThemeData(
-    color: Colors.white,
-  ),
-  toolbarHeight: kToolbarHeight * 1.1,
-  title: GestureDetector(
-    child: Row(
-      children: [
-        Text(
-          AppLocalizations.of(context).translate('appTitle'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(width: 7),
-        FaIcon(
-          FontAwesomeIcons.fileLines,
+        automaticallyImplyLeading: false,
+        iconTheme: const IconThemeData(
           color: Colors.white,
-          size: size.width * 0.055,
         ),
-      ],
-    ),
-    onTap: () => context.go('/'),
-  ),
-  backgroundColor: color.primary,
-),
-
+        toolbarHeight: kToolbarHeight * 1.1,
+        title: GestureDetector(
+          child: Row(
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('appTitle'),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 7),
+              FaIcon(
+                FontAwesomeIcons.fileLines,
+                color: Colors.white,
+                size: size.width * 0.055,
+              ),
+            ],
+          ),
+          onTap: () => context.go('/'),
+        ),
+        backgroundColor: color.primary,
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -130,17 +125,17 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                       context: context,
                       builder: (BuildContext context) {
                         return AlertDialog(
-                          title: Text(
-                              AppLocalizations.of(context).translate('infoTitle')),
+                          title: Text(AppLocalizations.of(context)
+                              .translate('infoTitle')),
                           content: SingleChildScrollView(
-                            child: Text(
-                                AppLocalizations.of(context).translate('infoContent')),
+                            child: Text(AppLocalizations.of(context)
+                                .translate('infoContent')),
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.of(context).pop(),
-                              child: Text(
-                                  AppLocalizations.of(context).translate('closeButton')),
+                              child: Text(AppLocalizations.of(context)
+                                  .translate('closeButton')),
                             ),
                           ],
                         );
@@ -148,7 +143,8 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                     );
                   },
                   icon: const Icon(Icons.info_outline), // Icono en el botón
-                  label: Text(AppLocalizations.of(context).translate('moreInfoButton')),
+                  label: Text(
+                      AppLocalizations.of(context).translate('moreInfoButton')),
                 ),
                 SizedBox(
                   height: size.width * 0.05,
@@ -194,7 +190,6 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        
                         TextField(
                           controller: tallerController,
                           decoration: InputDecoration(
@@ -215,46 +210,50 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                         ),
                         const SizedBox(height: 16),
                         DropdownButtonFormField<String>(
-  decoration: InputDecoration(
-    labelText: "Seleccione su rubro",
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(4.0), // Bordes redondeados
-      borderSide: const BorderSide(
-        color: Colors.black, // Color del marco
-        width: 1.0, // Grosor del marco
-      ),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(4.0), // Bordes redondeados
-      borderSide: const BorderSide(
-        color: Colors.black, // Color del marco cuando no está seleccionado
-        width: 1.0,
-      ),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(4.0), // Bordes redondeados
-      borderSide:  BorderSide(
-        color: color.primary, // Color del marco cuando está enfocado
-        width: 1.5,
-      ),
-    ),
-  ),
-  value: selectedRubro,
-  onChanged: (String? newValue) {
-    setState(() {
-      selectedRubro = newValue;
-    });
-  },
-  items: rubros.map<DropdownMenuItem<String>>((String rubro) {
-    return DropdownMenuItem<String>(
-      value: rubro,
-      child: Text(rubro),
-    );
-  }).toList(),
-),
-const SizedBox(height: 16),
-
-      
+                          decoration: InputDecoration(
+                            labelText: "Seleccione su rubro",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                  4.0), // Bordes redondeados
+                              borderSide: const BorderSide(
+                                color: Colors.black, // Color del marco
+                                width: 1.0, // Grosor del marco
+                              ),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                  4.0), // Bordes redondeados
+                              borderSide: const BorderSide(
+                                color: Colors
+                                    .black, // Color del marco cuando no está seleccionado
+                                width: 1.0,
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                  4.0), // Bordes redondeados
+                              borderSide: BorderSide(
+                                color: color
+                                    .primary, // Color del marco cuando está enfocado
+                                width: 1.5,
+                              ),
+                            ),
+                          ),
+                          value: selectedRubro,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              selectedRubro = newValue;
+                            });
+                          },
+                          items: rubros
+                              .map<DropdownMenuItem<String>>((String rubro) {
+                            return DropdownMenuItem<String>(
+                              value: rubro,
+                              child: Text(rubro),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
                         TextField(
                           controller: passwordController,
                           decoration: InputDecoration(
@@ -336,9 +335,10 @@ const SizedBox(height: 16),
                                             .showSnackBar(SnackBar(
                                           content: Text(
                                             AppLocalizations.of(context)
-                                                .translate('allFieldsRequiredError'),
-                                            style:
-                                                const TextStyle(color: Colors.white),
+                                                .translate(
+                                                    'allFieldsRequiredError'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
                                           backgroundColor: Colors.red,
                                         ));
@@ -353,9 +353,10 @@ const SizedBox(height: 16),
                                             .showSnackBar(SnackBar(
                                           content: Text(
                                             AppLocalizations.of(context)
-                                                .translate('passwordLengthError'),
-                                            style:
-                                                const TextStyle(color: Colors.white),
+                                                .translate(
+                                                    'passwordLengthError'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
                                           backgroundColor: Colors.red,
                                         ));
@@ -370,9 +371,10 @@ const SizedBox(height: 16),
                                             .showSnackBar(SnackBar(
                                           content: Text(
                                             AppLocalizations.of(context)
-                                                .translate('passwordMismatchError'),
-                                            style:
-                                                const TextStyle(color: Colors.white),
+                                                .translate(
+                                                    'passwordMismatchError'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
                                           ),
                                           backgroundColor: Colors.red,
                                         ));
@@ -390,8 +392,6 @@ const SizedBox(height: 16),
                                           },
                                         );
 
-                                      
-
                                         await supabase.from('usuarios').insert({
                                           'id': await GenerarId()
                                               .generarIdUsuario(),
@@ -408,13 +408,16 @@ const SizedBox(height: 16),
                                           "admin": true,
                                           "created_at":
                                               DateTime.now().toIso8601String(),
-                                              "rubro": selectedRubro,
+                                          "rubro": selectedRubro,
                                         });
 
                                         crearTablaTaller(
                                             Capitalize().capitalize(taller));
 
-                                        EnviarWpp().sendWhatsAppMessage("HXce5db05ee13a1c05f412591b9747ff41", 'whatsapp:+5491134272488', [fullname, "", "", "", ""]);
+                                        EnviarWpp().sendWhatsAppMessage(
+                                            "HXce5db05ee13a1c05f412591b9747ff41",
+                                            'whatsapp:+5491134272488',
+                                            [fullname, "", "", "", ""]);
                                         if (context.mounted) {
                                           context.go("/");
                                         }
@@ -427,7 +430,8 @@ const SizedBox(height: 16),
                                               .showSnackBar(SnackBar(
                                             content: Text(
                                               AppLocalizations.of(context)
-                                                  .translate('workshopCreatedSuccess'),
+                                                  .translate(
+                                                      'workshopCreatedSuccess'),
                                               style: const TextStyle(
                                                   color: Colors.white),
                                             ),
@@ -443,8 +447,11 @@ const SizedBox(height: 16),
                                               .showSnackBar(SnackBar(
                                             content: Text(
                                               AppLocalizations.of(context)
-                                                  .translate('workshopCreationError',
-                                                      params: {'error': e.toString()}),
+                                                  .translate(
+                                                      'workshopCreationError',
+                                                      params: {
+                                                    'error': e.toString()
+                                                  }),
                                               style: const TextStyle(
                                                   color: Colors.white),
                                             ),
@@ -475,5 +482,3 @@ const SizedBox(height: 16),
     );
   }
 }
-
-

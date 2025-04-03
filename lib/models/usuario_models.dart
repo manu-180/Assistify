@@ -11,7 +11,6 @@ class UsuarioModels {
   final DateTime createdAt;
   final String rubro;
 
-
   UsuarioModels({
     required this.id,
     required this.usuario,
@@ -40,7 +39,6 @@ class UsuarioModels {
       admin: map['admin'],
       createdAt: DateTime.parse(map['created_at']),
       rubro: map['rubro'],
-
     );
   }
 

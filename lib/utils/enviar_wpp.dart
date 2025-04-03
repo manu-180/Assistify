@@ -3,15 +3,14 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class EnviarWpp {
-  void sendWhatsAppMessage(String contentSid, String num, List<String> parameters) async {
+  void sendWhatsAppMessage(
+      String contentSid, String num, List<String> parameters) async {
     // Cargar variables de entorno
     await dotenv.load(fileName: ".env");
 
     var apiKeySid = dotenv.env['API_KEY_SID'] ?? '';
     var apiKeySecret = dotenv.env['API_KEY_SECRET'] ?? '';
     var accountSid = dotenv.env['ACCOUNT_SID'] ?? '';
-
-  
 
     final uri = Uri.parse(
         'https://api.twilio.com/2010-04-01/Accounts/$accountSid/Messages.json');
@@ -32,23 +31,19 @@ class EnviarWpp {
       }),
     };
 
-
     // Hacer la solicitud HTTP POST
     await http.post(
       uri,
       headers: {
-        'Authorization': 'Basic ${base64Encode(utf8.encode('$apiKeySid:$apiKeySecret'))}',
+        'Authorization':
+            'Basic ${base64Encode(utf8.encode('$apiKeySid:$apiKeySecret'))}',
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: body,
     );
 
     // Imprimir el estado de la respuesta
-   
 
     // Verificar si la solicitud fue exitosa
-  
   }
 }
-
-

@@ -78,10 +78,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size(size.width * 0.8, 50),
-                                side: BorderSide(color: Colors.white), // Borde blanco
+                                side: BorderSide(
+                                    color: Colors.white), // Borde blanco
                               ),
-                              child: const Text(
-                                  'Crea tu cuenta',
+                              child: const Text('Crea tu cuenta',
                                   style: TextStyle(color: Colors.white)),
                             ),
                             SizedBox(height: size.width * 0.04),
@@ -91,7 +91,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size(size.width * 0.8, 50),
-                                side: BorderSide(color: Colors.white), // Borde blanco
+                                side: BorderSide(
+                                    color: Colors.white), // Borde blanco
                               ),
                               child: const Text(
                                 'Inicia sesión',
@@ -119,7 +120,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size(size.width * 0.8, 50),
-                            side: BorderSide(color: Colors.white), // Borde blanco
+                            side:
+                                BorderSide(color: Colors.white), // Borde blanco
                           ),
                           child: const Text(
                             'Inicia sesión',

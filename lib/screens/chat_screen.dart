@@ -16,7 +16,8 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
-  List<Map<String, String>> _messages = []; // Solo almacena los mensajes visibles en la UI
+  List<Map<String, String>> _messages =
+      []; // Solo almacena los mensajes visibles en la UI
   bool _isLoading = false;
 
   final String? openAiApiKey = dotenv.env['OPEN_AI_KEY'];
@@ -28,10 +29,10 @@ class ChatScreenState extends State<ChatScreen> {
     // Mensaje de bienvenida del bot
     _messages.add({
       "role": "assistant",
-      "content": "¡Hola! Mi nombre es AssistifyBot. Puedo brindarte cualquier información de la aplicación de forma rápida y precisa. ¿En qué puedo ayudarte?"
+      "content":
+          "¡Hola! Mi nombre es AssistifyBot. Puedo brindarte cualquier información de la aplicación de forma rápida y precisa. ¿En qué puedo ayudarte?"
     });
   }
-
 
   Future<void> _sendMessage(String message) async {
     if (message.isEmpty) return;
@@ -116,7 +117,8 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
         },
         body: jsonEncode({
           "model": "gpt-3.5-turbo",
-          "messages": conversation, // Enviamos la conversación con el contexto oculto
+          "messages":
+              conversation, // Enviamos la conversación con el contexto oculto
           "max_tokens": 200,
         }),
       );
@@ -176,11 +178,11 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
 
   @override
   Widget build(BuildContext context) {
-
     final color = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
+      appBar:
+          ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
       body: Column(
         children: [
           SizedBox(height: 30),
@@ -192,16 +194,20 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
                 final isUser = message["role"] == "user";
                 return Container(
                   margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                  alignment:
+                      isUser ? Alignment.centerRight : Alignment.centerLeft,
                   child: Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: isUser ? color.primary.withAlpha(180) : Colors.grey[300],
+                      color: isUser
+                          ? color.primary.withAlpha(180)
+                          : Colors.grey[300],
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
                       cleanResponse(message["content"]!.trim()),
-                      style: TextStyle(color: isUser ? Colors.white : Colors.black),
+                      style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black),
                       textAlign: TextAlign.left,
                       softWrap: true,
                     ),

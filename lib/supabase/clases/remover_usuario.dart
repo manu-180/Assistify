@@ -53,7 +53,7 @@ class RemoverUsuario {
 
             ModificarCredito().removerCreditoUsuario(userEspera);
 
-            return; 
+            return;
           }
         }
       }
@@ -66,24 +66,45 @@ class RemoverUsuario {
           ModificarAlertTrigger().agregarAlertTrigger(user);
         }
 
-
         EnviarWpp().sendWhatsAppMessage(
           "HXc3a9c584ef95fdb872121c9cb8a09fd1",
           'whatsapp:+5491132820164',
-            Calcular24hs().esMayorA24Horas(clase.fecha, clase.hora)
-                ? [user, clase.dia, clase.fecha, clase.hora, "Se genero un credito para recuperar la clase"]
-                : [user, clase.dia, clase.fecha, clase.hora, "Cancelo con menos de 24 horas de anticipacion, no podra recuperar la clase"],
-            );
+          Calcular24hs().esMayorA24Horas(clase.fecha, clase.hora)
+              ? [
+                  user,
+                  clase.dia,
+                  clase.fecha,
+                  clase.hora,
+                  "Se genero un credito para recuperar la clase"
+                ]
+              : [
+                  user,
+                  clase.dia,
+                  clase.fecha,
+                  clase.hora,
+                  "Cancelo con menos de 24 horas de anticipacion, no podra recuperar la clase"
+                ],
+        );
         EnviarWpp().sendWhatsAppMessage(
           "HXc3a9c584ef95fdb872121c9cb8a09fd1",
           'whatsapp:+5491134272488',
-            Calcular24hs().esMayorA24Horas(clase.fecha, clase.hora)
-                ? [user, clase.dia, clase.fecha, clase.hora, "Se genero un credito para recuperar la clase"]
-                : [user, clase.dia, clase.fecha, clase.hora, "Cancelo con menos de 24 horas de anticipacion, no podra recuperar la clase"],
-            );
-
-            
-      } 
+          Calcular24hs().esMayorA24Horas(clase.fecha, clase.hora)
+              ? [
+                  user,
+                  clase.dia,
+                  clase.fecha,
+                  clase.hora,
+                  "Se genero un credito para recuperar la clase"
+                ]
+              : [
+                  user,
+                  clase.dia,
+                  clase.fecha,
+                  clase.hora,
+                  "Cancelo con menos de 24 horas de anticipacion, no podra recuperar la clase"
+                ],
+        );
+      }
     }
   }
 
@@ -111,7 +132,6 @@ class RemoverUsuario {
               .eq('id', item.id);
 
           ModificarLugarDisponible().agregarLugarDisponible(item.id);
-          
 
           if (callback != null) {
             callback(item);
@@ -119,10 +139,6 @@ class RemoverUsuario {
         }
       }
     }
-
-    
-
-
   }
 
   Future<void> removerUsuarioDeListaDeEspera(int idClase, String user) async {
@@ -140,19 +156,15 @@ class RemoverUsuario {
       await supabaseClient
           .from(taller)
           .update({"espera": clase.espera}).eq('id', idClase);
-      
-
 
       EnviarWpp().sendWhatsAppMessage(
           "HX28a321ebed0fb2ed0b0c2c5ac524748a",
           'whatsapp:+5491132820164',
-          [user, clase.dia, clase.fecha, clase.hora, ""]
-            );
-            EnviarWpp().sendWhatsAppMessage(
+          [user, clase.dia, clase.fecha, clase.hora, ""]);
+      EnviarWpp().sendWhatsAppMessage(
           "HX28a321ebed0fb2ed0b0c2c5ac524748a",
           'whatsapp:+5491134272488',
-          [user, clase.dia, clase.fecha, clase.hora, ""]
-            );
+          [user, clase.dia, clase.fecha, clase.hora, ""]);
     }
   }
 }

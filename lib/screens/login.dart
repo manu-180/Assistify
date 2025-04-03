@@ -79,44 +79,45 @@ class LoginState extends State<Login> {
 
     return Scaffold(
       appBar: AppBar(
-  automaticallyImplyLeading: false,
-  iconTheme: const IconThemeData(
-    color: Colors.white,
-  ),
-  toolbarHeight: kToolbarHeight * 1.1, 
-  title: GestureDetector(
-    child: Row(
-      children: [
-        Text(
-          AppLocalizations.of(context).translate('appTitle'),
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(width: 7),
-        FaIcon(
-          FontAwesomeIcons.fileLines,
+        automaticallyImplyLeading: false,
+        iconTheme: const IconThemeData(
           color: Colors.white,
-          size: size.width * 0.055,
         ),
-      ],
-    ),
-    onTap: () => context.go('/'),
-  ),
-  backgroundColor: color.primary,
-),
-
+        toolbarHeight: kToolbarHeight * 1.1,
+        title: GestureDetector(
+          child: Row(
+            children: [
+              Text(
+                AppLocalizations.of(context).translate('appTitle'),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 7),
+              FaIcon(
+                FontAwesomeIcons.fileLines,
+                color: Colors.white,
+                size: size.width * 0.055,
+              ),
+            ],
+          ),
+          onTap: () => context.go('/'),
+        ),
+        backgroundColor: color.primary,
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(size.width * 0.04, size.width * 0.08,size.width * 0.04,0),
+                padding: EdgeInsets.fromLTRB(
+                    size.width * 0.04, size.width * 0.08, size.width * 0.04, 0),
                 child: Text(
                   localizations.translate('homeScreenIntro'),
                   style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: color.primary,
-                          ),
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: color.primary,
+                  ),
                 ),
               ),
               SizedBox(height: size.height * 0.02),
@@ -183,7 +184,7 @@ class LoginState extends State<Login> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                             ElevatedButton(
+                            ElevatedButton(
                                 onPressed: () => context.go("/"),
                                 child: Text(AppLocalizations.of(context)
                                     .translate('goBackButton'))),
@@ -249,10 +250,9 @@ class LoginState extends State<Login> {
                                         .hideCurrentSnackBar();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text(localizations
-                                            .translate('loginError', params: {
-                                          'error': e.message 
-                                        })),
+                                        content: Text(localizations.translate(
+                                            'loginError',
+                                            params: {'error': e.message})),
                                         backgroundColor: Colors.red,
                                       ),
                                     );

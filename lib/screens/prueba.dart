@@ -14,9 +14,7 @@ class Prueba extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    
 
-    
     return FutureBuilder(
       future: _loadData(context),
       builder: (context, snapshot) {
@@ -37,7 +35,8 @@ class Prueba extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     translatedText,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -62,14 +61,18 @@ class Prueba extends StatelessWidget {
   Future<void> corregirDia() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
-    final clases = await ObtenerTotalInfo(supabase: supabase, clasesTable: taller, usuariosTable: "usuarios").obtenerClases();
+    final clases = await ObtenerTotalInfo(
+            supabase: supabase, clasesTable: taller, usuariosTable: "usuarios")
+        .obtenerClases();
 
-    for( final clase in clases) {
-      if(clase.dia == "miercoles"){
-
-      await supabase.from(taller).update({'dia': "miércoles"}).eq('id', clase.id);}
+    for (final clase in clases) {
+      if (clase.dia == "miercoles") {
+        await supabase
+            .from(taller)
+            .update({'dia': "miércoles"}).eq('id', clase.id);
+      }
     }
-}
+  }
 
   void _mostrarAdvertencia(BuildContext context, dynamic taller) {
     showDialog(
@@ -95,7 +98,8 @@ class Prueba extends StatelessWidget {
                 corregirDia();
 
                 ResetClases().reset();
-                ActualizarFechasDatabase().actualizarClasesAlNuevoMes(taller, 2025);
+                ActualizarFechasDatabase()
+                    .actualizarClasesAlNuevoMes(taller, 2025);
                 await Future.delayed(const Duration(seconds: 2));
                 await ActualizarSemanas().actualizarSemana();
               },

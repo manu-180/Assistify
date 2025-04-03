@@ -117,53 +117,52 @@ class CustomAppBarState extends State<CustomAppBar> {
     final size = MediaQuery.of(context).size;
     final user = Supabase.instance.client.auth.currentUser;
 
-final adminRoutes = [
-  {
-    'value': '/turnos/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('classesLabel'),
-  },
-  {
-    'value': '/misclases/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('myClassesLabel'),
-  },
-  {
-    'value': '/gestionhorarios/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
-  },
-  {
-    'value': '/gestionclases/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('manageClassesLabel'),
-  },
-  {
-    'value': '/usuarios/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('studentsLabel'),
-  },
-  {
-    'value': '/configuracion/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('settingsLabel'),
-  },
-  // if (user?.id == '668da4f9-3487-42c5-8f28-fe2da23806d4') 
-    {
-      'value': '/prueba',
-      'label': AppLocalizations.of(context).translate('testLabel'),
-    },
-];
+    final adminRoutes = [
+      {
+        'value': '/turnos/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('classesLabel'),
+      },
+      {
+        'value': '/misclases/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('myClassesLabel'),
+      },
+      {
+        'value': '/gestionhorarios/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
+      },
+      {
+        'value': '/gestionclases/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('manageClassesLabel'),
+      },
+      {
+        'value': '/usuarios/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('studentsLabel'),
+      },
+      {
+        'value': '/configuracion/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('settingsLabel'),
+      },
+      // if (user?.id == '668da4f9-3487-42c5-8f28-fe2da23806d4')
+      {
+        'value': '/prueba',
+        'label': AppLocalizations.of(context).translate('testLabel'),
+      },
+    ];
 
-final userRoutes = [
-  {
-    'value': '/turnos/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('classesLabel'),
-  },
-  {
-    'value': '/misclases/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('myClassesLabel'),
-  },
-  {
-    'value': '/configuracion/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('settingsLabel'),
-  },
-];
-
+    final userRoutes = [
+      {
+        'value': '/turnos/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('classesLabel'),
+      },
+      {
+        'value': '/misclases/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('myClassesLabel'),
+      },
+      {
+        'value': '/configuracion/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('settingsLabel'),
+      },
+    ];
 
     final menuItems = (isAdmin) ? adminRoutes : userRoutes;
 
@@ -178,15 +177,20 @@ final userRoutes = [
               context.push("/home/${taller ?? ''}");
             },
             child: Row(
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('appTitle'),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-              SizedBox(width: 7),
-              FaIcon(FontAwesomeIcons.fileLines, color: Colors.white, size: size.width * 0.055,),
-            ],
-          ),
+              children: [
+                Text(
+                  AppLocalizations.of(context).translate('appTitle'),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w500),
+                ),
+                SizedBox(width: 7),
+                FaIcon(
+                  FontAwesomeIcons.fileLines,
+                  color: Colors.white,
+                  size: size.width * 0.055,
+                ),
+              ],
+            ),
           ),
           SizedBox(width: size.width * 0.02),
           PopupMenuButton<String>(

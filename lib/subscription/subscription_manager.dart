@@ -72,9 +72,8 @@ class SubscriptionManager {
 
     if (currentUser != null) {
       await supabase
-      .from('subscriptions')
-      .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);  
-      
+          .from('subscriptions')
+          .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
     }
   }
 

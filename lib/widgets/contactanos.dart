@@ -14,18 +14,18 @@ class Contactanos extends StatefulWidget {
   State<Contactanos> createState() => _ContactanosState();
 }
 
-class _ContactanosState extends State<Contactanos> with TickerProviderStateMixin {
-
-  
+class _ContactanosState extends State<Contactanos>
+    with TickerProviderStateMixin {
   bool _isExpanded = false;
   bool _showChatBot = false;
   final TextEditingController _controller = TextEditingController();
-  List<Map<String, String>> _messages = []; // Solo almacena los mensajes visibles en la UI
+  List<Map<String, String>> _messages =
+      []; // Solo almacena los mensajes visibles en la UI
   bool _isLoading = false;
 
   final String? openAiApiKey = dotenv.env['OPEN_AI_KEY'];
   final String apiUrl = "https://api.openai.com/v1/chat/completions";
-  
+
   get http => null;
 
   Future<void> _sendMessage(String message) async {
@@ -111,7 +111,8 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
         },
         body: jsonEncode({
           "model": "gpt-3.5-turbo",
-          "messages": conversation, // Enviamos la conversación con el contexto oculto
+          "messages":
+              conversation, // Enviamos la conversación con el contexto oculto
           "max_tokens": 200,
         }),
       );
@@ -306,59 +307,69 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
                     padding: const EdgeInsets.all(16),
                     child: _showChatBot
                         ? Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-                final isUser = message["role"] == "user";
-                return Container(
-                  margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                  alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isUser ? Colors.blue : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Text(
-                      cleanResponse(message["content"]!.trim()),
-                      style: TextStyle(color: isUser ? Colors.white : Colors.black),
-                      textAlign: TextAlign.left,
-                      softWrap: true,
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          if (_isLoading) CircularProgressIndicator(),
-          Padding(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: InputDecoration(
-                      hintText: "Escribe un mensaje...",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  onPressed: () {
-                    _sendMessage(_controller.text);
-                    _controller.clear();
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
-      )
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: _messages.length,
+                                  itemBuilder: (context, index) {
+                                    final message = _messages[index];
+                                    final isUser = message["role"] == "user";
+                                    return Container(
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 10),
+                                      alignment: isUser
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        decoration: BoxDecoration(
+                                          color: isUser
+                                              ? Colors.blue
+                                              : Colors.grey[300],
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          cleanResponse(
+                                              message["content"]!.trim()),
+                                          style: TextStyle(
+                                              color: isUser
+                                                  ? Colors.white
+                                                  : Colors.black),
+                                          textAlign: TextAlign.left,
+                                          softWrap: true,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              if (_isLoading) CircularProgressIndicator(),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _controller,
+                                        decoration: InputDecoration(
+                                          hintText: "Escribe un mensaje...",
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.send),
+                                      onPressed: () {
+                                        _sendMessage(_controller.text);
+                                        _controller.clear();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )
                         : const SizedBox.shrink(),
                   ),
                 ),
@@ -376,7 +387,9 @@ Assistify tiene tres secciones principales: **Clases**, **Mis Clases** y **Confi
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            _isExpanded ? Icons.close : Icons.contact_page_outlined,
+                            _isExpanded
+                                ? Icons.close
+                                : Icons.contact_page_outlined,
                             color: Theme.of(context).primaryColor,
                           ),
                           const SizedBox(width: 5),

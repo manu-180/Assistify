@@ -155,7 +155,8 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
 
   String _obtenerDia(String? fecha) {
     if (fecha == null || fecha.isEmpty) return '';
-    return DiaConFecha().obtenerDiaDeLaSemana(fecha, AppLocalizations.of(context));
+    return DiaConFecha()
+        .obtenerDiaDeLaSemana(fecha, AppLocalizations.of(context));
   }
 
   Future<void> mostrarDialogo(
@@ -217,14 +218,16 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                             ),
                           )
                         : Center(
-                            child: Text(localizations.translate('noUsersFound')),
+                            child:
+                                Text(localizations.translate('noUsersFound')),
                           ),
                     const SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(localizations.translate(
-                            tipoAccion == "insertar" ? 'insertX4' : 'removeX4')),
+                        Text(localizations.translate(tipoAccion == "insertar"
+                            ? 'insertX4'
+                            : 'removeX4')),
                         Switch(
                           value: insertarX4,
                           onChanged: (value) {
@@ -249,7 +252,7 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                               if (insertarX4) {
                                 await AgregarUsuario(supabase)
                                     .agregarUsuarioEnCuatroClases(
-                                      context,
+                                  context,
                                   clase,
                                   usuarioSeleccionado,
                                   (ClaseModels claseActualizada) {
@@ -276,15 +279,23 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                   },
                                 );
                                 EnviarWpp().sendWhatsAppMessage(
-  "HX6dad986ed219654d62aed35763d10ccb",
-  'whatsapp:+5491134272488',
-  [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""] 
-);
-EnviarWpp().sendWhatsAppMessage(
-  "HX6dad986ed219654d62aed35763d10ccb",
-  'whatsapp:+5491132820164',
-  [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""] 
-);
+                                    "HX6dad986ed219654d62aed35763d10ccb",
+                                    'whatsapp:+5491134272488', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
+                                EnviarWpp().sendWhatsAppMessage(
+                                    "HX6dad986ed219654d62aed35763d10ccb",
+                                    'whatsapp:+5491132820164', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
                               } else {
                                 await AgregarUsuario(supabase)
                                     .agregarUsuarioAClase(
@@ -294,15 +305,23 @@ EnviarWpp().sendWhatsAppMessage(
                                   clase,
                                 );
                                 EnviarWpp().sendWhatsAppMessage(
-              "HX13d84cd6816c60f21f172fe42bb3b0bb",
-              'whatsapp:+5491132820164',
-              [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""]
-                );
-                EnviarWpp().sendWhatsAppMessage(
-              "HX13d84cd6816c60f21f172fe42bb3b0bb",
-              'whatsapp:+5491134272488',
-              [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""]
-                );
+                                    "HX13d84cd6816c60f21f172fe42bb3b0bb",
+                                    'whatsapp:+5491132820164', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
+                                EnviarWpp().sendWhatsAppMessage(
+                                    "HX13d84cd6816c60f21f172fe42bb3b0bb",
+                                    'whatsapp:+5491134272488', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
                                 if (mounted) {
                                   setState(() {
                                     clase.mails.add(usuarioSeleccionado);
@@ -339,15 +358,15 @@ EnviarWpp().sendWhatsAppMessage(
                                   },
                                 );
                                 EnviarWpp().sendWhatsAppMessage(
-      "HX5a0f97cd3b0363325e3b1cc6c4d6a372",
-      'whatsapp:+5491132820164',
-      [usuarioSeleccionado,clase.dia,"","",""],
-    );
-    EnviarWpp().sendWhatsAppMessage(
-      "HX5a0f97cd3b0363325e3b1cc6c4d6a372",
-      'whatsapp:+5491134272488',
-      [usuarioSeleccionado,clase.dia,"","",""],
-    );
+                                  "HX5a0f97cd3b0363325e3b1cc6c4d6a372",
+                                  'whatsapp:+5491132820164',
+                                  [usuarioSeleccionado, clase.dia, "", "", ""],
+                                );
+                                EnviarWpp().sendWhatsAppMessage(
+                                  "HX5a0f97cd3b0363325e3b1cc6c4d6a372",
+                                  'whatsapp:+5491134272488',
+                                  [usuarioSeleccionado, clase.dia, "", "", ""],
+                                );
                               } else {
                                 await RemoverUsuario(supabase)
                                     .removerUsuarioDeClase(
@@ -356,15 +375,23 @@ EnviarWpp().sendWhatsAppMessage(
                                   true,
                                 );
                                 EnviarWpp().sendWhatsAppMessage(
-          "HXc0f22718dded5d710b659d89b4117bb1",
-          'whatsapp:+5491132820164',
-          [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""]
-            );
-        EnviarWpp().sendWhatsAppMessage(
-          "HXc0f22718dded5d710b659d89b4117bb1",
-          'whatsapp:+5491134272488',
-          [usuarioSeleccionado, clase.dia, clase.fecha, clase.hora, ""]
-            );
+                                    "HXc0f22718dded5d710b659d89b4117bb1",
+                                    'whatsapp:+5491132820164', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
+                                EnviarWpp().sendWhatsAppMessage(
+                                    "HXc0f22718dded5d710b659d89b4117bb1",
+                                    'whatsapp:+5491134272488', [
+                                  usuarioSeleccionado,
+                                  clase.dia,
+                                  clase.fecha,
+                                  clase.hora,
+                                  ""
+                                ]);
                                 if (mounted) {
                                   setState(() {
                                     clase.mails.remove(usuarioSeleccionado);
@@ -374,7 +401,9 @@ EnviarWpp().sendWhatsAppMessage(
                             }
                           },
                           child: Text(localizations.translate(
-                              tipoAccion == "insertar" ? 'addButton' : 'removeButton')),
+                              tipoAccion == "insertar"
+                                  ? 'addButton'
+                                  : 'removeButton')),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -490,7 +519,8 @@ EnviarWpp().sendWhatsAppMessage(
                                               ),
                                               const SizedBox(width: 10),
                                               Text(
-                                                localizations.translate('studentsLabel'),
+                                                localizations
+                                                    .translate('studentsLabel'),
                                                 style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -519,12 +549,14 @@ EnviarWpp().sendWhatsAppMessage(
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.zero, 
-  ),
+                                                  padding: EdgeInsets.zero,
+                                                ),
                                                 child: Text(
-                                                  localizations.translate('addUserButton'),
+                                                  localizations.translate(
+                                                      'addUserButton'),
                                                   style: TextStyle(
-                                                    fontSize: size.width * 0.025,
+                                                    fontSize:
+                                                        size.width * 0.025,
                                                   ),
                                                 ),
                                               ),
@@ -542,12 +574,14 @@ EnviarWpp().sendWhatsAppMessage(
                                                   );
                                                 },
                                                 style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.zero, 
-  ),
+                                                  padding: EdgeInsets.zero,
+                                                ),
                                                 child: Text(
-                                                  localizations.translate('removeUserButton'),
+                                                  localizations.translate(
+                                                      'removeUserButton'),
                                                   style: TextStyle(
-                                                    fontSize: size.width * 0.025,
+                                                    fontSize:
+                                                        size.width * 0.025,
                                                   ),
                                                 ),
                                               ),
@@ -562,39 +596,38 @@ EnviarWpp().sendWhatsAppMessage(
                             },
                           )
                         : Center(
-    child: Padding(
-      padding: EdgeInsets.only(top: size.width * 0.2),
-      child: SizedBox(
-        width: size.width * 0.65,
-        child: Column(
-          children: [
-            Icon(
-              Icons.info,
-              color: color,
-              size: size.width * 0.12,
-            ),
-            SizedBox(height: size.width * 0.02),
-            // TEXTO cuando no hay clases
-            Text(
-              AppLocalizations.of(context).translate(
-                'noClassesLoaded',
-                params: {
-                  'day': _obtenerDia(fechaSeleccionada),
-                  'date': diaMes,
-                },
-              ),
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                color: colors.primary,
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  ),
-
+                            child: Padding(
+                              padding: EdgeInsets.only(top: size.width * 0.2),
+                              child: SizedBox(
+                                width: size.width * 0.65,
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.info,
+                                      color: color,
+                                      size: size.width * 0.12,
+                                    ),
+                                    SizedBox(height: size.width * 0.02),
+                                    // TEXTO cuando no hay clases
+                                    Text(
+                                      AppLocalizations.of(context).translate(
+                                        'noClassesLoaded',
+                                        params: {
+                                          'day': _obtenerDia(fechaSeleccionada),
+                                          'date': diaMes,
+                                        },
+                                      ),
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold,
+                                        color: colors.primary,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                   ),
               ],
             ),

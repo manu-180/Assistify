@@ -4,7 +4,9 @@ import 'package:taller_ceramica/l10n/app_localizations.dart'; // Importar traduc
 class DiaConFecha {
   String obtenerDiaDeLaSemana(String? fecha, AppLocalizations localizations) {
     // Verificar si la fecha es nula o no tiene el formato esperado
-    if (fecha == null || fecha.isEmpty || fecha == localizations.translate('selectDate')) {
+    if (fecha == null ||
+        fecha.isEmpty ||
+        fecha == localizations.translate('selectDate')) {
       return localizations.translate('selectDate');
     }
 

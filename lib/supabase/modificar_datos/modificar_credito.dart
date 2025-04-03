@@ -12,7 +12,7 @@ class ModificarCredito {
 
     for (final usuario in data) {
       if (usuario.fullname == user) {
-        var creditosActualmente = usuario.clasesDisponibles ;
+        var creditosActualmente = usuario.clasesDisponibles;
         creditosActualmente += 1;
         await supabase.from('usuarios').update(
             {'clases_disponibles': creditosActualmente}).eq('id', usuario.id);
@@ -32,7 +32,7 @@ class ModificarCredito {
 
     for (final usuario in data) {
       if (usuario.fullname == user) {
-        var creditosActualmente = usuario.clasesDisponibles ;
+        var creditosActualmente = usuario.clasesDisponibles;
         creditosActualmente -= 1;
         if (usuario.clasesDisponibles > 0) {
           await supabase.from('usuarios').update(

@@ -1,7 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 
-
 class ObtenerLugarDisponible {
   Future<int?> obtenerLugarDisponible(int id) async {
     final supabase = Supabase.instance.client;
@@ -15,10 +14,10 @@ class ObtenerLugarDisponible {
         .single(); // Obtiene un solo resultado
 
     if (response['lugar_disponible'] != null) {
-      return response['lugar_disponible'] as int; // Devuelve el número de lugares disponibles
+      return response['lugar_disponible']
+          as int; // Devuelve el número de lugares disponibles
     }
 
     return null; // En caso de que no se encuentre el dato
   }
 }
-

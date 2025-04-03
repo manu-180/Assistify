@@ -114,8 +114,5 @@ final appRouter = GoRouter(
       path: "/chatscreen",
       builder: (context, state) => ChatScreen(),
     ),
-    
- 
-    
   ],
 );

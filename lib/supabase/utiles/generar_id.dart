@@ -15,7 +15,6 @@ class GenerarId {
     final idUnico = respuesta[0]["id"] + 1;
 
     return idUnico;
-
   }
 
   Future<int> generarIdClase() async {
@@ -40,4 +39,3 @@ class GenerarId {
     return listclase.last.id + 1;
   }
 }
-

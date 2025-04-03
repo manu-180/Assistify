@@ -38,7 +38,8 @@ class _CambiarPasswordState extends State<CambiarPassword> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Text(
-                      AppLocalizations.of(context).translate('changePasswordTitle'),
+                      AppLocalizations.of(context)
+                          .translate('changePasswordTitle'),
                       style: TextStyle(
                         fontSize: 19,
                         fontWeight: FontWeight.bold,
@@ -157,8 +158,9 @@ class _CambiarPasswordState extends State<CambiarPassword> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                            AppLocalizations.of(context)
-                                .translate('passwordUpdateError', params: {'error': e.toString()}),
+                            AppLocalizations.of(context).translate(
+                                'passwordUpdateError',
+                                params: {'error': e.toString()}),
                             style: const TextStyle(color: Colors.white),
                           ),
                           backgroundColor: Colors.red,
