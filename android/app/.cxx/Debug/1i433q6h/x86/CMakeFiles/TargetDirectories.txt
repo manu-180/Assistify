@@ -1,0 +1,2 @@
+C:/Users/Manuel/Desktop/Folder/Assistify/android/app/.cxx/Debug/1i433q6h/x86/CMakeFiles/edit_cache.dir
+C:/Users/Manuel/Desktop/Folder/Assistify/android/app/.cxx/Debug/1i433q6h/x86/CMakeFiles/rebuild_cache.dir

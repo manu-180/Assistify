@@ -16,16 +16,14 @@ import 'package:taller_ceramica/utils/generar_fechas_del_mes.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/widgets/shimmer_loader.dart';
 
-class ClasesScreen extends StatefulWidget {
-  const ClasesScreen({
-    super.key,
-  });
+class ClasesScreen extends ConsumerStatefulWidget {
+  const ClasesScreen({super.key, String? taller});
 
   @override
-  State<ClasesScreen> createState() => _ClasesScreenState();
+  ConsumerState<ClasesScreen> createState() => ClasesScreenState();
 }
 
-class _ClasesScreenState extends State<ClasesScreen> {
+class ClasesScreenState extends ConsumerState<ClasesScreen> {
   List<String> fechasDisponibles = [];
   String semanaSeleccionada = 'semana1';
   String? diaSeleccionado;
@@ -42,76 +40,102 @@ class _ClasesScreenState extends State<ClasesScreen> {
   Map<String, List<ClaseModels>> horariosPorDia = {};
   String? avisoDeClasesDisponibles;
   Map<int, int> capacidadCache = {};
+  final Map<String, Map<String, dynamic>> _cachePorSemana = {};
 
   Future<void> cargarDatos() async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  // ⚠️ Si ya existe en caché, usarlo
+  if (_cachePorSemana.containsKey(semanaSeleccionada)) {
+    final cache = _cachePorSemana[semanaSeleccionada]!;
 
     setState(() {
-      isLoading = true;
+      diasUnicos = cache['diasUnicos'];
+      horariosPorDia = cache['horariosPorDia'];
+      avisoDeClasesDisponibles = cache['aviso'];
+      isLoading = false;
     });
 
-    final capacidades =
-        await ObtenerCapacidadClase().cargarTodasLasCapacidades();
-    for (var capacidad in capacidades) {
-      capacidadCache[capacidad['id']] = capacidad['capacidad'];
-    }
-
-    final datos = await ObtenerTotalInfo(
-      supabase: supabase,
-      usuariosTable: 'usuarios',
-      clasesTable: taller,
-    ).obtenerClases();
-
-    final datosSemana =
-        datos.where((clase) => clase.semana == semanaSeleccionada).toList();
-
-    final dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-
-    datosSemana.sort((a, b) {
-      String fechaA = '${a.fecha} ${a.hora}';
-      String fechaB = '${b.fecha} ${b.hora}';
-
-      DateTime parsedFechaA = dateFormat.parse(fechaA);
-      DateTime parsedFechaB = dateFormat.parse(fechaB);
-
-      return parsedFechaA.compareTo(parsedFechaB);
-    });
-
-    final diasSet = <String>{};
-    diasUnicos = datosSemana.where((clase) {
-      final diaFecha = '${clase.dia} - ${clase.fecha}';
-      if (diasSet.contains(diaFecha)) {
-        return false;
-      } else {
-        diasSet.add(diaFecha);
-        return true;
-      }
-    }).toList();
-
-    horariosPorDia = {};
-    for (var clase in datosSemana) {
-      final diaFecha = '${clase.dia} - ${clase.fecha}';
-      horariosPorDia.putIfAbsent(diaFecha, () => []).add(clase);
-    }
-
-    final diasConClasesDisponibles = await obtenerDiasConClasesDisponibles();
-    if (diasConClasesDisponibles.isEmpty) {
-      avisoDeClasesDisponibles =
-          AppLocalizations.of(context).translate('noAvailableClasses');
-    } else {
-      avisoDeClasesDisponibles = AppLocalizations.of(context)
-          .translate('availableClasses', params: {
-        'days': diasConClasesDisponibles.join(', ')
-      });
-    }
-
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-    }
+    return;
   }
+
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+
+  setState(() {
+    isLoading = true;
+  });
+
+  final capacidades =
+      await ObtenerCapacidadClase().cargarTodasLasCapacidades();
+  for (var capacidad in capacidades) {
+    capacidadCache[capacidad['id']] = capacidad['capacidad'];
+  }
+
+  final datos = await ObtenerTotalInfo(
+    supabase: supabase,
+    usuariosTable: 'usuarios',
+    clasesTable: taller,
+  ).obtenerClases();
+
+  final datosSemana =
+      datos.where((clase) => clase.semana == semanaSeleccionada).toList();
+
+  final dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+
+  datosSemana.sort((a, b) {
+    String fechaA = '${a.fecha} ${a.hora}';
+    String fechaB = '${b.fecha} ${b.hora}';
+
+    DateTime parsedFechaA = dateFormat.parse(fechaA);
+    DateTime parsedFechaB = dateFormat.parse(fechaB);
+
+    return parsedFechaA.compareTo(parsedFechaB);
+  });
+
+  final diasSet = <String>{};
+  final diasUnicosTemp = datosSemana.where((clase) {
+    final diaFecha = '${clase.dia} - ${clase.fecha}';
+    if (diasSet.contains(diaFecha)) {
+      return false;
+    } else {
+      diasSet.add(diaFecha);
+      return true;
+    }
+  }).toList();
+
+  final horariosPorDiaTemp = <String, List<ClaseModels>>{};
+  for (var clase in datosSemana) {
+    final diaFecha = '${clase.dia} - ${clase.fecha}';
+    horariosPorDiaTemp.putIfAbsent(diaFecha, () => []).add(clase);
+  }
+
+  // 🔹 Obtener aviso de clases disponibles
+  final diasConClasesDisponibles = await obtenerDiasConClasesDisponibles();
+  String aviso;
+  if (diasConClasesDisponibles.isEmpty) {
+    aviso = AppLocalizations.of(context).translate('noAvailableClasses');
+  } else {
+    aviso = AppLocalizations.of(context).translate('availableClasses', params: {
+      'days': diasConClasesDisponibles.join(', ')
+    });
+  }
+
+  // 🔹 Guardar en caché
+  _cachePorSemana[semanaSeleccionada] = {
+    'diasUnicos': diasUnicosTemp,
+    'horariosPorDia': horariosPorDiaTemp,
+    'aviso': aviso,
+  };
+
+  if (mounted) {
+    setState(() {
+      diasUnicos = diasUnicosTemp;
+      horariosPorDia = horariosPorDiaTemp;
+      avisoDeClasesDisponibles = aviso;
+      isLoading = false;
+    });
+  }
+}
+
 
   Future<List<String>> obtenerDiasConClasesDisponibles() async {
   final diasConClases = <String>{};
@@ -359,9 +383,7 @@ class _ClasesScreenState extends State<ClasesScreen> {
     await AgregarUsuario(supabase)
         .agregarUsuarioAClase(clase.id, user, false, clase);
 
-    setState(() {
-      cargarDatos();
-    });
+    cargarDatos();
   }
 
   String _obtenerTituloDialogo(String mensaje) {

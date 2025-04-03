@@ -8,6 +8,7 @@ import 'package:taller_ceramica/screens/mis_clases.dart';
 import 'package:taller_ceramica/screens/gestion_clases_screen.dart';
 import 'package:taller_ceramica/screens/gestion_horarios_screen.dart';
 import 'package:taller_ceramica/screens/prueba.dart';
+import 'package:taller_ceramica/screens/responsive_turnos_screen/clases_screen.dart';
 import 'package:taller_ceramica/screens/responsive_turnos_screen/responsive_clases_screen.dart';
 import 'package:taller_ceramica/screens/sign_up_screen.dart';
 import 'package:taller_ceramica/screens/subscription_screen.dart';
@@ -40,10 +41,8 @@ final appRouter = GoRouter(
     GoRoute(
       path: "/turnos/:taller",
       builder: (context, state) {
-        final isTablet = MediaQuery.of(context).size.width > 600;
         final tallerParam = state.pathParameters['taller'];
-        return ResposiveClasesScreen(
-          isTablet: isTablet,
+        return ClasesScreen(
           taller: tallerParam,
         );
       },
