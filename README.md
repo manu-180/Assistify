@@ -23,7 +23,7 @@ user:
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
 despliegue en web:
-*eliminar docs*
+Remove-Item -Recurse -Force docs
 flutter build web
 mkdir docs    
 cp -r build/web/* docs/

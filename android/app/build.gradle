@@ -1,10 +1,11 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // El plugin de Flutter va al final
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// Carga del archivo key.properties
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
@@ -26,38 +27,38 @@ android {
     }
 
     defaultConfig {
-        // Application ID único.
         applicationId = "com.manuelnavarro.tallerdeceramica"
-        // Configuración mínima y objetivo.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    // Configuración de firma
     signingConfigs {
         release {
-            keyAlias = keystoreProperties['keyAlias']
-            keyPassword = keystoreProperties['keyPassword']
-            storeFile = keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-            storePassword = keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.release
+            signingConfig signingConfigs.release
 
-            // Habilita la generación de símbolos de depuración
+            // Optimización del bundle
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            // NDK para subir símbolos en Play Console (opcional)
             ndk {
                 debugSymbolLevel 'FULL'
             }
 
-            // Configuraciones para optimización y seguridad
             debuggable false
-            shrinkResources true
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -66,7 +67,7 @@ flutter {
     source = "../.."
 }
 
-// Agregar dependencias necesarias
+// Dependencias adicionales (si necesitás facturación de Google, por ejemplo)
 dependencies {
-    implementation 'com.android.billingclient:billing:5.1.0' // Biblioteca de facturación de Google Play
-} 
+    implementation 'com.android.billingclient:billing:5.1.0'
+}

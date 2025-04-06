@@ -9,6 +9,7 @@ import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/models/usuario_models.dart';
+import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 
 import '../utils/utils_barril.dart';
@@ -406,22 +407,30 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                 ),
               ),
         floatingActionButton: SizedBox(
-          width: size.width * 0.38,
-          child: FloatingActionButton(
-            onPressed: () async {
-              final usuarioActivo = Supabase.instance.client.auth.currentUser;
-              final taller =
-                  await ObtenerTaller().retornarTaller(usuarioActivo!.id);
-              context.push('/crear-usuario/$taller');
-            },
-            child: Container(
-              alignment: Alignment.center,
-              child: Text(
-                AppLocalizations.of(context).translate('createNewUser'),
-                style: TextStyle(fontSize: size.width * 0.030),
-              ),
-            ),
-          ),
-        ));
+  width: size.width * 0.38,
+  child: FloatingActionButton(
+    onPressed: () {
+      showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return CrearUsuarioDialog(
+      onUsuarioCreado: () async {
+        await cargarUsuarios(); // refresca la lista
+      },
+    );
+  },
+);
+
+    },
+    child: Container(
+      alignment: Alignment.center,
+      child: Text(
+        AppLocalizations.of(context).translate('createNewUser'),
+        style: TextStyle(fontSize: size.width * 0.030),
+      ),
+    ),
+  ),
+),
+);
   }
 }
