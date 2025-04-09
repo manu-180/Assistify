@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
@@ -22,9 +23,7 @@ class _ContactanosState extends State<Contactanos>
 
     with TickerProviderStateMixin {
   bool _isExpanded = false;
-  final String serviceId = 'service_0tzx0aw';
-  final String templateId = 'template_0acu8r8';
-  final String publicKey = 'UapUkrGXYrXahZMcZ';  
+
 
   
 
@@ -46,12 +45,14 @@ class _ContactanosState extends State<Contactanos>
   required String nombreUsuario,
   required String message,
 }) async {
+  await dotenv.load(fileName: ".env");
+  
   final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
 
   final response = await http.post(
     url,
     headers: {
-      'Authorization': 'Bearer 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',
+      'Authorization': dotenv.env['SENDGRID_API_KEY'] ?? "",
       'Content-Type': 'application/json',
     },
     body: json.encode({
