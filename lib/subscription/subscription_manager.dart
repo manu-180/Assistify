@@ -19,63 +19,50 @@ class SubscriptionManager {
   }
 
   Future<void> verificarEstadoSuscripcion() async {
-    // Verifica la conexión a Internet antes de proceder
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
-
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    if (usuarioActivo == null) return;
-
-    await _inAppPurchase.restorePurchases();
-    final List<PurchaseDetails> restoredPurchases = _purchases
-        .where((purchase) => purchase.status == PurchaseStatus.restored)
-        .toList();
-
-    bool isSubscribed = restoredPurchases.any((purchase) {
-      return (purchase.productID == 'monthlysubscription' ||
-              purchase.productID == 'annualsubscription' ||
-              purchase.productID == 'cero' ||
-              purchase.productID == 'prueba') &&
-          purchase.status == PurchaseStatus.purchased;
-    });
-
-    await Supabase.instance.client
-        .from('subscriptions')
-        .update({'is_active': isSubscribed}).eq('user_id', usuarioActivo.id);
+  if (!await Internet().hayConexionInternet()) {
+    throw Exception('No hay conexión a Internet.');
   }
+
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  if (usuarioActivo == null) return;
+
+  final restoredPurchases = await restorePurchases();
+
+  final bool isSubscribed = restoredPurchases.any((purchase) =>
+      (purchase.productID == 'monthlysubscription' ||
+       purchase.productID == 'annualsubscription' ||
+       purchase.productID == 'cero' ||
+       purchase.productID == 'prueba') &&
+      purchase.status == PurchaseStatus.purchased);
+
+  await Supabase.instance.client
+      .from('subscriptions')
+      .update({'is_active': isSubscribed}).eq('user_id', usuarioActivo.id);
+}
+
 
   Future<void> checkAndUpdateSubscription() async {
-    // Verifica la conexión a Internet antes de proceder
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
-
-    await _inAppPurchase.restorePurchases();
-    final List<PurchaseDetails> restoredPurchases = _purchases
-        .where((purchase) => purchase.status == PurchaseStatus.restored)
-        .toList();
-
-    bool isSubscribed = false;
-    for (var purchase in restoredPurchases) {
-      if (purchase.productID == 'monthlysubscription' ||
-          purchase.productID == 'annualsubscription' ||
-          purchase.productID == 'cero' ||
-          purchase.productID == 'prueba') {
-        if (purchase.status == PurchaseStatus.purchased) {
-          isSubscribed = true;
-          break;
-        }
-      }
-    }
-    final currentUser = Supabase.instance.client.auth.currentUser;
-
-    if (currentUser != null) {
-      await supabase
-          .from('subscriptions')
-          .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
-    }
+  if (!await Internet().hayConexionInternet()) {
+    throw Exception('No hay conexión a Internet.');
   }
+
+  final currentUser = Supabase.instance.client.auth.currentUser;
+  if (currentUser == null) return;
+
+  final restoredPurchases = await restorePurchases();
+
+  final bool isSubscribed = restoredPurchases.any((purchase) =>
+      (purchase.productID == 'monthlysubscription' ||
+       purchase.productID == 'annualsubscription' ||
+       purchase.productID == 'cero' ||
+       purchase.productID == 'prueba') &&
+      purchase.status == PurchaseStatus.purchased);
+
+  await supabase
+      .from('subscriptions')
+      .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
+}
+
 
   /// Escucha las actualizaciones de compras
   void listenToPurchaseUpdates() {
@@ -129,11 +116,39 @@ class SubscriptionManager {
     }
   }
 
-  Future<void> restorePurchases() async {
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
+  Future<List<PurchaseDetails>> restorePurchases() async {
+  if (!await Internet().hayConexionInternet()) {
+    throw Exception('No hay conexión a Internet.');
+  }
+
+  final Completer<List<PurchaseDetails>> completer = Completer();
+
+  final List<PurchaseDetails> restored = [];
+
+  final Stream<List<PurchaseDetails>> purchaseUpdates =
+      _inAppPurchase.purchaseStream;
+
+  final subscription = purchaseUpdates.listen((List<PurchaseDetails> purchases) {
+    for (var purchase in purchases) {
+      if (purchase.status == PurchaseStatus.restored ||
+          purchase.status == PurchaseStatus.purchased) {
+        restored.add(purchase);
+      }
     }
 
-    await _inAppPurchase.restorePurchases();
-  }
+    // Cuando llegan las restauraciones, devolvemos la lista
+    if (!completer.isCompleted) {
+      completer.complete(restored);
+    }
+  });
+
+  await _inAppPurchase.restorePurchases();
+
+  // Esperamos máximo 8 segundos por respuesta
+  return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
+    subscription.cancel();
+    return restored;
+  });
+}
+
 }

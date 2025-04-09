@@ -7,6 +7,7 @@ import 'dart:async';
 
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/subscription/subscription_manager.dart';
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/supabase/suscribir/suscribir_usuario.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
@@ -94,6 +95,10 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
+    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+
+
     for (var purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased) {
         final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -111,6 +116,7 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
           purchaseToken: purchaseToken,
           startDate: startDate,
           isActive: isActive,
+          taller: taller,
         );
 
         ScaffoldMessenger.of(context).showSnackBar(

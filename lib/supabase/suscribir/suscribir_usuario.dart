@@ -10,25 +10,31 @@ class SuscribirUsuario {
 
   /// Función para insertar un nuevo registro en la tabla `subscriptions`
   Future<void> insertSubscription({
-    required String userId,
-    required String productId,
-    required String purchaseToken,
-    required DateTime startDate,
-    required bool isActive,
-  }) async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  required String userId,
+  required String productId,
+  required String purchaseToken,
+  required DateTime startDate,
+  required bool isActive,
+  required String taller,
+}) async {
+  final existing = await supabase
+      .from('subscriptions')
+      .select()
+      .eq('user_id', userId)
+      .maybeSingle();
 
-    if (await inSuscription() != "") {
-      await supabase.from('subscriptions').update({
-        'product_id': productId,
-        'purchase_token': purchaseToken,
-        'start_date': startDate.toIso8601String(),
-        'is_active': isActive,
-      }).eq('id', await inSuscription());
-      return;
-    }
-    await supabaseClient.from('subscriptions').insert({
+  if (existing != null) {
+    // Actualiza si ya existe
+    await supabase.from('subscriptions').update({
+      'product_id': productId,
+      'purchase_token': purchaseToken,
+      'start_date': startDate.toIso8601String(),
+      'is_active': isActive,
+      'taller': taller,
+    }).eq('user_id', userId);
+  } else {
+    // Inserta si no existe
+    await supabase.from('subscriptions').insert({
       'user_id': userId,
       'product_id': productId,
       'purchase_token': purchaseToken,
@@ -37,6 +43,9 @@ class SuscribirUsuario {
       'taller': taller,
     });
   }
+}
+
+
 
   Future<String> inSuscription() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;

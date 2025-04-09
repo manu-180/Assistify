@@ -287,7 +287,6 @@ class LoginState extends State<Login> {
           ),
         ),
       ),
-      floatingActionButton: Contactanos(),
     );
   }
 }
