@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/clases/agregar_usuario.dart';
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_feriado.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
@@ -479,120 +480,156 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                             itemCount: horariosFiltrados.length,
                             itemBuilder: (context, index) {
                               final clase = horariosFiltrados[index];
-                              return Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Card(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      ListTile(
-                                        title: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 5),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                  horizontal: 8,
-                                                  vertical: 4,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  border: Border.all(
-                                                    color: colors.primary,
-                                                    width: 1.5,
-                                                  ),
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                  color: colors.primary
-                                                      .withAlpha(10),
-                                                ),
-                                                child: Text(
-                                                  clase.hora,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                localizations
-                                                    .translate('studentsLabel'),
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        subtitle: Text(clase.mails.join(", ")),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          children: [
-                                            SizedBox(
-                                              width: size.width > 600
-                                                  ? size.width * 0.15
-                                                  : size.width * 0.33,
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  mostrarDialogo(
-                                                    "insertar",
-                                                    clase,
-                                                    colors,
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  padding: EdgeInsets.zero,
-                                                ),
-                                                child: Text(
-                                                  localizations.translate(
-                                                      'addUserButton'),
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        size.width * 0.025,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: size.width > 600
-                                                  ? size.width * 0.15
-                                                  : size.width * 0.33,
-                                              child: ElevatedButton(
-                                                onPressed: () {
-                                                  mostrarDialogo(
-                                                    "remover",
-                                                    clase,
-                                                    colors,
-                                                  );
-                                                },
-                                                style: ElevatedButton.styleFrom(
-                                                  padding: EdgeInsets.zero,
-                                                ),
-                                                child: Text(
-                                                  localizations.translate(
-                                                      'removeUserButton'),
-                                                  style: TextStyle(
-                                                    fontSize:
-                                                        size.width * 0.025,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              return FutureBuilder<bool>(
+  future: ObtenerFeriado().obtenerFeriado(clase.id),
+
+  builder: (context, snapshot) {
+    if (!snapshot.hasData) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final esFeriado = snapshot.data!;
+
+    if (esFeriado) {
+      // 🎉 Card temática feriado
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Card(
+          color: Colors.amber.shade100,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Icon(Icons.celebration, size: 40, color: Colors.orange),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "¡Es feriado!",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        "No hay clases este día. ¡Disfrutá tu descanso!",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ✅ Card normal si no es feriado
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Card(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: colors.primary,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        color: colors.primary.withAlpha(10),
+                      ),
+                      child: Text(
+                        clase.hora,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    clase.mails.isNotEmpty
+                        ? Text(
+                            localizations.translate('studentsLabel'),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        : const Text(
+                            "Clase vacía",
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                  ],
+                ),
+              ),
+              subtitle: Text(clase.mails.join(", ")),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  SizedBox(
+                    width: size.width > 600 ? size.width * 0.15 : size.width * 0.33,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        mostrarDialogo("insertar", clase, colors);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Text(
+                        localizations.translate('addUserButton'),
+                        style: TextStyle(fontSize: size.width * 0.025),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: size.width > 600 ? size.width * 0.15 : size.width * 0.33,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        mostrarDialogo("remover", clase, colors);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                      ),
+                      child: Text(
+                        localizations.translate('removeUserButton'),
+                        style: TextStyle(fontSize: size.width * 0.025),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+);
+
                             },
                           )
                         : Center(

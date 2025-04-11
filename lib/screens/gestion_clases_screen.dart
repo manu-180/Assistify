@@ -356,6 +356,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                             'lugar_disponible': lugar,
                             'mes': mesActual,
                             "espera": [],
+                            "feriado": false,
                           });
                         }
 
@@ -571,14 +572,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                 },
                               ),
                             ),
-                            subtitle: Text(
-                              AppLocalizations.of(context).translate(
-                                'maxCapacityInfo',
-                                params: {
-                                  'maxCapacity': clase.lugaresDisponibles.toString(),
-                                },
-                              ),
-                            ),
+                           
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -648,7 +642,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
         ),
       ),
       floatingActionButton: SizedBox(
-        width: 200,
+        width: MediaQuery.of(context).size.width * 0.5,
         child: FloatingActionButton(
           backgroundColor: colors.secondaryContainer,
           onPressed: () {

@@ -65,6 +65,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
       dia TEXT NOT NULL,
       fecha TEXT NOT NULL,
       hora TEXT NOT NULL,
+      feriado BOOLEAN NOT NULL DEFAULT FALSE,
       mails JSONB DEFAULT '[]',
       lugar_disponible INTEGER NOT NULL DEFAULT 0,
       mes INTEGER NOT NULL DEFAULT $mesActual,

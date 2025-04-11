@@ -4,6 +4,7 @@ class ClaseModels {
   final String dia;
   final String fecha;
   final String hora;
+  final bool feriado;
   final List<String> mails;
   int lugaresDisponibles;
   final int mes;
@@ -15,6 +16,7 @@ class ClaseModels {
     required this.dia,
     required this.fecha,
     required this.hora,
+    required this.feriado,
     required this.mails,
     required this.lugaresDisponibles,
     required this.mes,
@@ -34,6 +36,7 @@ class ClaseModels {
       dia: map['dia'],
       fecha: map['fecha'],
       hora: map['hora'],
+      feriado: map['feriado'],
       mails: List<String>.from(map['mails'] ?? []),
       lugaresDisponibles: map['lugar_disponible'],
       mes: map['mes'],
@@ -49,6 +52,7 @@ class ClaseModels {
       'dia': dia,
       'fecha': fecha,
       'hora': hora,
+      'feriado': feriado,
       'mails': mails,
       'lugar_disponible': lugaresDisponibles,
       'mes': mes,
@@ -63,6 +67,7 @@ class ClaseModels {
     String? dia,
     String? fecha,
     String? hora,
+    bool? feriado,
     List<String>? mails,
     int? lugaresDisponibles,
     int? mes,
@@ -74,6 +79,7 @@ class ClaseModels {
       dia: dia ?? this.dia,
       fecha: fecha ?? this.fecha,
       hora: hora ?? this.hora,
+      feriado: feriado ?? this.feriado,
       mails: mails ?? List.from(this.mails),
       lugaresDisponibles: lugaresDisponibles ?? this.lugaresDisponibles,
       mes: mes ?? this.mes,

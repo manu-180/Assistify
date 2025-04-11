@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_capacidad_clase.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/utils/generar_fechas_del_mes.dart';
@@ -270,8 +269,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
       final clases = entry.value;
 
       final hayClaseDisponible = await Future.any(clases.map((clase) async {
-        return clase.mails.length <
-                await ObtenerCapacidadClase().capacidadClase(clase.id) &&
+        
             !Calcular24hs()
                 .esMenorA0Horas(clase.fecha, clase.hora, mesActual) &&
             clase.lugaresDisponibles > 0;
@@ -453,8 +451,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
     final partesFecha = clase.fecha.split('/');
     final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
     final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
-    final estaLlena = clase.mails.length >=
-        await ObtenerCapacidadClase().capacidadClase(clase.id);
+    
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
@@ -463,7 +460,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
           width: screenWidth * 0.7,
           height: screenWidth * 0.12,
           child: ElevatedButton(
-            onPressed: ((estaLlena ||
+            onPressed: ((
                     Calcular24hs()
                         .esMenorA0Horas(clase.fecha, clase.hora, mesActual) ||
                     clase.lugaresDisponibles <= 0 && !await IsAdmin().admin()))
@@ -491,7 +488,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
                   },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(
-                estaLlena ||
+                
                         Calcular24hs().esMenorA0Horas(
                             clase.fecha, clase.hora, mesActual) ||
                         clase.lugaresDisponibles <= 0

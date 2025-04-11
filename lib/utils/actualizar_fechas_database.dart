@@ -58,10 +58,10 @@ class ActualizarFechasDatabase {
               dia: '',
               fecha: '',
               hora: '',
+              feriado: false,
               mails: [],
               lugaresDisponibles: 0,
               mes: 0,
-              capacidad: 0,
               espera: [],
             ),
           );

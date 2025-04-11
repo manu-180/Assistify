@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_capacidad_clase.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/main.dart';
@@ -39,7 +38,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
 
   List<ClaseModels> diasUnicos = [];
   Map<String, List<ClaseModels>> horariosPorDia = {};
-  Map<int, int> capacidadCache = {};
   final Map<String, List<ClaseModels>> _cachePorSemana = {};
 
   String? avisoDeClasesDisponibles;
@@ -70,11 +68,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     }
 
     // 🚨 Si no está cacheada, seguimos con el flujo normal
-    final capacidades =
-        await ObtenerCapacidadClase().cargarTodasLasCapacidades();
-    for (var capacidad in capacidades) {
-      capacidadCache[capacidad['id']] = capacidad['capacidad'];
-    }
+   
 
     final datos = await ObtenerTotalInfo(
       supabase: supabase,
@@ -202,13 +196,11 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
       final clases = entry.value;
 
       for (var clase in clases) {
-        final capacidad = capacidadCache[clase.id] ?? 0;
-        final mailsLimpios = clase.mails.map((mail) => mail.trim()).toList();
         final menorA24 =
             Calcular24hs().esMenorA0Horas(clase.fecha, clase.hora, mesActual);
         final lugarDisponible = lugaresPorClase[clase.id] ?? 0;
 
-        if (mailsLimpios.length < capacidad &&
+        if (
             !menorA24 &&
             lugarDisponible > 0) {
           final partesFecha = dia.split(' - ')[1].split('/');
@@ -550,7 +542,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                                   final clase =
                                       horariosPorDia[diaSeleccionado]![index];
                                   return construirBotonHorario(
-                                      clase, capacidadCache);
+                                      clase);
                                 },
                               )
                         : const SizedBox(),
@@ -582,13 +574,10 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   }
 
   Widget construirBotonHorario(
-      ClaseModels clase, Map<int, int> capacidadCache) {
+      ClaseModels clase) {
     final partesFecha = clase.fecha.split('/');
     final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
     final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
-
-    final capacidad = capacidadCache[clase.id] ?? 0;
-    final estaLlena = clase.mails.length >= capacidad;
 
     final screenWidth = MediaQuery.of(context).size.width;
 
@@ -622,7 +611,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         );
                       }
                     }
-                  : ((estaLlena ||
+                  : ((
                           Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0))
@@ -634,7 +623,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
-                  estaLlena ||
+                  
                           Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0
