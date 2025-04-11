@@ -473,7 +473,7 @@ class AppLocalizations {
       "maxCapacityLabel": "Capacidad máxima",
       "cancelButtonLabel": "Cancelar",
       "invalidCapacityError":
-          "Por favor, ingresa un valor numérico válido para la capacidad.",
+          "Por favor, ingresa un valor numérico válido para el lugar.",
       "saveButtonLabel": "Guardar",
       "manageClassesInfo":
           "En esta sección podrás gestionar las clases disponibles. Agregar o remover lugares, eliminar clases y agregar nuevas clases.",
@@ -490,7 +490,7 @@ class AppLocalizations {
       "createNewClassButton": "Crear una clase nueva",
       "addNewClassTitle": "Agregar nueva clase todos los \$day",
       "classTimeHint": "Hora de la clase (HH:mm)",
-      "classCapacityHint": "Capacidad máxima de alumnos",
+      "classCapacityHint": "Lugares disponibles",
       "loadingClassesLabel": "Cargando clases",
       "enterValidTimeDateError": "Debes ingresar una hora y fecha válida.",
       "enterNumericCapacityError":
