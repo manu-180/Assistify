@@ -7,7 +7,6 @@ class ClaseModels {
   final List<String> mails;
   int lugaresDisponibles;
   final int mes;
-  final int capacidad;
   final List<String> espera;
 
   ClaseModels({
@@ -19,7 +18,6 @@ class ClaseModels {
     required this.mails,
     required this.lugaresDisponibles,
     required this.mes,
-    required this.capacidad,
     required this.espera,
   });
 
@@ -39,7 +37,6 @@ class ClaseModels {
       mails: List<String>.from(map['mails'] ?? []),
       lugaresDisponibles: map['lugar_disponible'],
       mes: map['mes'],
-      capacidad: map['capacidad'],
       espera: List<String>.from(map['espera'] ?? []),
     );
   }
@@ -55,7 +52,6 @@ class ClaseModels {
       'mails': mails,
       'lugar_disponible': lugaresDisponibles,
       'mes': mes,
-      'capacidad': capacidad,
       'espera': espera,
     };
   }
@@ -70,7 +66,6 @@ class ClaseModels {
     List<String>? mails,
     int? lugaresDisponibles,
     int? mes,
-    int? capacidad,
     List<String>? espera,
   }) {
     return ClaseModels(
@@ -82,7 +77,6 @@ class ClaseModels {
       mails: mails ?? List.from(this.mails),
       lugaresDisponibles: lugaresDisponibles ?? this.lugaresDisponibles,
       mes: mes ?? this.mes,
-      capacidad: capacidad ?? this.capacidad,
       espera: espera ?? List.from(this.espera),
     );
   }

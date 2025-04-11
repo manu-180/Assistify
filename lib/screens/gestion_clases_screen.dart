@@ -178,7 +178,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
     final horaController = TextEditingController();
-    final capacidadController = TextEditingController();
+    final lugarController = TextEditingController();
 
     final localizations = AppLocalizations.of(context);
 
@@ -205,7 +205,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                           ),
                         ),
                         TextField(
-                          controller: capacidadController,
+                          controller: lugarController,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             hintText:
@@ -253,10 +253,10 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                           );
                         }
 
-                        final capacidadText = capacidadController.text.trim();
-                        final capacidad = int.tryParse(capacidadText);
+                        final lugarText = lugarController.text.trim();
+                        final lugar = int.tryParse(lugarText);
 
-                        if (capacidad == null) {
+                        if (lugar == null) {
                           throw Exception(
                             localizations.translate('invalidCapacityError'),
                           );
@@ -353,9 +353,8 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                             'fecha': fechaStr,
                             'hora': hora,
                             'mails': [],
-                            'lugar_disponible': capacidad,
+                            'lugar_disponible': lugar,
                             'mes': mesActual,
-                            'capacidad': capacidad,
                             "espera": [],
                           });
                         }
@@ -408,7 +407,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
     final capacityController =
-        TextEditingController(text: clase.capacidad.toString());
+        TextEditingController(text: clase.lugaresDisponibles.toString());
 
     return showDialog(
       context: context,
@@ -460,7 +459,6 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                       clasesFiltradas.indexWhere((c) => c.id == clase.id);
                   if (index != -1) {
                     final updatedClase = clase.copyWith(
-                      capacidad: newCapacity,
                       lugaresDisponibles: newCapacity - clase.mails.length,
                     );
 
@@ -577,7 +575,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                               AppLocalizations.of(context).translate(
                                 'maxCapacityInfo',
                                 params: {
-                                  'maxCapacity': clase.capacidad.toString(),
+                                  'maxCapacity': clase.lugaresDisponibles.toString(),
                                 },
                               ),
                             ),
