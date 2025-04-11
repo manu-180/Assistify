@@ -36,7 +36,7 @@ class ClaseModels {
       dia: map['dia'],
       fecha: map['fecha'],
       hora: map['hora'],
-      feriado: map['feriado'],
+      feriado: map['feriado'] ?? false,
       mails: List<String>.from(map['mails'] ?? []),
       lugaresDisponibles: map['lugar_disponible'],
       mes: map['mes'],
