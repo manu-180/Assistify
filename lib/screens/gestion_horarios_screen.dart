@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/clases/agregar_usuario.dart';
+import 'package:taller_ceramica/supabase/modificar_datos/modificar_feriado.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_feriado.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
@@ -159,8 +160,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     return DiaConFecha()
         .obtenerDiaDeLaSemana(fecha, AppLocalizations.of(context));
   }
-
-  
 
   Future<void> mostrarDialogo(
       String tipoAccion, ClaseModels clase, ColorScheme color) async {
@@ -484,147 +483,262 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                               final clase = horariosFiltrados[index];
                               final esFeriado = clase.feriado;
 
-if (esFeriado) {
-  // 🎉 Card temática feriado
-  return Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Card(
-      color: Colors.amber.shade100,
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Icon(Icons.celebration, size: 40, color: Colors.orange),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    "¡Es feriado!",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange,
-                    ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    "No hay clases este día. ¡Disfrutá tu descanso!",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
+                              return GestureDetector(
+                                onLongPress: () async {
+                                  bool nuevoValor = !esFeriado;
 
-// ✅ Card normal si no es feriado
-return Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: Card(
-    color: Colors.white,
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ListTile(
-          title: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: colors.primary,
-                      width: 1.5,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    color: colors.primary.withAlpha(10),
-                  ),
-                  child: Text(
-                    clase.hora,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                clase.mails.isNotEmpty
-                    ? Text(
-                        localizations.translate('studentsLabel'),
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : const Text(
-                        "Clase vacía",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-              ],
-            ),
-          ),
-          subtitle: Text(clase.mails.join(", ")),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              SizedBox(
-                width: size.width > 600 ? size.width * 0.15 : size.width * 0.33,
-                child: ElevatedButton(
-                  onPressed: () {
-                    mostrarDialogo("insertar", clase, colors);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Text(
-                    localizations.translate('addUserButton'),
-                    style: TextStyle(fontSize: size.width * 0.025),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: size.width > 600 ? size.width * 0.15 : size.width * 0.33,
-                child: ElevatedButton(
-                  onPressed: () {
-                    mostrarDialogo("remover", clase, colors);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                  ),
-                  child: Text(
-                    localizations.translate('removeUserButton'),
-                    style: TextStyle(fontSize: size.width * 0.025),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    ),
-  ),
-);
+                                  await showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("Modificar feriado"),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                                "¿Querés marcar esta clase como feriado?"),
+                                            const SizedBox(height: 10),
+                                            SwitchListTile(
+                                              value: nuevoValor,
+                                              onChanged: (val) {
+                                                nuevoValor = val;
+                                                Navigator.of(context).pop();
+                                              },
+                                              title: Text(nuevoValor
+                                                  ? "Feriado"
+                                                  : "Clase normal"),
+                                            ),
+                                          ],
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(context),
+                                            child: const Text("Cancelar"),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              Navigator.pop(context);
 
+                                              await ModificarFeriado
+                                                  .cambiarFeriado(
+                                                idClase: clase.id,
+                                                nuevoValor: nuevoValor,
+                                              );
 
-                            },
-                          )
+                                              setState(() {
+                                                final idx = horariosFiltrados
+                                                    .indexWhere((c) =>
+                                                        c.id == clase.id);
+                                                if (idx != -1) {
+                                                  horariosFiltrados[idx] =
+                                                      clase.copyWith(
+                                                          feriado: nuevoValor);
+                                                }
+
+                                                final idxAll =
+                                                    horariosDisponibles
+                                                        .indexWhere((c) =>
+                                                            c.id == clase.id);
+                                                if (idxAll != -1) {
+                                                  horariosDisponibles[idxAll] =
+                                                      clase.copyWith(
+                                                          feriado: nuevoValor);
+                                                }
+                                              });
+                                            },
+                                            child: const Text("Guardar"),
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                                child: esFeriado
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          color: Colors.amber.shade100,
+                                          elevation: 4,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.celebration,
+                                                    size: 40,
+                                                    color: Colors.orange),
+                                                const SizedBox(width: 16),
+                                                const Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "¡Es feriado!",
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color:
+                                                              Colors.deepOrange,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 4),
+                                                      Text(
+                                                        "No hay clases este día. ¡Disfrutá tu descanso!",
+                                                        style: TextStyle(
+                                                            fontSize: 16),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          color: Colors.white,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              ListTile(
+                                                title: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 5),
+                                                  child: Row(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8,
+                                                                vertical: 4),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          border: Border.all(
+                                                              color: colors
+                                                                  .primary,
+                                                              width: 1.5),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(8),
+                                                          color: colors.primary
+                                                              .withAlpha(10),
+                                                        ),
+                                                        child: Text(
+                                                          clase.hora,
+                                                          style:
+                                                              const TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 16,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 10),
+                                                      clase.mails.isNotEmpty
+                                                          ? Text(
+                                                              localizations
+                                                                  .translate(
+                                                                      'studentsLabel'),
+                                                              style: const TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            )
+                                                          : const Text(
+                                                              "Clase vacía",
+                                                              style: TextStyle(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                    clase.mails.join(", ")),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: size.width > 600
+                                                          ? size.width * 0.15
+                                                          : size.width * 0.33,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          mostrarDialogo(
+                                                              "insertar",
+                                                              clase,
+                                                              colors);
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero),
+                                                        child: Text(
+                                                          localizations.translate(
+                                                              'addUserButton'),
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  size.width *
+                                                                      0.025),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: size.width > 600
+                                                          ? size.width * 0.15
+                                                          : size.width * 0.33,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          mostrarDialogo(
+                                                              "remover",
+                                                              clase,
+                                                              colors);
+                                                        },
+                                                        style: ElevatedButton
+                                                            .styleFrom(
+                                                                padding:
+                                                                    EdgeInsets
+                                                                        .zero),
+                                                        child: Text(
+                                                          localizations.translate(
+                                                              'removeUserButton'),
+                                                          style: TextStyle(
+                                                              fontSize:
+                                                                  size.width *
+                                                                      0.025),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            })
                         : Center(
                             child: Padding(
                               padding: EdgeInsets.only(top: size.width * 0.2),

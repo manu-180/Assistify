@@ -10,11 +10,8 @@ class ModificarFeriado {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-    
     await supabase
         .from(taller)
         .update({'feriado': nuevoValor}).eq('id', idClase);
-
-    
   }
 }

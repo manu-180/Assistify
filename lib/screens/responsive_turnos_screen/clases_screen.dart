@@ -199,7 +199,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
             Calcular24hs().esMenorA0Horas(clase.fecha, clase.hora, mesActual);
         final lugarDisponible = lugaresPorClase[clase.id] ?? 0;
 
-        if (!menorA24 && lugarDisponible > 0) {
+        if (!menorA24 && lugarDisponible > 0 && clase.feriado == false) {
           final partesFecha = dia.split(' - ')[1].split('/');
           final diaMes = int.parse(partesFecha[1]);
 
@@ -606,7 +606,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         );
                       }
                     }
-                  : ((Calcular24hs().esMenorA0Horas(
+                  : ((clase.feriado ||
+                          Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0))
                       ? null
@@ -617,7 +618,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
-                  Calcular24hs().esMenorA0Horas(
+                  clase.feriado ||
+                          Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0
                       ? Colors.grey.shade400

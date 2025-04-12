@@ -240,7 +240,10 @@ class AgregarUsuario {
       final partes = item.fecha.split('/');
       if (partes.length == 3) {
         if (item.dia == clase.dia && item.hora == clase.hora) {
-          if (!item.mails.contains(user) && count < 4) {
+          if (!item.feriado &&
+              !item.mails.contains(user) &&
+              count < 4 &&
+              (int.tryParse(item.fecha.split('/')[1]) == item.mes)) {
             item.mails.add(user);
 
             await supabaseClient
