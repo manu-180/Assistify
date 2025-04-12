@@ -106,7 +106,6 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     super.initState();
     SubscriptionVerifier.verificarAdminYSuscripcion(context);
     cargarUsuarios();
-    
   }
 
   Future<void> mostrarDialogoEliminar({
@@ -223,215 +222,207 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-        appBar:
-            ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
-        body: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
-                        child: BoxText(
-                          text: AppLocalizations.of(context)
-                              .translate('usersSectionDescription'),
-                        ),
+      appBar:
+          ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
+                      child: BoxText(
+                        text: AppLocalizations.of(context)
+                            .translate('usersSectionDescription'),
                       ),
-                      const SizedBox(height: 10),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: usuarios.length,
-                          itemBuilder: (context, index) {
-                            final usuario = usuarios[index];
-                            return GestureDetector(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 5),
-                                child: Card(
-                                  surfaceTintColor: usuario.admin
-                                      ? Colors.amber
-                                      : Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: ListTile(
-                                    title: Text(usuario.fullname),
-                                    subtitle: Text(
-                                      usuario.clasesDisponibles == 1
-                                          ? "${usuario.clasesDisponibles} ${AppLocalizations.of(context).translate('singleCredit')}"
-                                          : "${usuario.clasesDisponibles} ${AppLocalizations.of(context).translate('multipleCredits')}",
-                                    ),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        IconButton(
-                                          icon: const Icon(Icons.add,
-                                              color: Colors.green),
-                                          onPressed: () =>
-                                              mostrarDialogoConContador(
-                                            context: context,
-                                            titulo: AppLocalizations.of(context)
-                                                .translate('addCredits'),
-                                            contenido:
-                                                AppLocalizations.of(context)
-                                                    .translate(
-                                                        'selectCreditsToAdd'),
-                                            onConfirmar: (cantidad) async {
-                                              for (int i = 0;
-                                                  i < cantidad;
-                                                  i++) {
-                                                await agregarCredito(
-                                                    usuario.fullname);
-                                              }
-                                            },
-                                          ),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: usuarios.length,
+                        itemBuilder: (context, index) {
+                          final usuario = usuarios[index];
+                          return GestureDetector(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 5),
+                              child: Card(
+                                surfaceTintColor:
+                                    usuario.admin ? Colors.amber : Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                                child: ListTile(
+                                  title: Text(usuario.fullname),
+                                  subtitle: Text(
+                                    usuario.clasesDisponibles == 1
+                                        ? "${usuario.clasesDisponibles} ${AppLocalizations.of(context).translate('singleCredit')}"
+                                        : "${usuario.clasesDisponibles} ${AppLocalizations.of(context).translate('multipleCredits')}",
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.add,
+                                            color: Colors.green),
+                                        onPressed: () =>
+                                            mostrarDialogoConContador(
+                                          context: context,
+                                          titulo: AppLocalizations.of(context)
+                                              .translate('addCredits'),
+                                          contenido: AppLocalizations.of(
+                                                  context)
+                                              .translate('selectCreditsToAdd'),
+                                          onConfirmar: (cantidad) async {
+                                            for (int i = 0; i < cantidad; i++) {
+                                              await agregarCredito(
+                                                  usuario.fullname);
+                                            }
+                                          },
                                         ),
-                                        IconButton(
-                                          icon: const Icon(Icons.remove,
-                                              color: Colors.orange),
-                                          onPressed: () =>
-                                              mostrarDialogoConContador(
-                                            context: context,
-                                            titulo: AppLocalizations.of(context)
-                                                .translate('removeCredits'),
-                                            contenido: AppLocalizations.of(
-                                                    context)
-                                                .translate(
-                                                    'selectCreditsToRemove'),
-                                            onConfirmar: (cantidad) async {
-                                              for (int i = 0;
-                                                  i < cantidad;
-                                                  i++) {
-                                                await removerCredito(
-                                                    usuario.fullname);
-                                              }
-                                            },
-                                          ),
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.remove,
+                                            color: Colors.orange),
+                                        onPressed: () =>
+                                            mostrarDialogoConContador(
+                                          context: context,
+                                          titulo: AppLocalizations.of(context)
+                                              .translate('removeCredits'),
+                                          contenido:
+                                              AppLocalizations.of(context)
+                                                  .translate(
+                                                      'selectCreditsToRemove'),
+                                          onConfirmar: (cantidad) async {
+                                            for (int i = 0; i < cantidad; i++) {
+                                              await removerCredito(
+                                                  usuario.fullname);
+                                            }
+                                          },
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              onTap: () async {
-                                final alumno = usuario.fullname;
-                                const columna = 'mails';
+                            ),
+                            onTap: () async {
+                              final alumno = usuario.fullname;
+                              const columna = 'mails';
 
-                                try {
-                                  final clases = await AlumnosEnClase()
-                                      .clasesAlumno(alumno, columna);
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
+                              try {
+                                final clases = await AlumnosEnClase()
+                                    .clasesAlumno(alumno, columna);
+                                ScaffoldMessenger.of(context)
+                                    .hideCurrentSnackBar();
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        clases.isNotEmpty
-                                            ? "Clases de $alumno:\n${clases.join('\n')}"
-                                            : "$alumno no tiene clase asignadas.",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      duration: const Duration(seconds: 7),
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      clases.isNotEmpty
+                                          ? "Clases de $alumno:\n${clases.join('\n')}"
+                                          : "$alumno no tiene clase asignadas.",
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                     ),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Error al obtener las clases: $e",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      backgroundColor: Colors
-                                          .red, // Cambia el color si quieres
-                                      duration: const Duration(seconds: 7),
-                                    ),
-                                  );
-                                }
-                              },
-                              onLongPress: () {
-                                final alumno = usuario.fullname;
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Row(
-                                        children: [
-                                          FaIcon(
-                                            FontAwesomeIcons
-                                                .triangleExclamation,
-                                            size: 30,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Flexible(
-                                              child: Text(
-                                            "¿Quieres eliminar a $alumno?",
-                                          )),
-                                        ],
-                                      ),
-                                      actions: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(context)
-                                                .pop(); // Cierra el diálogo
-                                          },
-                                          child: const Text("Cancelar"),
-                                        ),
-                                        SizedBox(
-                                          width: 2,
-                                        ),
-                                        FilledButton(
-                                          style: FilledButton.styleFrom(
-                                            backgroundColor: Colors
-                                                .red.shade700, // Rojo oscuro
-                                          ),
-                                          onPressed: () {
-                                            // Agregar lógica para eliminar al alumno
-                                            Navigator.of(context)
-                                                .pop(); // Cierra el diálogo
-                                          },
-                                          child: const Text("Eliminar"),
-                                        ),
-                                      ],
-                                    );
-                                  },
+                                    duration: const Duration(seconds: 7),
+                                  ),
                                 );
-                              },
-                            );
-                          },
-                        ),
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Error al obtener las clases: $e",
+                                      style:
+                                          const TextStyle(color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors
+                                        .red, // Cambia el color si quieres
+                                    duration: const Duration(seconds: 7),
+                                  ),
+                                );
+                              }
+                            },
+                            onLongPress: () {
+                              final alumno = usuario.fullname;
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      children: [
+                                        FaIcon(
+                                          FontAwesomeIcons.triangleExclamation,
+                                          size: 30,
+                                        ),
+                                        SizedBox(width: 10),
+                                        Flexible(
+                                            child: Text(
+                                          "¿Quieres eliminar a $alumno?",
+                                        )),
+                                      ],
+                                    ),
+                                    actions: [
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(context)
+                                              .pop(); // Cierra el diálogo
+                                        },
+                                        child: const Text("Cancelar"),
+                                      ),
+                                      SizedBox(
+                                        width: 2,
+                                      ),
+                                      FilledButton(
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: Colors
+                                              .red.shade700, // Rojo oscuro
+                                        ),
+                                        onPressed: () {
+                                          // Agregar lógica para eliminar al alumno
+                                          Navigator.of(context)
+                                              .pop(); // Cierra el diálogo
+                                        },
+                                        child: const Text("Eliminar"),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-        floatingActionButton: SizedBox(
-  width: size.width * 0.38,
-  child: FloatingActionButton(
-    onPressed: () {
-      showDialog(
-  context: context,
-  builder: (BuildContext context) {
-    return CrearUsuarioDialog(
-      onUsuarioCreado: () async {
-        await cargarUsuarios(); // refresca la lista
-      },
-    );
-  },
-);
-
-    },
-    child: Container(
-      alignment: Alignment.center,
-      child: Text(
-        AppLocalizations.of(context).translate('createNewUser'),
-        style: TextStyle(fontSize: size.width * 0.030),
+            ),
+      floatingActionButton: SizedBox(
+        width: size.width * 0.38,
+        child: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return CrearUsuarioDialog(
+                  onUsuarioCreado: () async {
+                    await cargarUsuarios(); // refresca la lista
+                  },
+                );
+              },
+            );
+          },
+          child: Container(
+            alignment: Alignment.center,
+            child: Text(
+              AppLocalizations.of(context).translate('createNewUser'),
+              style: TextStyle(fontSize: size.width * 0.030),
+            ),
+          ),
+        ),
       ),
-    ),
-  ),
-),
-);
+    );
   }
 }

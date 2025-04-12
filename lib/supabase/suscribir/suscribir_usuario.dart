@@ -10,42 +10,40 @@ class SuscribirUsuario {
 
   /// Función para insertar un nuevo registro en la tabla `subscriptions`
   Future<void> insertSubscription({
-  required String userId,
-  required String productId,
-  required String purchaseToken,
-  required DateTime startDate,
-  required bool isActive,
-  required String taller,
-}) async {
-  final existing = await supabase
-      .from('subscriptions')
-      .select()
-      .eq('user_id', userId)
-      .maybeSingle();
+    required String userId,
+    required String productId,
+    required String purchaseToken,
+    required DateTime startDate,
+    required bool isActive,
+    required String taller,
+  }) async {
+    final existing = await supabase
+        .from('subscriptions')
+        .select()
+        .eq('user_id', userId)
+        .maybeSingle();
 
-  if (existing != null) {
-    // Actualiza si ya existe
-    await supabase.from('subscriptions').update({
-      'product_id': productId,
-      'purchase_token': purchaseToken,
-      'start_date': startDate.toIso8601String(),
-      'is_active': isActive,
-      'taller': taller,
-    }).eq('user_id', userId);
-  } else {
-    // Inserta si no existe
-    await supabase.from('subscriptions').insert({
-      'user_id': userId,
-      'product_id': productId,
-      'purchase_token': purchaseToken,
-      'start_date': startDate.toIso8601String(),
-      'is_active': isActive,
-      'taller': taller,
-    });
+    if (existing != null) {
+      // Actualiza si ya existe
+      await supabase.from('subscriptions').update({
+        'product_id': productId,
+        'purchase_token': purchaseToken,
+        'start_date': startDate.toIso8601String(),
+        'is_active': isActive,
+        'taller': taller,
+      }).eq('user_id', userId);
+    } else {
+      // Inserta si no existe
+      await supabase.from('subscriptions').insert({
+        'user_id': userId,
+        'product_id': productId,
+        'purchase_token': purchaseToken,
+        'start_date': startDate.toIso8601String(),
+        'is_active': isActive,
+        'taller': taller,
+      });
+    }
   }
-}
-
-
 
   Future<String> inSuscription() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;

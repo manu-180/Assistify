@@ -68,7 +68,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     }
 
     // 🚨 Si no está cacheada, seguimos con el flujo normal
-   
 
     final datos = await ObtenerTotalInfo(
       supabase: supabase,
@@ -200,9 +199,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
             Calcular24hs().esMenorA0Horas(clase.fecha, clase.hora, mesActual);
         final lugarDisponible = lugaresPorClase[clase.id] ?? 0;
 
-        if (
-            !menorA24 &&
-            lugarDisponible > 0) {
+        if (!menorA24 && lugarDisponible > 0) {
           final partesFecha = dia.split(' - ')[1].split('/');
           final diaMes = int.parse(partesFecha[1]);
 
@@ -541,8 +538,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                                 itemBuilder: (context, index) {
                                   final clase =
                                       horariosPorDia[diaSeleccionado]![index];
-                                  return construirBotonHorario(
-                                      clase);
+                                  return construirBotonHorario(clase);
                                 },
                               )
                         : const SizedBox(),
@@ -573,8 +569,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     );
   }
 
-  Widget construirBotonHorario(
-      ClaseModels clase) {
+  Widget construirBotonHorario(ClaseModels clase) {
     final partesFecha = clase.fecha.split('/');
     final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
     final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
@@ -611,8 +606,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         );
                       }
                     }
-                  : ((
-                          Calcular24hs().esMenorA0Horas(
+                  : ((Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0))
                       ? null
@@ -623,8 +617,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
-                  
-                          Calcular24hs().esMenorA0Horas(
+                  Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
                           clase.lugaresDisponibles <= 0
                       ? Colors.grey.shade400

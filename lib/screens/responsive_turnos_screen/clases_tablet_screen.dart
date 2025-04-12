@@ -269,9 +269,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
       final clases = entry.value;
 
       final hayClaseDisponible = await Future.any(clases.map((clase) async {
-        
-            !Calcular24hs()
-                .esMenorA0Horas(clase.fecha, clase.hora, mesActual) &&
+        !Calcular24hs().esMenorA0Horas(clase.fecha, clase.hora, mesActual) &&
             clase.lugaresDisponibles > 0;
       }));
 
@@ -451,7 +449,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
     final partesFecha = clase.fecha.split('/');
     final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
     final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
-    
+
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Column(
@@ -460,8 +458,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
           width: screenWidth * 0.7,
           height: screenWidth * 0.12,
           child: ElevatedButton(
-            onPressed: ((
-                    Calcular24hs()
+            onPressed: ((Calcular24hs()
                         .esMenorA0Horas(clase.fecha, clase.hora, mesActual) ||
                     clase.lugaresDisponibles <= 0 && !await IsAdmin().admin()))
                 ? null
@@ -488,8 +485,7 @@ class _ClasesScreenState extends State<ClasesTabletScreen> {
                   },
             style: ButtonStyle(
               backgroundColor: WidgetStateProperty.all(
-                
-                        Calcular24hs().esMenorA0Horas(
+                Calcular24hs().esMenorA0Horas(
                             clase.fecha, clase.hora, mesActual) ||
                         clase.lugaresDisponibles <= 0
                     ? Colors.grey.shade400

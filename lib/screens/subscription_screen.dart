@@ -98,7 +98,6 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-
     for (var purchase in purchases) {
       if (purchase.status == PurchaseStatus.purchased) {
         final usuarioActivo = Supabase.instance.client.auth.currentUser;

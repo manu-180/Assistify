@@ -572,7 +572,6 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                 },
                               ),
                             ),
-                           
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
