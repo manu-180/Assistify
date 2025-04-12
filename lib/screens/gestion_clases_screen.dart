@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/clases/eliminar_clase.dart';
+import 'package:taller_ceramica/supabase/modificar_datos/modificar_feriado.dart';
 import 'package:taller_ceramica/supabase/modificar_datos/modificar_lugar_disponible.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
@@ -30,6 +31,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
   String? fechaSeleccionada;
   List<ClaseModels> clasesDisponibles = [];
   List<ClaseModels> clasesFiltradas = [];
+
   bool isLoading = true;
   bool isProcessing = false;
   int mes = 0;
@@ -173,6 +175,9 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
   }
 
   Future<void> mostrarDialogoAgregarClase(String dia) async {
+
+
+
     final size = MediaQuery.of(context).size;
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
@@ -403,81 +408,62 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
     );
   }
 
-  Future<void> mostrarDialogoModificarCapacidad(ClaseModels clase) async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  Future<void> mostrarDialogoModificarFeriado(ClaseModels clase, bool feriado) async {
+      bool nuevoValor = !feriado;
 
-    final capacityController =
-        TextEditingController(text: clase.lugaresDisponibles.toString());
-
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-            AppLocalizations.of(context).translate('modifyClassCapacity'),
-          ),
-          content: TextField(
-            controller: capacityController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(
-              labelText:
-                  AppLocalizations.of(context).translate('maxCapacityLabel'),
+      await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Modificar feriado"),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("¿Querés marcar esta clase como feriado?"),
+                const SizedBox(height: 10),
+                SwitchListTile(
+                  value: nuevoValor,
+                  onChanged: (val) {
+                    nuevoValor = val;
+                    Navigator.of(context).pop();
+                  },
+                  title: Text(nuevoValor ? "Feriado" : "Clase normal"),
+                ),
+              ],
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                AppLocalizations.of(context).translate('cancelButtonLabel'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Cancelar"),
               ),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                final newCapacityString = capacityController.text.trim();
-                final newCapacity = int.tryParse(newCapacityString);
+              ElevatedButton(
+                onPressed: () async {
+                  Navigator.pop(context);
 
-                if (newCapacity == null) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(this.context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        AppLocalizations.of(context)
-                            .translate('invalidCapacityError'),
-                      ),
-                    ),
+                  await ModificarFeriado.cambiarFeriado(
+                    idClase: clase.id,
+                    nuevoValor: nuevoValor,
                   );
-                  return;
-                }
 
-                await supabase.from(taller).update({
-                  'capacidad': newCapacity,
-                  'lugar_disponible': newCapacity - clase.mails.length,
-                }).eq('id', clase.id);
+                  setState(() {
+                    final idx = clasesFiltradas.indexWhere((c) => c.id == clase.id);
+                    if (idx != -1) {
+                      clasesFiltradas[idx] = clase.copyWith(feriado: nuevoValor);
+                    }
 
-                setState(() {
-                  final index =
-                      clasesFiltradas.indexWhere((c) => c.id == clase.id);
-                  if (index != -1) {
-                    final updatedClase = clase.copyWith(
-                      lugaresDisponibles: newCapacity - clase.mails.length,
-                    );
-
-                    clasesFiltradas[index] = updatedClase;
-                  }
-                });
-
-                Navigator.of(context).pop();
-              },
-              child: Text(
-                AppLocalizations.of(context).translate('saveButtonLabel'),
+                    final idxAll = clasesDisponibles.indexWhere((c) => c.id == clase.id);
+                    if (idxAll != -1) {
+                      clasesDisponibles[idxAll] = clase.copyWith(feriado: nuevoValor);
+                    }
+                  });
+                },
+                child: const Text("Guardar"),
               ),
-            ),
-          ],
-        );
-      },
-    );
-  }
+            ],
+          );
+        },
+      );
+    }
 
   void cambiarFecha(bool siguiente) {
     setState(() {
@@ -504,6 +490,8 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
 
   @override
   Widget build(BuildContext context) {
+   
+
     final color = Theme.of(context).primaryColor;
     final colors = Theme.of(context).colorScheme;
 
@@ -555,84 +543,135 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                   child: ListView.builder(
                     itemCount: clasesFiltradas.length,
                     itemBuilder: (context, index) {
-                      final clase = clasesFiltradas[index];
-                      return Card(
-                        child: InkWell(
-                          onLongPress: () {
-                            mostrarDialogoModificarCapacidad(clase);
+  final clase = clasesFiltradas[index];
+  final esFeriado = clase.feriado;
+
+  return GestureDetector(
+    onLongPress: () {
+                            mostrarDialogoModificarFeriado(clase, esFeriado);
                           },
-                          child: ListTile(
-                            title: Text(
-                              AppLocalizations.of(context).translate(
-                                'classInfo',
-                                params: {
-                                  'time': clase.hora,
-                                  'availablePlaces':
-                                      clase.lugaresDisponibles.toString(),
-                                },
-                              ),
+    child: esFeriado
+        ? Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Card(
+              color: Colors.amber.shade100,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  children: [
+                    const Icon(Icons.celebration, size: 40, color: Colors.orange),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "¡Es feriado!",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.deepOrange,
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.add),
-                                  onPressed: () async {
-                                    bool? respuesta =
-                                        await mostrarDialogoConfirmacion(
-                                      context,
-                                      AppLocalizations.of(context)
-                                          .translate('addPlaceConfirmation'),
-                                    );
-                                    if (respuesta == true) {
-                                      agregarLugar(clase.id);
-                                      ModificarLugarDisponible()
-                                          .agregarLugarDisponible(clase.id);
-                                    }
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            "No hay clases este día. ¡Disfrutá tu descanso!",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        : Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Card(color: Colors.white,
+                          child: InkWell(
+                            onLongPress: () {
+                              mostrarDialogoModificarFeriado(clase, esFeriado);
+                            },
+                            child: ListTile(
+                              title: Text(
+                                AppLocalizations.of(context).translate(
+                                  'classInfo',
+                                  params: {
+                                    'time': clase.hora,
+                                    'availablePlaces':
+                                        clase.lugaresDisponibles.toString(),
                                   },
                                 ),
-                                IconButton(
-                                  icon: const Icon(Icons.remove),
-                                  onPressed: () async {
-                                    bool? respuesta =
-                                        await mostrarDialogoConfirmacion(
-                                      context,
-                                      AppLocalizations.of(context)
-                                          .translate('removePlaceConfirmation'),
-                                    );
-                                    if (respuesta == true &&
-                                        clase.lugaresDisponibles > 0) {
-                                      quitarLugar(clase.id);
-                                      ModificarLugarDisponible()
-                                          .removerLugarDisponible(clase.id);
-                                    }
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
+                              ),
+                              subtitle: clase.mails.isEmpty? Text("Sin alumnos"): Text(clase.mails.join(", ")),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () async {
+                                      bool? respuesta =
+                                          await mostrarDialogoConfirmacion(
+                                        context,
+                                        AppLocalizations.of(context)
+                                            .translate('addPlaceConfirmation'),
+                                      );
+                                      if (respuesta == true) {
+                                        agregarLugar(clase.id);
+                                        ModificarLugarDisponible()
+                                            .agregarLugarDisponible(clase.id);
+                                      }
+                                    },
                                   ),
-                                  onPressed: () async {
-                                    bool? respuesta =
-                                        await mostrarDialogoConfirmacion(
-                                      context,
-                                      AppLocalizations.of(context)
-                                          .translate('deleteClassConfirmation'),
-                                    );
-                                    if (respuesta == true) {
-                                      setState(() {
-                                        clasesFiltradas.removeAt(index);
-                                        EliminarClase().eliminarClase(clase.id);
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () async {
+                                      bool? respuesta =
+                                          await mostrarDialogoConfirmacion(
+                                        context,
+                                        AppLocalizations.of(context)
+                                            .translate('removePlaceConfirmation'),
+                                      );
+                                      if (respuesta == true &&
+                                          clase.lugaresDisponibles > 0) {
+                                        quitarLugar(clase.id);
+                                        ModificarLugarDisponible()
+                                            .removerLugarDisponible(clase.id);
+                                      }
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.red,
+                                    ),
+                                    onPressed: () async {
+                                      bool? respuesta =
+                                          await mostrarDialogoConfirmacion(
+                                        context,
+                                        AppLocalizations.of(context)
+                                            .translate('deleteClassConfirmation'),
+                                      );
+                                      if (respuesta == true) {
+                                        setState(() {
+                                          clasesFiltradas.removeAt(index);
+                                          EliminarClase().eliminarClase(clase.id);
+                                        });
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      );
+        )
+  );
                     },
                   ),
                 ),

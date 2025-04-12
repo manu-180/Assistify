@@ -465,7 +465,7 @@ class AppLocalizations {
       "manageSchedulesInfo":
           "En esta sección podrás gestionar tus horarios, ver quiénes asisten a tus clases y agregar o remover usuarios de las mismas.",
       "selectDateHint": "Selecciona una fecha",
-      "studentsLabel": "Alumnos:",
+      "studentsLabel": "Alumnos",
       "addUserButton": "Agregar Usuario",
       "removeUserButton": "Remover Usuario",
       "noClassesLoaded": "No hay clases cargadas el \$day \$date",
