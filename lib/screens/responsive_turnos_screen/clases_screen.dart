@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
@@ -44,73 +45,54 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   String? avisoAnterior;
   bool esAdmin = false;
 
-  Future<void> cargarDatos() async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  Future<void> cargarDatos({bool intentoDesdeOtraSemana = false}) async {
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-    setState(() => isLoading = true);
+  setState(() => isLoading = true);
 
-    // ✅ Si la semana ya está cacheada, usarla directamente
-    if (_cachePorSemana.containsKey(semanaSeleccionada)) {
-      final datosSemana = _cachePorSemana[semanaSeleccionada]!;
-
-      _procesarDatosSemana(datosSemana);
-
-      // 🧠 Mostrar aviso lo antes posible
-      _generarAvisoConDatosLocales();
-
-      setState(() => isLoading = false);
-
-      // 🔄 Luego actualizamos el aviso con info real (Supabase)
-      _actualizarClasesDisponibles();
-
-      return;
-    }
-
-    // 🚨 Si no está cacheada, seguimos con el flujo normal
-
-    final datos = await ObtenerTotalInfo(
-      supabase: supabase,
-      usuariosTable: 'usuarios',
-      clasesTable: taller,
-    ).obtenerClases();
-
-    final datosSemana =
-        datos.where((clase) => clase.semana == semanaSeleccionada).toList();
-
-    _cachePorSemana[semanaSeleccionada] = datosSemana;
+  if (_cachePorSemana.containsKey(semanaSeleccionada)) {
+    final datosSemana = _cachePorSemana[semanaSeleccionada]!;
 
     _procesarDatosSemana(datosSemana);
-    await _actualizarClasesDisponibles();
+    _generarAvisoConDatosLocales();
     setState(() => isLoading = false);
-  }
+    _actualizarClasesDisponibles();
 
-  void _procesarDatosSemana(List<ClaseModels> datosSemana) {
-    final dateFormat = DateFormat("dd/MM/yyyy HH:mm");
-
-    datosSemana.sort((a, b) {
-      final fechaA = dateFormat.parse('${a.fecha} ${a.hora}');
-      final fechaB = dateFormat.parse('${b.fecha} ${b.hora}');
-      return fechaA.compareTo(fechaB);
-    });
-
-    final diasSet = <String>{};
-    diasUnicos = datosSemana.where((clase) {
-      final diaFecha = '${clase.dia} - ${clase.fecha}';
-      if (diasSet.contains(diaFecha)) {
-        return false;
-      } else {
-        diasSet.add(diaFecha);
-        return true;
-      }
-    }).toList();
-
-    horariosPorDia = {};
-    for (var clase in datosSemana) {
-      final diaFecha = '${clase.dia} - ${clase.fecha}';
-      horariosPorDia.putIfAbsent(diaFecha, () => []).add(clase);
+    if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
+      // 👇 Volvemos a intentar con la siguiente semana
+      cambiarSemanaAdelante(forzar: true);
+    } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
+      // 👇 Ya intentamos una vez y sigue vacío: mostrar alerta
+      _mostrarDialogoSinClases(taller);
     }
+
+    return;
   }
+
+  // Si no está cacheada, seguimos
+  final datos = await ObtenerTotalInfo(
+    supabase: supabase,
+    usuariosTable: 'usuarios',
+    clasesTable: taller,
+  ).obtenerClases();
+
+  final datosSemana =
+      datos.where((clase) => clase.semana == semanaSeleccionada).toList();
+
+  _cachePorSemana[semanaSeleccionada] = datosSemana;
+
+  _procesarDatosSemana(datosSemana);
+  await _actualizarClasesDisponibles();
+  setState(() => isLoading = false);
+
+  if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
+    cambiarSemanaAdelante(forzar: true);
+  } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
+    _mostrarDialogoSinClases(taller);
+  }
+}
+
 
   void precargarTodasLasSemanas() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -244,6 +226,33 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     }
   }
 
+  void _procesarDatosSemana(List<ClaseModels> datosSemana) {
+    final dateFormat = DateFormat("dd/MM/yyyy HH:mm");
+
+    datosSemana.sort((a, b) {
+      final fechaA = dateFormat.parse('${a.fecha} ${a.hora}');
+      final fechaB = dateFormat.parse('${b.fecha} ${b.hora}');
+      return fechaA.compareTo(fechaB);
+    });
+
+    final diasSet = <String>{};
+    diasUnicos = datosSemana.where((clase) {
+      final diaFecha = '${clase.dia} - ${clase.fecha}';
+      if (diasSet.contains(diaFecha)) {
+        return false;
+      } else {
+        diasSet.add(diaFecha);
+        return true;
+      }
+    }).toList();
+
+    horariosPorDia = {};
+    for (var clase in datosSemana) {
+      final diaFecha = '${clase.dia} - ${clase.fecha}';
+      horariosPorDia.putIfAbsent(diaFecha, () => []).add(clase);
+    }
+  }
+
   Future<void> mostrarAlertaListaEspera({
     required BuildContext context,
     ClaseModels? clase,
@@ -280,18 +289,19 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     );
   }
 
-  void cambiarSemanaAdelante() {
-    final indiceActual = semanas.indexOf(semanaSeleccionada);
-    final nuevoIndice = (indiceActual + 1) % semanas.length;
+  void cambiarSemanaAdelante({bool forzar = false}) {
+  final indiceActual = semanas.indexOf(semanaSeleccionada);
+  final nuevoIndice = (indiceActual + 1) % semanas.length;
 
-    setState(() {
-      semanaSeleccionada = semanas[nuevoIndice];
-      isLoading = true;
-      avisoDeClasesDisponibles = null;
-    });
+  setState(() {
+    semanaSeleccionada = semanas[nuevoIndice];
+    isLoading = true;
+    avisoDeClasesDisponibles = null;
+  });
 
-    cargarDatos();
-  }
+  cargarDatos(intentoDesdeOtraSemana: forzar);
+}
+
 
   void cambiarSemanaAtras() {
     final indiceActual = semanas.indexOf(semanaSeleccionada);
@@ -305,6 +315,33 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
 
     cargarDatos();
   }
+
+  void _mostrarDialogoSinClases(String taller) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Sin clases registradas'),
+      content: const Text('Primero debes cargar tus clases.'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.push('/gestionclases/$taller');
+ 
+          },
+          child: const Text('Ir a gestión'),
+        ),
+      ],
+    ),
+  );
+}
+
 
   void mostrarConfirmacion(BuildContext context, ClaseModels clase) async {
     final user = Supabase.instance.client.auth.currentUser;
@@ -570,88 +607,127 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   }
 
   Widget construirBotonHorario(ClaseModels clase) {
-    final partesFecha = clase.fecha.split('/');
-    final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
-    final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
+  final partesFecha = clase.fecha.split('/');
+  final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
+  final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
+  final screenWidth = MediaQuery.of(context).size.width;
+  
 
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    return Column(
-      children: [
-        SizedBox(
-          width: screenWidth * 0.7,
-          height: screenWidth * 0.12,
-          child: GestureDetector(
-            child: ElevatedButton(
-              onPressed: esAdmin
-                  ? () async {
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              clase.mails.isEmpty
-                                  ? AppLocalizations.of(context)
-                                      .translate('noStudents')
-                                  : AppLocalizations.of(context).translate(
-                                      'studentsInClass',
-                                      params: {
-                                        'students': clase.mails.join(', ')
-                                      },
-                                    ),
-                            ),
-                            duration: const Duration(seconds: 5),
-                            behavior: SnackBarBehavior.fixed,
-                          ),
-                        );
-                      }
-                    }
-                  : ((clase.feriado ||
-                          Calcular24hs().esMenorA0Horas(
-                              clase.fecha, clase.hora, mesActual) ||
-                          clase.lugaresDisponibles <= 0))
-                      ? null
-                      : () async {
-                          if (context.mounted) {
-                            mostrarConfirmacion(context, clase);
-                          }
-                        },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(
-                  clase.feriado ||
-                          Calcular24hs().esMenorA0Horas(
-                              clase.fecha, clase.hora, mesActual) ||
-                          clase.lugaresDisponibles <= 0
-                      ? Colors.grey.shade400
-                      : Colors.green,
+  // 👉 Si es feriado, mostramos una tarjeta especial
+  if (clase.feriado) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Card(
+        color: Colors.amber.shade100,
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            children: [
+              Icon(Icons.celebration,
+                  size: screenWidth * 0.08, color: Colors.orange),
+              const SizedBox(width: 10),
+               Expanded(
+                
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "¡Es feriado!",
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.04,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepOrange,
+                      ),
+                    ),
+            
+                  ],
                 ),
-                shape: WidgetStateProperty.all(
-                  RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.03)),
-                ),
-                padding: WidgetStateProperty.all(EdgeInsets.zero),
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Text(
-                    diaYHora,
-                    style: TextStyle(
-                        fontSize: screenWidth * 0.032, color: Colors.white),
-                  ),
-                ],
-              ),
-            ),
-            onLongPress: () {
-              mostrarAlertaListaEspera(context: context, clase: clase);
-            },
+            ],
           ),
         ),
-        const SizedBox(height: 18),
-      ],
+      ),
     );
   }
-}
+
+  // 🔁 Caso normal: clase habilitada o deshabilitada
+  return Column(
+    children: [
+      SizedBox(
+        width: screenWidth * 0.7,
+        height: screenWidth * 0.12,
+        child: GestureDetector(
+          child: ElevatedButton(
+            onPressed: esAdmin
+                ? () async {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            clase.mails.isEmpty
+                                ? AppLocalizations.of(context)
+                                    .translate('noStudents')
+                                : AppLocalizations.of(context).translate(
+                                    'studentsInClass',
+                                    params: {
+                                      'students': clase.mails.join(', ')
+                                    },
+                                  ),
+                          ),
+                          duration: const Duration(seconds: 5),
+                          behavior: SnackBarBehavior.fixed,
+                        ),
+                      );
+                    }
+                  }
+                : ((Calcular24hs().esMenorA0Horas(
+                            clase.fecha, clase.hora, mesActual) ||
+                        clase.lugaresDisponibles <= 0))
+                    ? null
+                    : () async {
+                        if (context.mounted) {
+                          mostrarConfirmacion(context, clase);
+                        }
+                      },
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all(
+                Calcular24hs().esMenorA0Horas(
+                            clase.fecha, clase.hora, mesActual) ||
+                        clase.lugaresDisponibles <= 0
+                    ? Colors.grey.shade400
+                    : Colors.green,
+              ),
+              shape: WidgetStateProperty.all(
+                RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+              ),
+              padding: WidgetStateProperty.all(EdgeInsets.zero),
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Text(
+                  diaYHora,
+                  style: TextStyle(
+                      fontSize: screenWidth * 0.032, color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          onLongPress: () {
+            mostrarAlertaListaEspera(context: context, clase: clase);
+          },
+        ),
+      ),
+      const SizedBox(height: 18),
+    ],
+  );
+  }}
 
 class _AvisoDeClasesDisponibles extends StatelessWidget {
   const _AvisoDeClasesDisponibles({
@@ -748,7 +824,7 @@ class _SemanaNavigation extends StatelessWidget {
   }
 }
 
-class _DiaSelection extends StatelessWidget {
+class _DiaSelection extends StatefulWidget {
   final List<ClaseModels> diasUnicos;
   final Function(String) seleccionarDia;
   final List<String> fechasDisponibles;
@@ -764,68 +840,117 @@ class _DiaSelection extends StatelessWidget {
   });
 
   @override
+  State<_DiaSelection> createState() => _DiaSelectionState();
+}
+
+class _DiaSelectionState extends State<_DiaSelection> {
+  bool _yaIntentoUnaVez = false;
+  bool _yaMostroDialogo = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final tieneDiasParaMostrar = _hayFechasDelMesActual();
+
+    if (!tieneDiasParaMostrar && !_yaIntentoUnaVez && !_yaMostroDialogo) {
+      _yaIntentoUnaVez = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.cambiarSemanaAdelante();
+      });
+    } else if (!tieneDiasParaMostrar && _yaIntentoUnaVez && !_yaMostroDialogo) {
+      _yaMostroDialogo = true;
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _mostrarDialogoSinClases();
+      });
+    }
+  }
+
+  bool _hayFechasDelMesActual() {
+    return widget.diasUnicos.any((clase) {
+      final partes = clase.fecha.split('/');
+      final mes = int.parse(partes[1]);
+      return mes == widget.mesActual;
+    });
+  }
+
+  void _mostrarDialogoSinClases() {
+    final taller = Supabase.instance.client.auth.currentUser?.userMetadata?['taller'] ?? '';
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sin clases registradas'),
+        content: const Text('Primero debes cargar tus clases.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/gestionclases/$taller');
+            },
+            child: const Text('Ir a gestión'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    // Si no hay datos en diasUnicos, se pasa automáticamente a la siguiente semana.
-    if (diasUnicos.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        cambiarSemanaAdelante(); // Cambiar a la siguiente semana.
-      });
-      return const SizedBox.shrink(); // Evitar mostrar contenido innecesario.
-    }
+    final filteredFechas = widget.fechasDisponibles.where((dateString) {
+      final partes = dateString.split('/');
+      final fecha = DateTime(
+        int.parse(partes[2]),
+        int.parse(partes[1]),
+        int.parse(partes[0]),
+      );
+      return fecha.month == widget.mesActual;
+    }).toList();
+
+    final diasParaMostrar = widget.diasUnicos.where((clase) {
+      return filteredFechas.contains(clase.fecha);
+    }).toList();
 
     return ListView.builder(
-      itemCount: diasUnicos.length,
+      itemCount: diasParaMostrar.length,
       itemBuilder: (context, index) {
-        final clase = diasUnicos[index];
+        final clase = diasParaMostrar[index];
         final partesFecha = clase.fecha.split('/');
         final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
         final diaMesAnio = '${clase.dia} - ${clase.fecha}';
 
-        final diaFecha = '${clase.dia} - $diaMes';
-
-        final filteredFechas = fechasDisponibles.where((dateString) {
-          final partes = dateString.split('/');
-          final fecha = DateTime(
-            int.parse(partes[2]),
-            int.parse(partes[1]),
-            int.parse(partes[0]),
-          );
-
-          return fecha.month == mesActual;
-        }).toList();
-
-        if (filteredFechas.contains(clase.fecha)) {
-          return Column(
-            children: [
-              SizedBox(
-                width: screenWidth * 0.8,
-                height: screenHeight * 0.053,
-                child: ElevatedButton(
-                  onPressed: () => seleccionarDia(diaMesAnio),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: Size.zero,
-                    padding: EdgeInsets.zero,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                    ),
-                  ),
-                  child: Text(
-                    diaFecha,
-                    style: TextStyle(fontSize: screenWidth * 0.032),
+        return Column(
+          children: [
+            SizedBox(
+              width: screenWidth * 0.8,
+              height: screenHeight * 0.053,
+              child: ElevatedButton(
+                onPressed: () => widget.seleccionarDia(diaMesAnio),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
                   ),
                 ),
+                child: Text(
+                  '${clase.dia} - $diaMes',
+                  style: TextStyle(fontSize: screenWidth * 0.032),
+                ),
               ),
-              const SizedBox(
-                height: 20,
-              )
-            ],
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
+            ),
+            const SizedBox(height: 20),
+          ],
+        );
       },
     );
   }

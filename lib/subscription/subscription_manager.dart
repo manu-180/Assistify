@@ -29,11 +29,14 @@ class SubscriptionManager {
     final restoredPurchases = await restorePurchases();
 
     final bool isSubscribed = restoredPurchases.any((purchase) =>
-        (purchase.productID == 'monthlysubscription' ||
-            purchase.productID == 'annualsubscription' ||
-            purchase.productID == 'cero' ||
-            purchase.productID == 'prueba') &&
-        purchase.status == PurchaseStatus.purchased);
+    (purchase.productID == 'monthlysubscription' ||
+     purchase.productID == 'annualsubscription' ||
+     purchase.productID == 'cero' ||
+     purchase.productID == 'prueba') &&
+    (purchase.status == PurchaseStatus.purchased || 
+     purchase.status == PurchaseStatus.restored)
+);
+
 
     await Supabase.instance.client
         .from('subscriptions')

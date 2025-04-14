@@ -82,8 +82,9 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
       final PurchaseParam purchaseParam =
           PurchaseParam(productDetails: productDetails);
       debugPrint('Attempting to purchase: ${productDetails.id}');
-      _inAppPurchase.buyConsumable(
-          purchaseParam: purchaseParam, autoConsume: false);
+      _inAppPurchase.buyNonConsumable(
+    purchaseParam: purchaseParam);
+
     } catch (e) {
       debugPrint('Error initiating purchase: $e');
       ScaffoldMessenger.of(context).showSnackBar(

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
@@ -398,6 +399,53 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                 ),
         ),
       ),
+      floatingActionButton: Stack(
+  children: [
+    Positioned(
+      bottom: 16,
+      right: 16,
+      child: BounceInDown(
+        duration: const Duration(milliseconds: 600),
+        child: IconButton(
+          icon: Icon(Icons.info_outline, color: color.primary, size: 28),
+          onPressed: () async {
+
+            if (!context.mounted) return;
+
+            showDialog(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: Row(
+                  children: [
+                    Icon(Icons.info_outline, color: color.primary),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Información",
+                      style: TextStyle(color: color.primary),
+                    ),
+                  ],
+                ),
+                content: Text(
+  "1️⃣ Desde aquí podés ver todas las clases en las que estás anotado durante el mes.\n\n"
+  "2️⃣ Si necesitás cancelar una clase, presioná el botón \"Cancelar\". Se abrirá una alerta para confirmar. Si cancelás con más de 24 hs de anticipación, vas a obtener un crédito para recuperar esa clase en otro momento. Si lo hacés con menos de 24 hs, no se genera crédito.\n\n"
+  "3️⃣ También vas a ver tus clases en lista de espera. Si alguien cancela su lugar en una clase donde estás en espera, se te asignará automáticamente ese espacio y recibirás una notificación por WhatsApp.",
+),
+
+
+                actions: [
+                  TextButton(
+                    child: const Text("Entendido"),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    ),
+  ],
+),
     );
   }
 }

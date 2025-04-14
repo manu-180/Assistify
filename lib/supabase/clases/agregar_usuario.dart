@@ -239,7 +239,7 @@ class AgregarUsuario {
     for (final item in data) {
       final partes = item.fecha.split('/');
       if (partes.length == 3) {
-        if (item.dia == clase.dia && item.hora == clase.hora) {
+        if (item.dia == clase.dia && item.hora == clase.hora) { 
           if (!item.feriado &&
               !item.mails.contains(user) &&
               count < 4 &&
