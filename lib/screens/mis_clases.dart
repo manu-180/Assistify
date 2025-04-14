@@ -11,6 +11,7 @@ import 'package:taller_ceramica/utils/utils_barril.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/models/clase_models.dart';
 import 'package:taller_ceramica/providers/auth_notifier.dart';
+import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 
@@ -222,12 +223,7 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                 )
               : Column(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 20, 10, 0),
-                      child: BoxText(
-                        text: localizations.translate('viewCancelClassesInfo'),
-                      ),
-                    ),
+                    
                     const SizedBox(height: 50),
                     (clasesDelUsuario.isEmpty &&
                             listaDeEsperaDelUsuario.isEmpty)
@@ -399,53 +395,9 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                 ),
         ),
       ),
-      floatingActionButton: Stack(
-  children: [
-    Positioned(
-      bottom: 16,
-      right: 16,
-      child: BounceInDown(
-        duration: const Duration(milliseconds: 600),
-        child: IconButton(
-          icon: Icon(Icons.info_outline, color: color.primary, size: 28),
-          onPressed: () async {
-
-            if (!context.mounted) return;
-
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: color.primary),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Información",
-                      style: TextStyle(color: color.primary),
-                    ),
-                  ],
-                ),
-                content: Text(
-  "1️⃣ Desde aquí podés ver todas las clases en las que estás anotado durante el mes.\n\n"
+      floatingActionButton: InformationButon(text:  "1️⃣ Desde aquí podés ver todas las clases en las que estás anotado durante el mes.\n\n"
   "2️⃣ Si necesitás cancelar una clase, presioná el botón \"Cancelar\". Se abrirá una alerta para confirmar. Si cancelás con más de 24 hs de anticipación, vas a obtener un crédito para recuperar esa clase en otro momento. Si lo hacés con menos de 24 hs, no se genera crédito.\n\n"
-  "3️⃣ También vas a ver tus clases en lista de espera. Si alguien cancela su lugar en una clase donde estás en espera, se te asignará automáticamente ese espacio y recibirás una notificación por WhatsApp.",
-),
-
-
-                actions: [
-                  TextButton(
-                    child: const Text("Entendido"),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    ),
-  ],
-),
+  "3️⃣ También vas a ver tus clases en lista de espera. Si alguien cancela su lugar en una clase donde estás en espera, se te asignará automáticamente ese espacio y recibirás una notificación por WhatsApp.")
     );
   }
 }

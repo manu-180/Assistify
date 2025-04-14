@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -744,39 +745,85 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      padding: EdgeInsets.all(screenWidth * 0.04),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            colors.secondaryContainer,
-            colors.primary.withAlpha(70),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0,0,10,10),
+          child: BounceInDown(
+          duration: const Duration(milliseconds: 600),
+          child: IconButton(
+            icon: Icon(Icons.info_outline, color: color, size: 28),
+            onPressed: () async {
+          
+              if (!context.mounted) return;
+          
+              showDialog(
+                context: context,
+                builder: (_) => AlertDialog(
+                  title: Row(
+                    children: [
+                      Icon(Icons.info_outline, color: color),
+                      const SizedBox(width: 8),
+                      Text(
+                        "Información",
+                        style: TextStyle(color: color),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+            text
+          ),
+          
+          
+                  actions: [
+                    TextButton(
+                      child: const Text("Entendido"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+                ),
         ),
-        borderRadius: BorderRadius.circular(screenWidth * 0.03),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.info,
-            color: color,
-            size: screenWidth * 0.08,
-          ),
-          SizedBox(width: screenWidth * 0.03),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: screenWidth * 0.04,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+        Container(
+          padding: EdgeInsets.all(screenWidth * 0.04),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                colors.secondaryContainer,
+                colors.primary.withAlpha(70),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
-        ],
-      ),
+          child: Row(
+            children: [
+              Icon(
+                Icons.info,
+                color: color,
+                size: screenWidth * 0.08,
+              ),
+              SizedBox(width: screenWidth * 0.03),
+              Expanded(
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.04,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

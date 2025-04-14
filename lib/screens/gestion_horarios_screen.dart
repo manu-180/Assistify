@@ -16,6 +16,7 @@ import 'package:taller_ceramica/utils/actualizar_fechas_database.dart';
 import 'package:taller_ceramica/utils/enviar_wpp.dart';
 import 'package:taller_ceramica/widgets/box_text.dart';
 import 'package:taller_ceramica/utils/generar_fechas_del_mes.dart';
+import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/mostrar_dia_segun_fecha.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
@@ -773,56 +774,13 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
           ),
         ),
       ),
-      floatingActionButton: Stack(
-  children: [
-    Positioned(
-      bottom: 16,
-      right: 16,
-      child: BounceInDown(
-        duration: const Duration(milliseconds: 600),
-        child: IconButton(
-          icon: Icon(Icons.info_outline, color: colors.primary, size: 28),
-          onPressed: () async {
-            final usuarioActivo = Supabase.instance.client.auth.currentUser;
-            final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
-
-            if (!context.mounted) return;
-
-            showDialog(
-              context: context,
-              builder: (_) => AlertDialog(
-                title: Row(
-                  children: [
-                    Icon(Icons.info_outline, color: colors.primary),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Información",
-                      style: TextStyle(color: colors.primary),
-                    ),
-                  ],
-                ),
-                content: Text(
-  "1️⃣ Seleccioná una fecha del mes para ver todas las clases de ese día.\n\n"
+      floatingActionButton: InformationButon(
+        text: "1️⃣ Seleccioná una fecha del mes para ver todas las clases de ese día.\n\n"
   "2️⃣ En cada clase vas a poder agregar o quitar alumnos. También podés usar la opción \"x4\" para hacerlo automáticamente en todas las clases iguales del mes (por ejemplo, todos los lunes a la misma hora).\n\n"
-  "2️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n"
- 
-),
-
-                actions: [
-                  TextButton(
-                    child: const Text("Entendido"),
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+  "2️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n",
       ),
-    ),
-  ],
-),
-
     );
+
+    
   }
 }
