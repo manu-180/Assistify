@@ -488,121 +488,107 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
     final colors = Theme.of(context).colorScheme;
-    final screenWidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.of(context).size;
 
-    double paddingSize = screenWidth * 0.05;
+    double paddingSize = size.width * 0.05;
 
     return Scaffold(
-      appBar: ResponsiveAppBar(isTablet: screenWidth > 600),
-      body: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.fromLTRB(paddingSize, 20, paddingSize, 0),
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withAlpha(50),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                AppLocalizations.of(context).translate('classScheduleInfo'),
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyLarge
-                    ?.copyWith(fontSize: screenWidth * 0.04),
-              ),
+      appBar: ResponsiveAppBar(isTablet: size.width > 600),
+      body: Padding(
+        padding: EdgeInsets.fromLTRB(size.width *0.02,size.height * 0.15,0,0),
+        child: Column(
+          children: [
+        
+            SemanaNavigation(
+              semanaSeleccionada: semanaSeleccionada,
+              cambiarSemanaAdelante: cambiarSemanaAdelante,
+              cambiarSemanaAtras: cambiarSemanaAtras,
             ),
-          ),
-          const SizedBox(height: 30),
-          _SemanaNavigation(
-            semanaSeleccionada: semanaSeleccionada,
-            cambiarSemanaAdelante: cambiarSemanaAdelante,
-            cambiarSemanaAtras: cambiarSemanaAtras,
-          ),
-          const SizedBox(height: 20),
-          Expanded(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: isLoading
-                      ? Column(
-                          children: List.generate(
-                              5,
-                              (index) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 20),
-                                    child: SizedBox(
-                                      height: screenWidth * 0.113,
-                                      child: ElevatedButton(
-                                        onPressed: () {},
-                                        style: ElevatedButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
+            const SizedBox(height: 20),
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: isLoading
+                        ? Column(
+                            children: List.generate(
+                                5,
+                                (index) => Padding(
+                                      padding: const EdgeInsets.only(bottom: 20),
+                                      child: SizedBox(
+                                        height: size.width * 0.113,
+                                        child: ElevatedButton(
+                                          onPressed: () {},
+                                          style: ElevatedButton.styleFrom(
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                            ),
+                                          ),
+                                          child: Center(
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: LinearProgressIndicator(
+                                                  minHeight: 2.2,
+                                                )),
                                           ),
                                         ),
-                                        child: Center(
-                                          child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              child: LinearProgressIndicator(
-                                                minHeight: 2.2,
-                                              )),
-                                        ),
                                       ),
-                                    ),
-                                  )),
-                        )
-                      : _DiaSelection(
-                          diasUnicos: diasUnicos,
-                          seleccionarDia: seleccionarDia,
-                          fechasDisponibles: fechasDisponibles,
-                          mesActual: mesActual,
-                          cambiarSemanaAdelante: cambiarSemanaAdelante,
-                        ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: paddingSize),
-                    child: diaSeleccionado != null
-                        ? isLoading
-                            ? const SizedBox()
-                            : ListView.builder(
-                                itemCount:
-                                    horariosPorDia[diaSeleccionado]?.length ??
-                                        0,
-                                itemBuilder: (context, index) {
-                                  final clase =
-                                      horariosPorDia[diaSeleccionado]![index];
-                                  return construirBotonHorario(clase);
-                                },
-                              )
-                        : const SizedBox(),
+                                    )),
+                          )
+                        : _DiaSelection(
+                            diasUnicos: diasUnicos,
+                            seleccionarDia: seleccionarDia,
+                            fechasDisponibles: fechasDisponibles,
+                            mesActual: mesActual,
+                            cambiarSemanaAdelante: cambiarSemanaAdelante,
+                          ),
                   ),
-                ),
-              ],
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: paddingSize),
+                      child: diaSeleccionado != null
+                          ? isLoading
+                              ? const SizedBox()
+                              : ListView.builder(
+                                  itemCount:
+                                      horariosPorDia[diaSeleccionado]?.length ??
+                                          0,
+                                  itemBuilder: (context, index) {
+                                    final clase =
+                                        horariosPorDia[diaSeleccionado]![index];
+                                    return construirBotonHorario(clase);
+                                  },
+                                )
+                          : const SizedBox(),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: paddingSize, vertical: 20),
-            child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
-                ? _AvisoDeClasesDisponibles(
-                    colors: colors,
-                    color: color,
-                    text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
-                  )
-                : ShimmerLoading(
-                    brillo: colors.primary.withAlpha(40),
-                    color: colors.primary.withAlpha(120),
-                    height: screenWidth * 0.19,
-                    width: screenWidth * 0.9,
-                  ),
-          ),
-          const SizedBox(height: 30),
-        ],
+            Padding(
+              padding:
+                  EdgeInsets.fromLTRB(0,0,size.width *0.04, 0),
+              child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
+                  ? _AvisoDeClasesDisponibles(
+                      colors: colors,
+                      color: color,
+                      text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
+                    )
+                  : ShimmerLoading(
+                      brillo: colors.primary.withAlpha(40),
+                      color: colors.primary.withAlpha(120),
+                      height: size.width * 0.19,
+                      width: size.width * 0.9,
+                    ),
+            ),
+            const SizedBox(height: 30),
+          ],
+        ),
       ),
     );
   }
@@ -773,7 +759,12 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
                     ],
                   ),
                   content: Text(
-            text
+            "1️⃣ Vas a ver botones de lunes a viernes. Tocá el día que te interese."
+
+"\n\n2️⃣ A la derecha se mostrarán los horarios para ese día. Si hay cupo, podés inscribirte tocando el botón verde."
+
+"\n\n3️⃣ Si la clase está llena, podés dejar el dedo presionado para unirte a la lista de espera."
+" Si un alumno cancela, y vos tenés crédito disponible, vas a ser agregado automáticamente y se te avisará por WhatsApp."
           ),
           
           
@@ -826,50 +817,78 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
       ],
     );
   }
-}
-
-class _SemanaNavigation extends StatelessWidget {
+}class SemanaNavigation extends StatefulWidget {
   final String semanaSeleccionada;
   final VoidCallback cambiarSemanaAdelante;
   final VoidCallback cambiarSemanaAtras;
 
-  const _SemanaNavigation({
+  const SemanaNavigation({
+    super.key,
     required this.semanaSeleccionada,
     required this.cambiarSemanaAdelante,
     required this.cambiarSemanaAtras,
   });
 
   @override
+  State<SemanaNavigation> createState() => _SemanaNavigationState();
+}
+
+class _SemanaNavigationState extends State<SemanaNavigation> {
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    final color = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: screenWidth * 0.04,
+    final semanas = ['semana1', 'semana2', 'semana3', 'semana4', 'semana5'];
+    final indiceSeleccionado = semanas.indexOf(widget.semanaSeleccionada);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+       IconButton(
+      onPressed: widget.cambiarSemanaAtras,
+      icon: Icon(
+        Icons.arrow_back_ios_new,
+        size: screenWidth * 0.07,
+        color: color.primary,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          IconButton(
-            onPressed: cambiarSemanaAtras,
-            icon: Icon(
-              Icons.arrow_left,
-              size: screenWidth * 0.07,
-            ),
+      padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
+      visualDensity: VisualDensity.compact, // <- Esto ajusta aún más
+    ),
+        Row(
+          children: List.generate(semanas.length, (index) {
+            final bool isActive = index == indiceSeleccionado;
+    
+            return Container(
+              margin: EdgeInsets.symmetric(horizontal: 2),
+              width: screenWidth * 0.032,
+              height: screenWidth * 0.02,
+              decoration: BoxDecoration(
+                color: isActive ? color.primary : Colors.transparent,
+                border: Border.all(
+                  color: color.primary,
+                  width: 1.5,
+                ),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            );
+          }),
+        ),
+        IconButton(
+          onPressed: widget.cambiarSemanaAdelante,
+          icon: Icon(
+            Icons.arrow_forward_ios,
+            size: screenWidth * 0.07,
+            color: color.primary,
           ),
-          SizedBox(width: screenWidth * 0.12),
-          IconButton(
-            onPressed: cambiarSemanaAdelante,
-            icon: Icon(
-              Icons.arrow_right,
-              size: screenWidth * 0.07,
-            ),
-          ),
-        ],
-      ),
+          padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
+      visualDensity: VisualDensity.compact, // <- 
+        ),
+      ],
     );
   }
 }
+
 
 class _DiaSelection extends StatefulWidget {
   final List<ClaseModels> diasUnicos;
@@ -978,7 +997,7 @@ class _DiaSelectionState extends State<_DiaSelection> {
         return Column(
           children: [
             SizedBox(
-              width: screenWidth * 0.8,
+              width: screenWidth * 0.99,
               height: screenHeight * 0.053,
               child: ElevatedButton(
                 onPressed: () => widget.seleccionarDia(diaMesAnio),
