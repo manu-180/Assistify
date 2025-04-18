@@ -13,6 +13,7 @@ import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/models/clase_models.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/generar_fechas_del_mes.dart';
+import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/widgets/shimmer_loader.dart';
 
@@ -495,9 +496,25 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     return Scaffold(
       appBar: ResponsiveAppBar(isTablet: size.width > 600),
       body: Padding(
-        padding: EdgeInsets.fromLTRB(size.width *0.02,size.height * 0.15,0,0),
+        padding: EdgeInsets.fromLTRB(size.width *0.03,size.height * 0.06,size.width *0.03,0),
         child: Column(
           children: [
+            Padding(
+              padding:
+                  EdgeInsets.fromLTRB(0,0,0, size.height *0.06),
+              child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
+                  ? _AvisoDeClasesDisponibles(
+                      colors: colors,
+                      color: color,
+                      text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
+                    )
+                  : ShimmerLoading(
+                      brillo: colors.primary.withAlpha(40),
+                      color: colors.primary.withAlpha(120),
+                      height: size.width * 0.19,
+                      width: size.width * 0.9,
+                    ),
+            ),
         
             SemanaNavigation(
               semanaSeleccionada: semanaSeleccionada,
@@ -570,26 +587,19 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding:
-                  EdgeInsets.fromLTRB(0,0,size.width *0.04, 0),
-              child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
-                  ? _AvisoDeClasesDisponibles(
-                      colors: colors,
-                      color: color,
-                      text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
-                    )
-                  : ShimmerLoading(
-                      brillo: colors.primary.withAlpha(40),
-                      color: colors.primary.withAlpha(120),
-                      height: size.width * 0.19,
-                      width: size.width * 0.9,
-                    ),
-            ),
+            
             const SizedBox(height: 30),
           ],
         ),
       ),
+      floatingActionButton: InformationButon(text: 
+            "1️⃣ Vas a ver botones de lunes a viernes. Tocá el día que te interese."
+
+"\n\n2️⃣ A la derecha se mostrarán los horarios para ese día. Si hay cupo, podés inscribirte tocando el botón verde."
+
+"\n\n3️⃣ Si la clase está llena, podés dejar el dedo presionado para unirte a la lista de espera."
+" Si un alumno cancela, y vos tenés crédito disponible, vas a ser agregado automáticamente y se te avisará por WhatsApp."
+          ),
     );
   }
 
@@ -731,55 +741,8 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0,0,10,10),
-          child: BounceInDown(
-          duration: const Duration(milliseconds: 600),
-          child: IconButton(
-            icon: Icon(Icons.info_outline, color: color, size: 28),
-            onPressed: () async {
-          
-              if (!context.mounted) return;
-          
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Row(
-                    children: [
-                      Icon(Icons.info_outline, color: color),
-                      const SizedBox(width: 8),
-                      Text(
-                        "Información",
-                        style: TextStyle(color: color),
-                      ),
-                    ],
-                  ),
-                  content: Text(
-            "1️⃣ Vas a ver botones de lunes a viernes. Tocá el día que te interese."
-
-"\n\n2️⃣ A la derecha se mostrarán los horarios para ese día. Si hay cupo, podés inscribirte tocando el botón verde."
-
-"\n\n3️⃣ Si la clase está llena, podés dejar el dedo presionado para unirte a la lista de espera."
-" Si un alumno cancela, y vos tenés crédito disponible, vas a ser agregado automáticamente y se te avisará por WhatsApp."
-          ),
-          
-          
-                  actions: [
-                    TextButton(
-                      child: const Text("Entendido"),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-                ),
-        ),
+    return 
+  
         Container(
           padding: EdgeInsets.all(screenWidth * 0.04),
           decoration: BoxDecoration(
@@ -813,9 +776,8 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
-    );
+        );
+ 
   }
 }class SemanaNavigation extends StatefulWidget {
   final String semanaSeleccionada;

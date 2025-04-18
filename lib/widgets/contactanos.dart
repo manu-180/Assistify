@@ -22,7 +22,7 @@ class _ContactanosState extends State<Contactanos>
 
   void _launchWhatsApp() async {
     final link = WhatsAppUnilink(
-      phoneNumber: '+5491132820164',
+      phoneNumber: '+5491125303794',
       text: '¡Hola! Me gustaría más información.',
     );
 
@@ -38,7 +38,10 @@ class _ContactanosState extends State<Contactanos>
     required String nombreUsuario,
     required String message,
   }) async {
-    await dotenv.load(fileName: ".env");
+
+    print("🔐 API KEY usada: ${dotenv.env['SENDGRID_API_KEY']}");
+
+    
 
     final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
 
