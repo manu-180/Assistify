@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:taller_ceramica/screens/chat_screen.dart';
+import 'package:taller_ceramica/screens/conversation_list_screen.dart';
 import 'package:taller_ceramica/screens/crear_taller.dart';
 import 'package:taller_ceramica/screens/login.dart';
 import 'package:taller_ceramica/screens/home_screen.dart';
@@ -105,6 +106,11 @@ final appRouter = GoRouter(
     GoRoute(
       path: "/chatscreen",
       builder: (context, state) => ChatScreen(),
+    ),
+    GoRoute(
+      path: '/soporte',
+      name: 'soporte',
+      builder: (context, state) => const ConversationListScreen(),
     ),
   ],
 );
