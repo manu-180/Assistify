@@ -10,6 +10,7 @@ class UsuarioModels {
   final bool admin;
   final DateTime createdAt;
   final String rubro;
+  final String? telefono;
 
   UsuarioModels({
     required this.id,
@@ -23,6 +24,7 @@ class UsuarioModels {
     required this.admin,
     required this.createdAt,
     required this.rubro,
+    required this.telefono,
   });
 
   // Función para convertir el mapa a un objeto UsuarioModels
@@ -39,6 +41,8 @@ class UsuarioModels {
       admin: map['admin'],
       createdAt: DateTime.parse(map['created_at']),
       rubro: map['rubro'],
+      telefono: map['telefono'],
+
     );
   }
 

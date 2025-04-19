@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_nombre_con_telefono.dart';
 
 class TwilioService {
   final apiKeySid = dotenv.env['API_KEY_SID'] ?? '';
@@ -89,10 +90,10 @@ Future<String?> fetchFirstParticipantIdentity(String conversationSid) async {
 
       final address = p['messaging_binding']?['address'];
       if (address != null && address.toString().startsWith('whatsapp:+549')) {
-        return address.toString().replaceFirst('whatsapp:+549', '');
+        return ObtenerNombreConTelefono().nombre(address.toString().replaceFirst('whatsapp:+549', '')) ;
       }
 
-      return address?.toString() ?? 'Desconocido';
+      return ObtenerNombreConTelefono().nombre(address!.toString());
     }
   }
 
