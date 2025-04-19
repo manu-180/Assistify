@@ -53,21 +53,20 @@ class TwilioService {
 }
 
 
-/// Obtiene un nombre representativo del primer participante de la conversación.
-/// Prioriza:
-/// 1. El atributo "name" si está presente.
-/// 2. El número de WhatsApp sin el prefijo `whatsapp:+549`.
-/// 3. El address crudo.
-/// 4. 'Desconocido' como fallback final.
 Future<String?> fetchFirstParticipantIdentity(String conversationSid) async {
+  final serviceSid = dotenv.env['CONVERSATION_SERVICE_SID'] ?? '';
+
+  final url = 'https://conversations.twilio.com/v1/Services/$serviceSid/Conversations/$conversationSid/Participants';
+
   final res = await http.get(
-    Uri.parse(
-      'https://conversations.twilio.com/v1/Conversations/$conversationSid/Participants',
-    ),
+    Uri.parse(url),
     headers: {
       'Authorization': basicAuthHeader(),
     },
   );
+
+  print("👤 PARTICIPANTS STATUS: ${res.statusCode}");
+  print("👤 BODY: ${res.body}");
 
   if (res.statusCode == 200) {
     final data = jsonDecode(res.body);
@@ -76,7 +75,6 @@ Future<String?> fetchFirstParticipantIdentity(String conversationSid) async {
     if (participants.isNotEmpty) {
       final p = participants.first;
 
-      // Intenta obtener el nombre desde los atributos (si se configuró con webhook)
       final rawAttributes = p['attributes'];
       try {
         if (rawAttributes != null && rawAttributes is String && rawAttributes.isNotEmpty) {
@@ -89,22 +87,18 @@ Future<String?> fetchFirstParticipantIdentity(String conversationSid) async {
         print('⚠️ Error al parsear atributos: $e');
       }
 
-      // Si no hay atributo, tratamos de sacar el número limpio del address
       final address = p['messaging_binding']?['address'];
       if (address != null && address.toString().startsWith('whatsapp:+549')) {
         return address.toString().replaceFirst('whatsapp:+549', '');
       }
 
-      // Si no matchea el formato, devolvemos el address como esté
-      return address ?? 'Desconocido';
+      return address?.toString() ?? 'Desconocido';
     }
-  } else {
-    print('❌ Error al obtener participantes. Status: ${res.statusCode}');
   }
 
-  // Si algo falla, devolvemos null para que lo maneje el caller
-  return null;
+  return 'Desconocido';
 }
+
 
 
 
