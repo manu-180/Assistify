@@ -1,16 +1,21 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:taller_ceramica/utils/conversation_list_notifier.dart';
 import '../services/twilio_service.dart';
+import '../utils/message_list_notifier.dart';
+
 
 final twilioServiceProvider = Provider<TwilioService>((ref) {
   return TwilioService();
 });
 
-final conversationListProvider = FutureProvider<List<Map<String, dynamic>>>((ref) async {
-  final service = ref.read(twilioServiceProvider);
-  return await service.fetchConversations();
-});
+final conversationListProvider =
+    StateNotifierProvider<ConversationListNotifier, AsyncValue<List<Map<String, dynamic>>>>(
+  (ref) => ConversationListNotifier(ref.read(twilioServiceProvider)),
+);
 
-final messagesProvider = FutureProvider.family<List<Map<String, dynamic>>, String>((ref, sid) async {
-  final service = ref.read(twilioServiceProvider);
-  return await service.fetchMessages(sid);
-});
+
+
+final messagesProvider = StateNotifierProvider.family<MessageListNotifier, AsyncValue<List<Map<String, dynamic>>>, String>(
+  (ref, sid) => MessageListNotifier(ref.read(twilioServiceProvider), sid),
+);
+

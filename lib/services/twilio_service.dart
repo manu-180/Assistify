@@ -7,14 +7,14 @@ class TwilioService {
   final apiKeySecret = dotenv.env['API_KEY_SECRET'] ?? '';
   final accountSid = dotenv.env['ACCOUNT_SID'] ?? '';
 
-  String _basicAuthHeader() {
+  String basicAuthHeader() {
     final credentials = base64Encode(utf8.encode('$apiKeySid:$apiKeySecret'));
     return 'Basic $credentials';
   }
 
   Future<List<Map<String, dynamic>>> fetchConversations() async {
-  final serviceSid = dotenv.env['CONVERSATION_SERVICE_SID'] ?? ''; // ejemplo: IS9...
-  
+  final serviceSid = dotenv.env['CONVERSATION_SERVICE_SID'] ?? '';
+
   final uri = Uri.https(
     'conversations.twilio.com',
     '/v1/Services/$serviceSid/Conversations',
@@ -26,23 +26,150 @@ class TwilioService {
   final res = await http.get(
     uri,
     headers: {
-      'Authorization': _basicAuthHeader(),
+      'Authorization': basicAuthHeader(),
     },
   );
 
   print("🧪 STATUS: ${res.statusCode}");
   print("📦 BODY: ${res.body}");
 
-  if (res.statusCode == 200) {
-    final data = jsonDecode(res.body);
-    final conversations = List<Map<String, dynamic>>.from(data['conversations']);
-    print("🔍 Conversaciones encontradas: ${conversations.length}");
-
-    return conversations;
-  } else {
+  if (res.statusCode != 200) {
     throw Exception('Error al cargar conversaciones');
   }
+
+  final data = jsonDecode(res.body);
+  final List<Map<String, dynamic>> conversations =
+      List<Map<String, dynamic>>.from(data['conversations']);
+
+  // 🚀 Enriquecer con nombre del participante
+  for (final convo in conversations) {
+    final sid = convo['sid'];
+    final participantName = await fetchFirstParticipantIdentity(sid);
+    
+    convo['user_name'] = participantName;
+  }
+
+  return conversations;
 }
+
+
+/// Obtiene un nombre representativo del primer participante de la conversación.
+/// Prioriza:
+/// 1. El atributo "name" si está presente.
+/// 2. El número de WhatsApp sin el prefijo `whatsapp:+549`.
+/// 3. El address crudo.
+/// 4. 'Desconocido' como fallback final.
+Future<String?> fetchFirstParticipantIdentity(String conversationSid) async {
+  final res = await http.get(
+    Uri.parse(
+      'https://conversations.twilio.com/v1/Conversations/$conversationSid/Participants',
+    ),
+    headers: {
+      'Authorization': basicAuthHeader(),
+    },
+  );
+
+  if (res.statusCode == 200) {
+    final data = jsonDecode(res.body);
+    final participants = List<Map<String, dynamic>>.from(data['participants']);
+
+    if (participants.isNotEmpty) {
+      final p = participants.first;
+
+      // Intenta obtener el nombre desde los atributos (si se configuró con webhook)
+      final rawAttributes = p['attributes'];
+      try {
+        if (rawAttributes != null && rawAttributes is String && rawAttributes.isNotEmpty) {
+          final parsed = jsonDecode(rawAttributes);
+          if (parsed['name'] != null && parsed['name'].toString().isNotEmpty) {
+            return parsed['name'];
+          }
+        }
+      } catch (e) {
+        print('⚠️ Error al parsear atributos: $e');
+      }
+
+      // Si no hay atributo, tratamos de sacar el número limpio del address
+      final address = p['messaging_binding']?['address'];
+      if (address != null && address.toString().startsWith('whatsapp:+549')) {
+        return address.toString().replaceFirst('whatsapp:+549', '');
+      }
+
+      // Si no matchea el formato, devolvemos el address como esté
+      return address ?? 'Desconocido';
+    }
+  } else {
+    print('❌ Error al obtener participantes. Status: ${res.statusCode}');
+  }
+
+  // Si algo falla, devolvemos null para que lo maneje el caller
+  return null;
+}
+
+
+
+Future<void> debugPrintParticipants(String conversationSid) async {
+  final serviceSid = dotenv.env['CONVERSATION_SERVICE_SID'] ?? '';
+
+  final url =
+      'https://conversations.twilio.com/v1/Services/$serviceSid/Conversations/$conversationSid/Participants';
+
+  final res = await http.get(
+    Uri.parse(url),
+    headers: {
+      'Authorization': basicAuthHeader(),
+    },
+  );
+
+  print("👤 PARTICIPANTS STATUS: ${res.statusCode}");
+  print("👤 BODY: ${res.body}");
+}
+
+
+
+Future<String> getMediaUrl(String mediaSid) async {
+  final serviceSid = dotenv.env['CONVERSATION_SERVICE_SID'] ?? '';
+
+  final url = 'https://mcs.us1.twilio.com/v1/Services/$serviceSid/Media/$mediaSid';
+
+  final response = await http.get(
+    Uri.parse(url),
+    headers: {
+      'Authorization': basicAuthHeader(),
+    },
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return data['links']['content_direct_temporary']; // URL real al archivo
+  } else {
+    throw Exception('No se pudo obtener la URL del audio');
+  }
+}
+
+Future<void> updateParticipantAttributes(String conversationSid, String participantSid, Map<String, dynamic> attributes) async {
+  final url = 'https://conversations.twilio.com/v1/Conversations/$conversationSid/Participants/$participantSid';
+
+  final response = await http.post(
+    Uri.parse(url),
+    headers: {
+      'Authorization': basicAuthHeader(),
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: {
+      'Attributes': jsonEncode(attributes),
+    },
+  );
+
+  print("🔧 UPDATE ATTRIBUTES STATUS: ${response.statusCode}");
+  print("🔧 BODY: ${response.body}");
+
+  if (response.statusCode != 200) {
+    throw Exception('No se pudieron actualizar los atributos');
+  }
+}
+
+
 
 
 
@@ -53,7 +180,7 @@ class TwilioService {
   final res = await http.get(
     Uri.parse(url),
     headers: {
-      'Authorization': _basicAuthHeader(),
+      'Authorization': basicAuthHeader(),
     },
   );
 
@@ -76,7 +203,7 @@ class TwilioService {
   final res = await http.post(
     Uri.parse(url),
     headers: {
-      'Authorization': _basicAuthHeader(),
+      'Authorization': basicAuthHeader(),
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: {

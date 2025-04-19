@@ -1,7 +1,9 @@
 import 'dart:async';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:http/http.dart' as http;
 import '../providers/twilio_provider.dart';
 import '../services/twilio_service.dart';
 
@@ -22,9 +24,9 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
     super.initState();
     controller = TextEditingController();
 
-    // ⏱️ Refrescamos cada 5 segundos
+    final messagesNotifier = ref.read(messagesProvider(widget.conversationSid).notifier);
     _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
-      ref.invalidate(messagesProvider(widget.conversationSid));
+      messagesNotifier.refreshIfChanged();
     });
   }
 
@@ -53,35 +55,119 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
                   final msg = messages[messages.length - 1 - index];
-                  return Align(
-  alignment: msg['author'] == 'system' ? Alignment.centerRight : Alignment.centerLeft,
-  child: Container(
-    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-    margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-    decoration: BoxDecoration(
-      color: msg['author'] == 'system'
-          ? Theme.of(context).colorScheme.primary
-          : Theme.of(context).colorScheme.secondary.withOpacity(0.3),
-      borderRadius: BorderRadius.only(
-        topLeft: const Radius.circular(12),
-        topRight: const Radius.circular(12),
-        bottomLeft: msg['author'] == 'system'
-            ? const Radius.circular(12)
-            : const Radius.circular(0),
-        bottomRight: msg['author'] == 'system'
-            ? const Radius.circular(0)
-            : const Radius.circular(12),
-      ),
-    ),
-    child: Text(
-      msg['body'] ?? '',
-      style: TextStyle(
-        color: msg['author'] == 'system' ? Colors.white : Colors.black87,
-      ),
-    ),
-  ),
-);
+                  final body = msg['body'] ?? '';
+                  final author = msg['author'] ?? '';
+                  final media = msg['media'] ?? [];
 
+                  final isOwn = author.contains('system');
+                  final bgColor = isOwn
+                      ? Theme.of(context).colorScheme.primary
+                      : Theme.of(context).colorScheme.secondary.withOpacity(0.2);
+                  final align = isOwn ? Alignment.centerRight : Alignment.centerLeft;
+                  final textColor = isOwn ? Colors.white : Colors.black87;
+
+                  // 🧠 MEDIA (audio / imagen / otros)
+                  if (media.isNotEmpty) {
+                    final mediaItem = media[0];
+                    final mediaSid = mediaItem['sid'];
+                    final contentType = mediaItem['content_type'] ?? '';
+
+                    return FutureBuilder<String>(
+                      future: service.getMediaUrl(mediaSid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const Padding(
+                            padding: EdgeInsets.all(8),
+                            child: SizedBox(),
+                          );
+                        }
+                        if (!snapshot.hasData) {
+                          return const Text('Media no disponible');
+                        }
+
+                        final mediaUrl = snapshot.data!;
+
+                        // 🎵 AUDIO
+                        if (contentType.contains('audio')) {
+                          final player = AudioPlayer();
+                          return Align(
+                            alignment: align,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: bgColor,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.play_arrow, color: textColor),
+                                onPressed: () async {
+                                  await player.play(UrlSource(mediaUrl));
+                                },
+                              ),
+                            ),
+                          );
+                        }
+
+                        // 🖼️ IMAGE
+                        if (contentType.contains('image')) {
+                          return Align(
+                            alignment: align,
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: bgColor,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  mediaUrl,
+                                  width: 200,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
+                        // ❓ OTRO
+                        return Align(
+                          alignment: align,
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: bgColor,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Text(
+                              'Contenido: $contentType',
+                              style: TextStyle(color: textColor),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+
+                  // ✅ MENSAJE DE TEXTO
+                  return Align(
+                    alignment: align,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: bgColor,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Text(
+                        body,
+                        style: TextStyle(color: textColor),
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -112,6 +198,14 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
           )
         ],
       ),
+     floatingActionButton: FloatingActionButton(
+  onPressed: () async {
+    final service = ref.read(twilioServiceProvider);
+    await service.debugPrintParticipants(widget.conversationSid);
+  },
+  child: const Icon(Icons.bug_report),
+),
+
     );
   }
 }

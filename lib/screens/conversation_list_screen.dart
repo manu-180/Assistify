@@ -26,27 +26,35 @@ class ConversationListScreen extends ConsumerWidget {
           }
 
           return ListView.builder(
-            itemCount: list.length,
-            itemBuilder: (context, index) {
-              final c = list[index];
-              final name = c['friendly_name'] ?? 'Sin nombre';
-              final sid = c['sid'] ?? 'Sin SID';
+  itemCount: list.length,
+  itemBuilder: (context, index) {
+    final c = list[index];
 
-              return ListTile(
-                leading: const Icon(Icons.chat_bubble_outline),
-                title: Text(name),
-                subtitle: Text('SID: $sid'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => SoporteChatScreen(conversationSid: sid),
-                    ),
-                  );
-                },
-              );
-            },
-          );
+    print("LA DATA IMPORTANTE $c");
+
+    // Obtenemos el nombre o número de usuario
+    final rawName = c['user_name'] ?? 'Desconocido';
+final name = rawName;
+
+
+    final sid = c['sid'] ?? 'Sin SID';
+
+    return ListTile(
+      leading: const Icon(Icons.chat_bubble_outline),
+      title: Text(name),
+      subtitle: Text('SID: $sid'),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => SoporteChatScreen(conversationSid: sid),
+          ),
+        );
+      },
+    );
+  },
+);
+
         },
       ),
     );

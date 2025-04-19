@@ -9,6 +9,7 @@ environment:
 
 dependencies:
   animate_do: ^3.3.4
+  audioplayers: ^6.4.0
   chewie: ^1.8.5
   connectivity_plus: ^6.1.1
   cupertino_icons: ^1.0.8
