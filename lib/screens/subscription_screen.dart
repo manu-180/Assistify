@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'dart:async';
+import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/subscription/subscription_manager.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/supabase/suscribir/suscribir_usuario.dart';
+import 'package:taller_ceramica/utils/verificar_suscripcion_con_backend.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 
 class SubscriptionScreen extends StatefulWidget {
@@ -96,45 +98,71 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-    for (var purchase in purchases) {
-      if (purchase.status == PurchaseStatus.purchased) {
-        final usuarioActivo = Supabase.instance.client.auth.currentUser;
-        final purchaseToken = purchase.verificationData.serverVerificationData;
-        final productId = purchase.productID;
+  for (var purchase in purchases) {
+    if (purchase.status == PurchaseStatus.purchased) {
+  try {
+    // ✅ Enviar acknowledgment si es necesario
+    if (purchase.pendingCompletePurchase) {
+      await _inAppPurchase.completePurchase(purchase);
+      debugPrint('🟢 Purchase completada y acknowledge enviada');
+    }
 
-        final DateTime startDate = DateTime.now();
+    final purchaseToken = purchase.verificationData.serverVerificationData;
+    final productId = purchase.productID;
+    final DateTime startDate = DateTime.now();
 
-        final bool isActive = true;
+    final bool isActive = await verificarSuscripcionConBackend(
+      purchaseToken: purchaseToken,
+      subscriptionId: productId,
+    );
 
-        // Inserta la suscripción en Supabase
-        await SuscribirUsuario(supabaseClient: supabase).insertSubscription(
-          userId: usuarioActivo!.id,
-          productId: productId,
-          purchaseToken: purchaseToken,
-          startDate: startDate,
-          isActive: isActive,
-          taller: taller,
-        );
+    await SuscribirUsuario(supabaseClient: supabase).insertSubscription(
+      userId: usuarioActivo.id,
+      productId: productId,
+      purchaseToken: purchaseToken,
+      startDate: startDate,
+      isActive: isActive,
+      taller: taller,
+    );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  AppLocalizations.of(context).translate('purchaseSuccess'))),
-        );
-      } else if (purchase.status == PurchaseStatus.error) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(AppLocalizations.of(context)
-                  .translate('purchaseError', params: {
-            'error': purchase.error?.message ?? 'Unknown error'
-          }))),
-        );
-      }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context).translate('purchaseSuccess'),
+        ),
+      ),
+    );
+  } catch (e) {
+    debugPrint('❌ Error en acknowledgment o backend: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).translate(
+          'purchaseError',
+          params: {'error': e.toString()},
+        )),
+      ),
+    );
+  }
+}
+else if (purchase.status == PurchaseStatus.error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).translate(
+            'purchaseError',
+            params: {
+              'error': purchase.error?.message ?? 'Unknown error',
+            },
+          )),
+        ),
+      );
     }
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {

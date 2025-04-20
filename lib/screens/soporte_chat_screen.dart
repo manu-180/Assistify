@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
+import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import '../providers/twilio_provider.dart';
 import '../services/twilio_service.dart';
 
@@ -41,9 +42,10 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
   Widget build(BuildContext context) {
     final messagesAsync = ref.watch(messagesProvider(widget.conversationSid));
     final service = ref.read(twilioServiceProvider);
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat'), backgroundColor: Colors.teal.shade700),
+      appBar: ResponsiveAppBar(isTablet: size.width > 600),
       body: Column(
         children: [
           Expanded(
@@ -198,13 +200,7 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
           )
         ],
       ),
-     floatingActionButton: FloatingActionButton(
-  onPressed: () async {
-    final service = ref.read(twilioServiceProvider);
-    await service.debugPrintParticipants(widget.conversationSid);
-  },
-  child: const Icon(Icons.bug_report),
-),
+  
 
     );
   }

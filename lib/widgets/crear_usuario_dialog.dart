@@ -226,6 +226,7 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
             final fullname = fullnameController.text.trim();
             final email = emailController.text.trim();
             final password = passwordController.text.trim();
+            final telefono = phoneController.text.trim();
 
             if (fullname.isEmpty ||
                 email.isEmpty ||
@@ -310,6 +311,7 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                 'trigger_alert': 0,
                 'clases_canceladas': [],
                 'taller': taller,
+                'telefono': telefono,
               });
 
               ScaffoldMessenger.of(context).showSnackBar(
