@@ -5,6 +5,7 @@ import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/capitalize.dart';
+import 'package:taller_ceramica/utils/crear_usuario_desde_admin.dart';
 
 class CrearUsuarioDialog extends StatefulWidget {
   final Future<void> Function()? onUsuarioCreado;
@@ -293,26 +294,25 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
               final taller =
                   await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-              final res = await supabase.auth.signUp(
-                email: email,
-                password: password,
-                data: {
-                  'fullname': Capitalize().capitalize(fullname),
-                },
-              );
+              final userId = await crearUsuarioAdmin(
+  email: email,
+  password: password,
+  fullname: fullname,
+);
 
-              await supabase.from('usuarios').insert({
-                'id': await GenerarId().generarIdUsuario(),
-                'usuario': email,
-                'fullname': Capitalize().capitalize(fullname),
-                'user_uid': res.user?.id,
-                'sexo': "mujer",
-                'clases_disponibles': 0,
-                'trigger_alert': 0,
-                'clases_canceladas': [],
-                'taller': taller,
-                'telefono': telefono,
-              });
+await supabase.from('usuarios').insert({
+  'id': await GenerarId().generarIdUsuario(),
+  'usuario': email,
+  'fullname': Capitalize().capitalize(fullname),
+  'user_uid': userId,
+  'sexo': "mujer",
+  'clases_disponibles': 0,
+  'trigger_alert': 0,
+  'clases_canceladas': [],
+  'taller': taller,
+  'telefono': telefono,
+});
+
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -324,10 +324,15 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                 ),
               );
 
-              Navigator.of(context).pop();
-              if (widget.onUsuarioCreado != null) {
-                await widget.onUsuarioCreado!();
-              }
+              final callback = widget.onUsuarioCreado;
+Navigator.of(context).pop();
+
+if (callback != null) {
+  Future.microtask(() async {
+    await callback();
+  });
+}
+
             } on AuthException catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_rubro.dart';
 import 'package:taller_ceramica/widgets/box_text.dart';
@@ -284,6 +285,7 @@ class HomeScreen extends StatelessWidget {
           }
         },
       ),
+      floatingActionButton: FloatingActionButton(onPressed: ( ) => context.push("/login")),
     );
   }
 

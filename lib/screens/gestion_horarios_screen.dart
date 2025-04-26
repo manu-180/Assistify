@@ -777,7 +777,7 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
       floatingActionButton: InformationButon(
         text: "1️⃣ Seleccioná una fecha del mes para ver todas las clases de ese día.\n\n"
   "2️⃣ En cada clase vas a poder agregar o quitar alumnos. También podés usar la opción \"x4\" para hacerlo automáticamente en todas las clases iguales del mes (por ejemplo, todos los lunes a la misma hora).\n\n"
-  "2️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n",
+  "3️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n",
       ),
     );
 

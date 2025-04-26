@@ -110,14 +110,22 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
       debugPrint('🟢 Purchase completada y acknowledge enviada');
     }
 
-    final purchaseToken = purchase.verificationData.serverVerificationData;
-    final productId = purchase.productID;
-    final DateTime startDate = DateTime.now();
+    await Future.delayed(const Duration(seconds: 2));
 
-    final bool isActive = await verificarSuscripcionConBackend(
-      purchaseToken: purchaseToken,
-      subscriptionId: productId,
-    );
+    final purchaseToken = purchase.verificationData.serverVerificationData;
+final productId = purchase.productID;
+final DateTime startDate = DateTime.now();
+
+debugPrint("🧾 Purchase info:");
+debugPrint("👉 Usuario ID: ${usuarioActivo.id}");
+debugPrint("👉 Producto ID: $productId");
+debugPrint("👉 Token: $purchaseToken");
+
+final bool isActive = await verificarSuscripcionConBackend(
+  purchaseToken: purchaseToken,
+  subscriptionId: productId,
+);
+
 
     await SuscribirUsuario(supabaseClient: supabase).insertSubscription(
       userId: usuarioActivo.id,

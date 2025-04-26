@@ -2,7 +2,8 @@ import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/utils/internet.dart'; // Importa la clase para verificar conexión
+import 'package:taller_ceramica/utils/internet.dart';
+import 'package:taller_ceramica/utils/verificar_suscripcion_con_backend.dart'; // Importa la clase para verificar conexión
 
 class SubscriptionManager {
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
@@ -53,12 +54,29 @@ class SubscriptionManager {
 
     final restoredPurchases = await restorePurchases();
 
-    final bool isSubscribed = restoredPurchases.any((purchase) =>
-        (purchase.productID == 'monthlysubscription' ||
-            purchase.productID == 'annualsubscription' ||
-            purchase.productID == 'cero' ||
-            purchase.productID == 'prueba') &&
-        purchase.status == PurchaseStatus.purchased);
+    bool isSubscribed = false;
+
+for (final purchase in restoredPurchases) {
+  if ((purchase.productID == 'monthlysubscription' ||
+       purchase.productID == 'annualsubscription' ||
+       purchase.productID == 'cero' ||
+       purchase.productID == 'prueba') &&
+      (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored)) {
+
+    final purchaseToken = purchase.verificationData.serverVerificationData;
+
+    final backendActiva = await verificarSuscripcionConBackend(
+      purchaseToken: purchaseToken,
+      subscriptionId: purchase.productID,
+    );
+
+    if (backendActiva) {
+      isSubscribed = true;
+      break; // Ya con una activa nos alcanza
+    }
+  }
+}
+
 
     await supabase
         .from('subscriptions')

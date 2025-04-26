@@ -15,6 +15,7 @@ import 'package:taller_ceramica/utils/utils_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:intl/intl.dart';
 import 'package:taller_ceramica/models/clase_models.dart';
+import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 
 import '../widgets/mostrar_dia_segun_fecha.dart';
@@ -695,33 +696,39 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
           ),
         ),
       ),
-      floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.5,
-        child: FloatingActionButton(
-          backgroundColor: colors.secondaryContainer,
-          onPressed: () {
-            if (fechaSeleccionada == null) {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)
-                        .translate('selectDateBeforeAdding'),
-                  ),
+      floatingActionButton: 
+
+    SizedBox(
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: FloatingActionButton(
+        backgroundColor: colors.secondaryContainer,
+        onPressed: () {
+          if (fechaSeleccionada == null) {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  AppLocalizations.of(context)
+                      .translate('selectDateBeforeAdding'),
                 ),
-              );
-              return;
-            }
-            mostrarDialogoAgregarClase(
-              DiaConFecha().obtenerDiaDeLaSemana(
-                  fechaSeleccionada!, AppLocalizations.of(context)),
+              ),
             );
-          },
-          child: Text(
-            AppLocalizations.of(context).translate('createNewClassButton'),
-          ),
+            return;
+          }
+          mostrarDialogoAgregarClase(
+            DiaConFecha().obtenerDiaDeLaSemana(
+              fechaSeleccionada!,
+              AppLocalizations.of(context),
+            ),
+          );
+        },
+        child: Text(
+          AppLocalizations.of(context).translate('createNewClassButton'),
         ),
       ),
-    );
+    ),
+
+
+          );
   }
 }
