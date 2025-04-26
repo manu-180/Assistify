@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:taller_ceramica/utils/capitalize.dart';
 
 Future<String?> crearUsuarioAdmin({
   required String email,
@@ -24,8 +25,9 @@ Future<String?> crearUsuarioAdmin({
       "email": email,
       "password": password,
       "user_metadata": {
-        "fullname": fullname,
+        "fullname": Capitalize().capitalize(fullname),
       },
+      "email_confirm": true,
     }),
   );
 
