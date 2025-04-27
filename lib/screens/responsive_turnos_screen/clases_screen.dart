@@ -874,27 +874,33 @@ class _DiaSelection extends StatefulWidget {
 class _DiaSelectionState extends State<_DiaSelection> {
   bool _yaIntentoUnaVez = false;
   bool _yaMostroDialogo = false;
+  bool _dialogoActivo = false;
+  bool _yaCambioSemana = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+void didChangeDependencies() {
+  super.didChangeDependencies();
 
-    final tieneDiasParaMostrar = _hayFechasDelMesActual();
+  final tieneDiasParaMostrar = _hayFechasDelMesActual();
 
-    if (!tieneDiasParaMostrar && !_yaIntentoUnaVez && !_yaMostroDialogo) {
-      _yaIntentoUnaVez = true;
+  if (!tieneDiasParaMostrar && !_yaIntentoUnaVez && !_yaCambioSemana) {
+    _yaIntentoUnaVez = true;
+    _yaCambioSemana = true;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.cambiarSemanaAdelante();
-      });
-    } else if (!tieneDiasParaMostrar && _yaIntentoUnaVez && !_yaMostroDialogo) {
-      _yaMostroDialogo = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.cambiarSemanaAdelante();
+    });
+  } else if (!tieneDiasParaMostrar && _yaCambioSemana && !_yaMostroDialogo && !_dialogoActivo) {
+    _yaMostroDialogo = true;
+    _dialogoActivo = true;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _mostrarDialogoSinClases();
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _mostrarDialogoSinClases();
+    });
   }
+}
+
+
 
   bool _hayFechasDelMesActual() {
     return widget.diasUnicos.any((clase) {
@@ -907,6 +913,10 @@ class _DiaSelectionState extends State<_DiaSelection> {
   void _mostrarDialogoSinClases() {
     final taller = Supabase.instance.client.auth.currentUser?.userMetadata?['taller'] ?? '';
 
+    if (_dialogoActivo) return;
+    _dialogoActivo = true;
+
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -914,11 +924,18 @@ class _DiaSelectionState extends State<_DiaSelection> {
         content: const Text('Primero debes cargar tus clases.'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            
+            onPressed: () { 
+              _dialogoActivo = false;
+
+              Navigator.of(context).pop();
+              },
             child: const Text('Cancelar'),
           ),
           FilledButton(
             onPressed: () {
+              _dialogoActivo = false;
+
               Navigator.of(context).pop();
               Navigator.of(context).pushReplacementNamed('/gestionclases/$taller');
             },
@@ -930,56 +947,89 @@ class _DiaSelectionState extends State<_DiaSelection> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
-    final filteredFechas = widget.fechasDisponibles.where((dateString) {
-      final partes = dateString.split('/');
-      final fecha = DateTime(
-        int.parse(partes[2]),
-        int.parse(partes[1]),
-        int.parse(partes[0]),
-      );
-      return fecha.month == widget.mesActual;
-    }).toList();
+  final filteredFechas = widget.fechasDisponibles.where((dateString) {
+    final partes = dateString.split('/');
+    final fecha = DateTime(
+      int.parse(partes[2]),
+      int.parse(partes[1]),
+      int.parse(partes[0]),
+    );
+    return fecha.month == widget.mesActual;
+  }).toList();
 
-    final diasParaMostrar = widget.diasUnicos.where((clase) {
-      return filteredFechas.contains(clase.fecha);
-    }).toList();
+  final diasParaMostrar = widget.diasUnicos.where((clase) {
+    return filteredFechas.contains(clase.fecha);
+  }).toList();
 
-    return ListView.builder(
-      itemCount: diasParaMostrar.length,
-      itemBuilder: (context, index) {
-        final clase = diasParaMostrar[index];
-        final partesFecha = clase.fecha.split('/');
-        final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
-        final diaMesAnio = '${clase.dia} - ${clase.fecha}';
+  if (diasParaMostrar.isEmpty) {
+    return const _SinClasesWidget();
+  }
 
-        return Column(
-          children: [
-            SizedBox(
-              width: screenWidth * 0.99,
-              height: screenHeight * 0.053,
-              child: ElevatedButton(
-                onPressed: () => widget.seleccionarDia(diaMesAnio),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size.zero,
-                  padding: EdgeInsets.zero,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
-                  ),
-                ),
-                child: Text(
-                  '${clase.dia} - $diaMes',
-                  style: TextStyle(fontSize: screenWidth * 0.032),
+  return ListView.builder(
+    itemCount: diasParaMostrar.length,
+    itemBuilder: (context, index) {
+      final clase = diasParaMostrar[index];
+      final partesFecha = clase.fecha.split('/');
+      final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
+      final diaMesAnio = '${clase.dia} - ${clase.fecha}';
+
+      return Column(
+        children: [
+          SizedBox(
+            width: screenWidth * 0.99,
+            height: screenHeight * 0.053,
+            child: ElevatedButton(
+              onPressed: () => widget.seleccionarDia(diaMesAnio),
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size.zero,
+                padding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
                 ),
               ),
+              child: Text(
+                '${clase.dia} - $diaMes',
+                style: TextStyle(fontSize: screenWidth * 0.032),
+              ),
             ),
-            const SizedBox(height: 20),
-          ],
-        );
-      },
+          ),
+          const SizedBox(height: 20),
+        ],
+      );
+    },
+  );
+}
+}
+
+class _SinClasesWidget extends StatelessWidget {
+  const _SinClasesWidget();
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final taller = Supabase.instance.client.auth.currentUser?.userMetadata?['taller'] ?? '';
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Text(
+            'No hay clases registradas aún.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pushReplacementNamed('/gestionclases/$taller');
+            },
+            child: const Text('Ir a gestionar clases'),
+          ),
+        ],
+      ),
     );
   }
 }

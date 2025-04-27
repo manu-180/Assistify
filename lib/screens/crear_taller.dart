@@ -169,7 +169,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
             onChanged: (value) {
               final phoneRegex = RegExp(r'^[0-9]{7,15}$');
               setState(() {
-                phoneError = !phoneRegex.hasMatch(value.trim()) ? "Número inválido. Ingresá solo los dígitos (ej: 1134272488)" : '';
+                phoneError = !phoneRegex.hasMatch(value.trim()) ? "Número inválido. (ej: 1134272488)" : '';
               });
             },
           ),
