@@ -872,79 +872,7 @@ class _DiaSelection extends StatefulWidget {
 }
 
 class _DiaSelectionState extends State<_DiaSelection> {
-  bool _yaIntentoUnaVez = false;
-  bool _yaMostroDialogo = false;
-  bool _dialogoActivo = false;
-  bool _yaCambioSemana = false;
 
-  @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-
-  final tieneDiasParaMostrar = _hayFechasDelMesActual();
-
-  if (!tieneDiasParaMostrar && !_yaIntentoUnaVez && !_yaCambioSemana) {
-    _yaIntentoUnaVez = true;
-    _yaCambioSemana = true;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.cambiarSemanaAdelante();
-    });
-  } else if (!tieneDiasParaMostrar && _yaCambioSemana && !_yaMostroDialogo && !_dialogoActivo) {
-    _yaMostroDialogo = true;
-    _dialogoActivo = true;
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _mostrarDialogoSinClases();
-    });
-  }
-}
-
-
-
-  bool _hayFechasDelMesActual() {
-    return widget.diasUnicos.any((clase) {
-      final partes = clase.fecha.split('/');
-      final mes = int.parse(partes[1]);
-      return mes == widget.mesActual;
-    });
-  }
-
-  void _mostrarDialogoSinClases() {
-    final taller = Supabase.instance.client.auth.currentUser?.userMetadata?['taller'] ?? '';
-
-    if (_dialogoActivo) return;
-    _dialogoActivo = true;
-
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sin clases registradas'),
-        content: const Text('Primero debes cargar tus clases.'),
-        actions: [
-          TextButton(
-            
-            onPressed: () { 
-              _dialogoActivo = false;
-
-              Navigator.of(context).pop();
-              },
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              _dialogoActivo = false;
-
-              Navigator.of(context).pop();
-              Navigator.of(context).pushReplacementNamed('/gestionclases/$taller');
-            },
-            child: const Text('Ir a gestión'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
 Widget build(BuildContext context) {
@@ -965,9 +893,6 @@ Widget build(BuildContext context) {
     return filteredFechas.contains(clase.fecha);
   }).toList();
 
-  if (diasParaMostrar.isEmpty) {
-    return const _SinClasesWidget();
-  }
 
   return ListView.builder(
     itemCount: diasParaMostrar.length,
@@ -1003,33 +928,4 @@ Widget build(BuildContext context) {
     },
   );
 }
-}
-
-class _SinClasesWidget extends StatelessWidget {
-  const _SinClasesWidget();
-
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final taller = Supabase.instance.client.auth.currentUser?.userMetadata?['taller'] ?? '';
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Text(
-            'No hay clases registradas aún.',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pushReplacementNamed('/gestionclases/$taller');
-            },
-            child: const Text('Ir a gestionar clases'),
-          ),
-        ],
-      ),
-    );
-  }
 }
