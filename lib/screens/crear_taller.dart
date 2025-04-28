@@ -114,6 +114,35 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
         children: [
           BoxText(text: AppLocalizations.of(context).translate('createWorkshopIntro')),
           const SizedBox(height: 16),
+          
+                ElevatedButton.icon(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text(AppLocalizations.of(context)
+                              .translate('infoTitle')),
+                          content: SingleChildScrollView(
+                            child: Text(AppLocalizations.of(context)
+                                .translate('infoContent')),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text(AppLocalizations.of(context)
+                                  .translate('closeButton')),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  icon: const Icon(Icons.info_outline), // Icono en el botón
+                  label: Text(
+                      AppLocalizations.of(context).translate('moreInfoButton')),
+                ),
+          const SizedBox(height: 16),
           TextField(
             controller: tallerController,
             decoration: InputDecoration(
@@ -362,6 +391,7 @@ if (res.user != null) {
               ),
             ],
           ),
+          const SizedBox(height: 16),
         ],
       ),
     ),
