@@ -184,13 +184,13 @@ class CustomAppBarState extends State<CustomAppBar> {
               children: [
                 Text(
                   AppLocalizations.of(context).translate('appTitle'),
-                  style: const TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.w500),
+                  style:  TextStyle(
+                      color: color.onPrimary, fontWeight: FontWeight.w500),
                 ),
                 SizedBox(width: 7),
                 FaIcon(
                   FontAwesomeIcons.fileLines,
-                  color: Colors.white,
+                  color: color.onPrimary,
                   size: size.width * 0.055,
                 ),
               ],

@@ -41,7 +41,7 @@ class MyApp extends ConsumerWidget {
     final AppTheme themeNotify = ref.watch(themeNotifyProvider);
 
     return MaterialApp.router(
-      title: "Taller de cerámica",
+      title: "Assistify",
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
       theme: themeNotify.getColor(),

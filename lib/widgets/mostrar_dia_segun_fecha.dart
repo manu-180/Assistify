@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:taller_ceramica/utils/dia_con_fecha.dart';
 import 'package:taller_ceramica/widgets/custom_box.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart'; // Importar traducciones
+import 'package:taller_ceramica/l10n/app_localizations.dart';
 
 class MostrarDiaSegunFecha extends StatelessWidget {
   const MostrarDiaSegunFecha({
@@ -20,29 +20,22 @@ class MostrarDiaSegunFecha extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
+    final color = Theme.of(context).colorScheme;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.shade200,
-            boxShadow: [
-              BoxShadow(
-                color: colors.primaryContainer.withAlpha(20),
-                blurRadius: 1,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        IconButton(
+          onPressed: () {
+            cambiarFecha(false);
+          },
+          icon: Icon(
+            Icons.arrow_back_ios,
+            size: screenWidth * 0.07,
+            color: color.primary,
           ),
-          child: IconButton(
-            onPressed: () {
-              cambiarFecha(false);
-            },
-            icon: const Icon(Icons.arrow_left, size: 28),
-            color: Colors.black,
-          ),
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
         ),
         SizedBox(width: screenWidth * 0.05),
         CustomBox(
@@ -52,28 +45,20 @@ class MostrarDiaSegunFecha extends StatelessWidget {
           text: text.isEmpty
               ? AppLocalizations.of(context).translate('selectDate')
               : DiaConFecha().obtenerDiaDeLaSemana(
-                  text, AppLocalizations.of(context)), // Pasar el contexto
+                  text, AppLocalizations.of(context)),
         ),
         SizedBox(width: screenWidth * 0.05),
-        Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.grey.shade200,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(20),
-                blurRadius: 1,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        IconButton(
+          onPressed: () {
+            cambiarFecha(true);
+          },
+          icon: Icon(
+            Icons.arrow_forward_ios,
+            size: screenWidth * 0.07,
+            color: color.primary,
           ),
-          child: IconButton(
-            onPressed: () {
-              cambiarFecha(true);
-            },
-            icon: const Icon(Icons.arrow_right, size: 28),
-            color: Colors.black,
-          ),
+          padding: EdgeInsets.zero,
+          visualDensity: VisualDensity.compact,
         ),
       ],
     );

@@ -601,7 +601,7 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                     : Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Card(
-                                          color: Colors.white,
+                                          color: colors.surface,
                                           child: Column(
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,

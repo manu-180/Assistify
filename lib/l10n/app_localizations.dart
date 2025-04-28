@@ -487,7 +487,7 @@ class AppLocalizations {
           "¿Estás seguro/a que quieres eliminar esta clase?",
       "selectDateBeforeAdding":
           "Por favor, selecciona una fecha antes de agregar clases.",
-      "createNewClassButton": "Crear una clase nueva",
+      "createNewClassButton": "Crear nueva clase",
       "addNewClassTitle": "Agregar nueva clase todos los \$day",
       "classTimeHint": "Hora de la clase (HH:mm)",
       "classCapacityHint": "Lugares disponibles",

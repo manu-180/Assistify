@@ -15,6 +15,8 @@ class ShimmerLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Shimmer.fromColors(
       baseColor: color,
       highlightColor: brillo,
@@ -22,7 +24,7 @@ class ShimmerLoading extends StatelessWidget {
         width: width,
         height: height,
         decoration: BoxDecoration(
-          color: Colors.grey.shade300,
+          color: colors.onPrimary,
           borderRadius: BorderRadius.circular(10),
         ),
       ),

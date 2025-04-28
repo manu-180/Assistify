@@ -1,0 +1,5 @@
+flutter_native_splash:
+  color: "#ffffff" # Fondo blanco (podés cambiar el color si querés)
+  image: assets/icon/aicon.png # Ruta a tu logo
+  android: true
+  ios: true
