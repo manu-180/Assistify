@@ -9,6 +9,7 @@ import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/models/usuario_models.dart';
+import 'package:taller_ceramica/supabase/utiles/al_menos_una_clase.dart';
 import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
@@ -25,6 +26,25 @@ class UsuariosScreen extends StatefulWidget {
 class _UsuariosScreenState extends State<UsuariosScreen> {
   bool isLoading = true;
   List<UsuarioModels> usuarios = [];
+
+  void mostrarAdvertenciaCrearUsuario(BuildContext context, String taller) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Advertencia'),
+      content: const Text('Antes de crear un usuario debes crear por lo menos una clase.'),
+      actions: [
+        FilledButton(
+          onPressed: () {
+            context.pop(); // Cierra el cartel
+            context.push('/gestionclases/$taller'); // Navega a gestión de clases
+          },
+          child: const Text('Gestión de clases'),
+        ),
+      ],
+    ),
+  );
+}
 
   Future<void> cargarUsuarios() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -221,6 +241,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
 
     return Scaffold(
       appBar:
@@ -419,7 +440,8 @@ El alumno usará su correo y contraseña para iniciar sesión.
       floatingActionButton: SizedBox(
         width: size.width * 0.38,
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
+            await AlMenosUnaClase().tallerTieneDatos() ?
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -429,7 +451,8 @@ El alumno usará su correo y contraseña para iniciar sesión.
                   },
                 );
               },
-            );
+            ):
+            mostrarAdvertenciaCrearUsuario( context ,usuarioActivo!.userMetadata!['taller']);
           },
           child: Container(
             alignment: Alignment.center,

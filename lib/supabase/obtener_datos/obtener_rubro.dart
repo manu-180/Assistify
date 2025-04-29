@@ -8,7 +8,8 @@ class ObtenerRubro {
         .eq('fullname', user)
         .single();
 
-    print("📩 Datos obtenidos: $data");
+    print("📩 Datos obtenidossssssssss: $data");
+
     return data["rubro"];
   }
 }

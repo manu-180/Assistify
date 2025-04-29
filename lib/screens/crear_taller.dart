@@ -318,6 +318,12 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   password: password,
   data: {
     'fullname': Capitalize().capitalize(fullname),
+    "rubro": selectedRubro,
+    "taller": Capitalize().capitalize(taller),
+    "telefono": phoneController.text,
+    "admin": true,
+    "created_at": DateTime.now().toIso8601String(),
+    
   },
 );
 
@@ -348,7 +354,7 @@ if (res.user != null) {
                           crearTablaTaller(Capitalize().capitalize(taller));
 
                           EnviarWpp().sendWhatsAppMessage(
-                            "HXce5db05ee13a1c05f412591b9747ff41",
+                            "HXa9fb3930150f932869bc13f223f26628",
                             'whatsapp:+549${phoneController.text}',
                             [fullname, "", "", "", ""]
                           );

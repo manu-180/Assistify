@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:taller_ceramica/main.dart';
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_rubro.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/capitalize.dart';
@@ -298,6 +299,10 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
   email: email,
   password: password,
   fullname: fullname,
+  telefono: telefono,
+  rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
+  taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
+
 );
 
 await supabase.from('usuarios').insert({
@@ -311,13 +316,14 @@ await supabase.from('usuarios').insert({
   'clases_canceladas': [],
   'taller': taller,
   'telefono': telefono,
+  'rubro': await ObtenerRubro().rubro(usuarioActivo.userMetadata?['fullname']),
 });
 
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    "La cuenta de $fullname se creó exitosamente. Se envió un link de confirmación a $email.",
+                    "La cuenta de $fullname se creó exitosamente. ¡Ya puede iniciar sesión!.",
                   ),
                   backgroundColor: const Color(0xFF4CAF50),
                   duration: const Duration(seconds: 9),
