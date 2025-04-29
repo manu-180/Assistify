@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_rubro.dart';
 import 'package:taller_ceramica/widgets/box_text.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/is_mujer.dart';
@@ -286,11 +285,7 @@ class HomeScreen extends StatelessWidget {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(onPressed: (){
-
-        final user = Supabase.instance.client.auth.currentUser;
-        print("📩 Usuario actual: ${user?.userMetadata}");
-      }),
+      
     
     );
   }
