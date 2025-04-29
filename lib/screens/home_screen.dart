@@ -286,7 +286,11 @@ class HomeScreen extends StatelessWidget {
           }
         },
       ),
-    
+      floatingActionButton: FloatingActionButton(onPressed: (){
+
+        final user = Supabase.instance.client.auth.currentUser;
+        print("📩 Usuario actual: ${user?.userMetadata}");
+      }),
     
     );
   }
