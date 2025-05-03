@@ -34,21 +34,18 @@ class _ContactanosState extends State<Contactanos>
   }
 
   Future<void> enviarConfirmacionPorSendGrid({
-    required String destinatario,
-    required String nombreUsuario,
-    required String message,
-  }) async {
+  required BuildContext context,
+  required String destinatario,
+  required String nombreUsuario,
+  required String message,
+}) async {
+  final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
 
-    print("🔐 API KEY usada: ${dotenv.env['SENDGRID_API_KEY']}");
-
-    
-
-    final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
-
+  try {
     final response = await http.post(
       url,
       headers: {
-        'Authorization': dotenv.env['SENDGRID_API_KEY'] ?? "",
+        'Authorization': 'Bearer ${dotenv.env['SENDGRID_API_KEY']}',
         'Content-Type': 'application/json',
       },
       body: json.encode({
@@ -72,12 +69,30 @@ class _ContactanosState extends State<Contactanos>
     );
 
     if (response.statusCode == 202) {
-      debugPrint("✅ Correo de confirmación enviado correctamente.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("✅ ¡Recibimos exitosamente tu consulta!"),
+          backgroundColor: Colors.green,
+        ),
+      );
     } else {
-      debugPrint("❌ Error al enviar correo. Código: ${response.statusCode}");
-      debugPrint("Respuesta: ${response.body}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("❌ Error al enviar el correo. Contactá a soporte por WhatsApp."),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("❌ Error inesperado. Contactá a soporte por WhatsApp."),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
+
 
   void _launchEmail() async {
     final user = Supabase.instance.client.auth.currentUser;
@@ -124,6 +139,7 @@ class _ContactanosState extends State<Contactanos>
             onPressed: () async {
               Navigator.of(context).pop();
               await enviarConfirmacionPorSendGrid(
+                context: context,
                 destinatario: email,
                 nombreUsuario: fullname,
                 message: mensajeController.text,
