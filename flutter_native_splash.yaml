@@ -1,5 +1,8 @@
 flutter_native_splash:
-  color: "#28A8EA"  # Fondo celeste igual al de tu logo
-  image: assets/icon/splash_icon.png  # (el archivo nuevo que te voy a pasar ahora)
+  color: "#28A8EA"
   android: true
   ios: true
+
+  android_12:
+    color: "#28A8EA"
+    # Si no querés logo, NO pongas image:

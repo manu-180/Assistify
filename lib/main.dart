@@ -23,13 +23,21 @@ Future<void> main() async {
 
   await initializeDateFormatting('es_ES', null);
 
+  // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
   subscriptionManager.listenToPurchaseUpdates();
-  await subscriptionManager.restorePurchases();
-  await subscriptionManager.checkAndUpdateSubscription();
 
-  runApp(const ProviderScope(child: MyApp()));
+  // 🟢 PostFrame: ejecutamos todo lo demás después del arranque visual
+  runApp(
+    ProviderScope(
+      child: PostFrameWrapper(
+        subscriptionManager: subscriptionManager,
+        child: const MyApp(),
+      ),
+    ),
+  );
 }
+
 
 final supabase = Supabase.instance.client;
 
@@ -83,5 +91,36 @@ class MyApp extends ConsumerWidget {
         return const Locale('en');
       },
     );
+  }
+}
+
+class PostFrameWrapper extends StatefulWidget {
+  final Widget child;
+  final SubscriptionManager subscriptionManager;
+
+  const PostFrameWrapper({
+    super.key,
+    required this.child,
+    required this.subscriptionManager,
+  });
+
+  @override
+  State<PostFrameWrapper> createState() => _PostFrameWrapperState();
+}
+
+class _PostFrameWrapperState extends State<PostFrameWrapper> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await widget.subscriptionManager.restorePurchases();
+      await widget.subscriptionManager.checkAndUpdateSubscription();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }

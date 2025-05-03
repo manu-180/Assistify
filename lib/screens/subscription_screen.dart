@@ -29,23 +29,26 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   StreamSubscription<List<PurchaseDetails>>? _subscription;
 
   @override
-  void initState() {
-    super.initState();
+void initState() {
+  super.initState();
 
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     SubscriptionManager().checkAndUpdateSubscription();
+  });
 
-    _initializeStore();
+  _initializeStore();
 
-    final Stream<List<PurchaseDetails>> purchaseUpdated =
-        _inAppPurchase.purchaseStream;
-    _subscription = purchaseUpdated.listen((purchases) {
-      _handlePurchaseUpdates(purchases);
-    }, onDone: () {
-      _subscription?.cancel();
-    }, onError: (error) {
-      debugPrint('Error en las compras: $error');
-    });
-  }
+  final Stream<List<PurchaseDetails>> purchaseUpdated =
+      _inAppPurchase.purchaseStream;
+  _subscription = purchaseUpdated.listen((purchases) {
+    _handlePurchaseUpdates(purchases);
+  }, onDone: () {
+    _subscription?.cancel();
+  }, onError: (error) {
+    debugPrint('Error en las compras: $error');
+  });
+}
+
 
   @override
   void dispose() {

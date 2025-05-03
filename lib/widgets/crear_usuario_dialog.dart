@@ -32,23 +32,42 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
   String passwordError = '';
   String phoneError = '';
   String fullnameError = '';
+Future<void> validarNombre(String nombre) async {
+  final existingUsers = await supabase
+      .from('usuarios')
+      .select('fullname')
+      .ilike('fullname', nombre.trim());
 
-  Future<void> validarNombre(String nombre) async {
-    final usuarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  setState(() {
+    fullnameError = existingUsers.isNotEmpty
+        ? 'Ese nombre ya esta registrado.'
+        : '';
+  });
+}
 
-    final existingUsers = await supabase
-        .from('usuarios')
-        .select('fullname')
-        .eq('taller', taller)
-        .ilike('fullname', nombre.trim());
+Future<bool> telefonoYaRegistrado(String telefono) async {
+  final res = await supabase
+      .from('usuarios')
+      .select('telefono')
+      .eq('telefono', telefono.trim())
+      .maybeSingle();
 
-    setState(() {
-      fullnameError = existingUsers.isNotEmpty
-          ? 'Ya existe este nombre en tus usuarios'
-          : '';
-    });
-  }
+  return res != null;
+}
+
+
+
+  Future<bool> emailYaRegistrado(String email) async {
+  final res = await supabase
+      .from('usuarios')
+      .select('usuario')
+      .eq('usuario', email.trim())
+      .limit(1)
+      .maybeSingle();
+
+  return res != null;
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -72,6 +91,7 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                   if (context.mounted) {
                     showDialog(
                       context: context,
+                      
                       builder: (_) => AlertDialog(
                         title: Row(
                           children: [
@@ -159,13 +179,25 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                 errorText: emailError.isEmpty ? null : emailError,
               ),
               keyboardType: TextInputType.emailAddress,
-              onChanged: (value) {
-                setState(() {
-                  emailError = emailRegex.hasMatch(value.trim())
-                      ? ''
-                      : 'Correo electrónico inválido';
-                });
-              },
+              onChanged: (value) async {
+  final emailActual = value.trim();
+
+  if (!emailRegex.hasMatch(emailActual)) {
+    setState(() {
+      emailError = 'Correo electrónico inválido';
+    });
+    return;
+  }
+
+  final existe = await emailYaRegistrado(emailActual);
+
+  if (emailActual == emailController.text.trim()) {
+    setState(() {
+      emailError = existe ? 'Ese mail ya fue registrado' : '';
+    });
+  }
+},
+
             ),
             const SizedBox(height: 16),
             TextField(
@@ -204,13 +236,24 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                 errorText: phoneError.isEmpty ? null : phoneError,
               ),
               keyboardType: TextInputType.phone,
-              onChanged: (value) {
-                setState(() {
-                  phoneError = phoneRegex.hasMatch(value.trim())
-                      ? ''
-                      : 'Teléfono inválido. ';
-                });
-              },
+              onChanged: (value) async {
+  final numero = value.trim();
+  if (!phoneRegex.hasMatch(numero)) {
+    setState(() {
+      phoneError = 'Teléfono inválido';
+    });
+    return;
+  }
+
+  final existe = await telefonoYaRegistrado(numero);
+
+  if (numero == phoneController.text.trim()) {
+    setState(() {
+      phoneError = existe ? 'Ese número ya está registrado' : '';
+    });
+  }
+},
+
             ),
             const SizedBox(height: 16),
           ],
@@ -229,6 +272,48 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
             final email = emailController.text.trim();
             final password = passwordController.text.trim();
             final telefono = phoneController.text.trim();
+
+            final yaExiste = await emailYaRegistrado(email);
+            final nombreYaExiste = await supabase
+    .from('usuarios')
+    .select('fullname')
+    .ilike('fullname', fullname)
+    .limit(1)
+    .maybeSingle();
+    final telExiste = await telefonoYaRegistrado(telefono);
+if (telExiste) {
+  setState(() => phoneError = 'Ese número ya está registrado');
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Ese número ya está registrado"),
+      backgroundColor: Colors.red,
+    ),
+  );
+  return;
+}
+
+
+if (nombreYaExiste != null) {
+  setState(() => fullnameError = 'Ya existe este nombre');
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Ese nombre ya fue registrado"),
+      backgroundColor: Colors.red,
+    ),
+  );
+  return;
+}
+
+if (yaExiste) {
+  setState(() => emailError = 'Ese mail ya fue registrado');
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text("Ese mail ya fue registrado"),
+      backgroundColor: Colors.red,
+    ),
+  );
+  return;
+}
 
             if (fullname.isEmpty ||
                 email.isEmpty ||

@@ -24,7 +24,8 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
 
-  final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}\$');
+  final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+
   final RegExp phoneRegex = RegExp(r'^\+?[0-9]{7,15}\$');
 
   final List<String> rubros = [
@@ -58,6 +59,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   String tallerError = '';
   String? selectedRubro;
   bool isLoading = false;
+  String fullnameError = '';
 
   Future<void> crearTablaTaller(String taller) async {
     final int mesActual = DateTime.now().month;
@@ -80,10 +82,35 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
     });
   }
 
+  Future<bool> emailYaRegistrado(String email) async {
+  final res = await supabase
+      .from('usuarios')
+      .select('usuario')
+      .eq('usuario', email)
+      .limit(1)
+      .maybeSingle();
+
+  return res != null;
+}
+
+
+  Future<bool> tallerYaExiste(String nombre) async {
+  final res = await supabase
+      .from('usuarios')
+      .select('taller')
+      .ilike('taller', nombre.trim()); // insensitive LIKE
+
+  return res.isNotEmpty;
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
+    
+
 
     return Scaffold(
       appBar: AppBar(
@@ -144,64 +171,133 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                 ),
           const SizedBox(height: 16),
           TextField(
-            controller: tallerController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).translate('workshopNameLabel'),
-              border: const OutlineInputBorder(),
-              errorText: tallerError.isEmpty ? null : tallerError,
-            ),
-            keyboardType: TextInputType.text,
-            onChanged: (value) {
-              setState(() {
-                tallerError = value.trim().isEmpty ? AppLocalizations.of(context).translate('emptyWorkshopNameError') : '';
-              });
-            },
-          ),
+  controller: fullnameController,
+  decoration: InputDecoration(
+    labelText: AppLocalizations.of(context).translate('fullNameLabel'),
+    border: const OutlineInputBorder(),
+    errorText: fullnameError.isEmpty ? null : fullnameError,
+  ),
+  keyboardType: TextInputType.name,
+  onChanged: (value) async {
+    final nombre = value.trim();
+    if (nombre.isEmpty) {
+      setState(() => fullnameError = "");
+      return;
+    }
+
+    final existe = await supabase
+        .from('usuarios')
+        .select('fullname')
+        .ilike('fullname', nombre)
+        .limit(1)
+        .maybeSingle();
+
+    setState(() {
+      fullnameError = existe != null ? "Ese nombre ya está registrado." : "";
+    });
+  },
+),
+
+
+
           const SizedBox(height: 16),
           TextField(
-            controller: fullnameController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).translate('fullNameLabel'),
-              border: const OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.name,
-          ),
+  controller: tallerController,
+  decoration: InputDecoration(
+    labelText: AppLocalizations.of(context).translate('workshopNameLabel'),
+    border: const OutlineInputBorder(),
+    errorText: tallerError.isEmpty ? null : tallerError,
+  ),
+  keyboardType: TextInputType.text,
+  onChanged: (value) async {
+    final nombre = value.trim();
+
+    if (nombre.isEmpty) {
+      setState(() {
+        tallerError = AppLocalizations.of(context).translate('emptyWorkshopNameError');
+      });
+      return;
+    }
+
+    final existe = await tallerYaExiste(nombre);
+
+    setState(() {
+      tallerError = existe ? "Ya existe ese nombre de empresa." : '';
+    });
+  },
+),
+
+          const SizedBox(height: 16),
+         
+          TextField(
+  controller: emailController,
+  decoration: InputDecoration(
+    labelText: AppLocalizations.of(context).translate('emailLabel'),
+    border: const OutlineInputBorder(),
+    errorText: mailError.isEmpty ? null : mailError,
+  ),
+  keyboardType: TextInputType.emailAddress,
+  onChanged: (value) async {
+  final emailActual = value.trim();
+  final emailRegex = RegExp(
+    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+  );
+
+  if (!emailRegex.hasMatch(emailActual)) {
+    setState(() {
+      mailError = AppLocalizations.of(context).translate('invalidEmailError');
+    });
+    return;
+  }
+
+  final existe = await emailYaRegistrado(emailActual);
+
+  // solo mostrar el error si el valor no cambió durante el await
+  if (emailActual == emailController.text.trim()) {
+    setState(() {
+      mailError = existe
+          ? 'Este correo electrónico ya está registrado.'
+          : '';
+    });
+  }
+},
+
+),
+
           const SizedBox(height: 16),
           TextField(
-            controller: emailController,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).translate('emailLabel'),
-              border: const OutlineInputBorder(),
-              errorText: mailError.isEmpty ? null : mailError,
-            ),
-            keyboardType: TextInputType.emailAddress,
-            onChanged: (value) {
-              final emailRegex = RegExp(
-                r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
-                r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
-                r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-              );
-              setState(() {
-                mailError = !emailRegex.hasMatch(value.trim()) ? AppLocalizations.of(context).translate('invalidEmailError') : '';
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: phoneController,
-            decoration: InputDecoration(
-              labelText: "Teléfono",
-              border: const OutlineInputBorder(),
-              errorText: phoneError.isEmpty ? null : phoneError,
-            ),
-            keyboardType: TextInputType.phone,
-            onChanged: (value) {
-              final phoneRegex = RegExp(r'^[0-9]{7,15}$');
-              setState(() {
-                phoneError = !phoneRegex.hasMatch(value.trim()) ? "Número inválido. (ej: 1134272488)" : '';
-              });
-            },
-          ),
+  controller: phoneController,
+  decoration: InputDecoration(
+    labelText: "Teléfono",
+    border: const OutlineInputBorder(),
+    errorText: phoneError.isEmpty ? null : phoneError,
+  ),
+  keyboardType: TextInputType.phone,
+  onChanged: (value) async {
+    final phone = value.trim();
+    final regex = RegExp(r'^[0-9]{7,15}$');
+
+    if (!regex.hasMatch(phone)) {
+      setState(() => phoneError = "Número inválido. (ej: 1134272488)");
+      return;
+    }
+
+    final existe = await supabase
+        .from('usuarios')
+        .select('telefono')
+        .eq('telefono', phone)
+        .limit(1)
+        .maybeSingle();
+
+    setState(() {
+      phoneError = existe != null ? "Ese número ya está registrado." : "";
+    });
+  },
+),
+
+
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             decoration: InputDecoration(
@@ -257,140 +353,214 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
               const SizedBox(width: 15),
               FilledButton(
                 onPressed: isLoading
-                    ? null
-                    : () async {
-                        setState(() {
-                          isLoading = true;
-                        });
+    ? null
+    : () async {
+        setState(() {
+          isLoading = true;
+        });
 
-                        FocusScope.of(context).unfocus();
-                        final fullname = fullnameController.text.trim();
-                        final email = emailController.text.trim();
-                        final taller = tallerController.text.trim();
-                        final password = passwordController.text.trim();
-                        final confirmPassword = confirmPasswordController.text.trim();
+        FocusScope.of(context).unfocus();
+        final fullname = fullnameController.text.trim();
+        final email = emailController.text.trim();
+        final taller = tallerController.text.trim();
+        final telefono = phoneController.text.trim();
+        final password = passwordController.text.trim();
+        final confirmPassword = confirmPasswordController.text.trim();
 
-                        if (fullname.isEmpty || email.isEmpty || taller.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context).translate('allFieldsRequiredError'),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Colors.red,
-                          ));
-                          return;
-                        }
+        // Validaciones iniciales
+        final existeTaller = await tallerYaExiste(taller);
+        final existeMail = await emailYaRegistrado(email);
+        final existeNombre = await supabase
+            .from('usuarios')
+            .select('fullname')
+            .ilike('fullname', fullname)
+            .limit(1)
+            .maybeSingle() !=
+            null;
+        final existeTelefono = await supabase
+            .from('usuarios')
+            .select('telefono')
+            .eq('telefono', telefono)
+            .limit(1)
+            .maybeSingle() !=
+            null;
 
-                        if (password.length < 6) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context).translate('passwordLengthError'),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Colors.red,
-                          ));
-                          return;
-                        }
+        if (existeNombre) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("El nombre ya está registrado"),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
-                        if (password != confirmPassword) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                            content: Text(
-                              AppLocalizations.of(context).translate('passwordMismatchError'),
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                            backgroundColor: Colors.red,
-                          ));
-                          return;
-                        }
+        if (existeMail) {
+          setState(() {
+            mailError = 'Este correo electrónico ya está registrado.';
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Este correo electrónico ya está registrado."),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
-                        try {
-                       final AuthResponse res = await supabase.auth.signUp(
-  email: email,
-  password: password,
-  data: {
-    'fullname': Capitalize().capitalize(fullname),
-    "rubro": selectedRubro,
-    "taller": Capitalize().capitalize(taller),
-    "telefono": phoneController.text,
-    "admin": true,
-    "created_at": DateTime.now().toIso8601String(),
-    
-  },
-);
+        if (existeTaller) {
+          setState(() {
+            tallerError = "Ya existe ese nombre de empresa.";
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("El nombre de empresa ya existe."),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
-if (res.user != null) {
-  print("✅ Usuario creado correctamente. Supabase debería haber enviado el mail.");
-} else {
-  print("❌ No se creó el usuario.");
-}
+        if (existeTelefono) {
+          setState(() {
+            phoneError = "Ese número ya está registrado.";
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Ese número ya está registrado."),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
+        if (fullname.isEmpty ||
+            email.isEmpty ||
+            taller.isEmpty ||
+            telefono.isEmpty ||
+            password.isEmpty ||
+            confirmPassword.isEmpty) {
+          setState(() {
+            isLoading = false;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).translate('allFieldsRequiredError'),
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+          return;
+        }
 
-                          await supabase.from('usuarios').insert({
-                            'id': await GenerarId().generarIdUsuario(),
-                            'usuario': email,
-                            'fullname': Capitalize().capitalize(fullname),
-                            'user_uid': res.user?.id,
-                            'sexo': "mujer",
-                            'clases_disponibles': 0,
-                            'trigger_alert': 0,
-                            'clases_canceladas': [],
-                            'taller': Capitalize().capitalize(taller),
-                            "admin": true,
-                            "created_at": DateTime.now().toIso8601String(),
-                            "rubro": selectedRubro,
-                            "telefono": phoneController.text,
-                            
-                          });
+        if (password.length < 6) {
+          setState(() {
+            passwordError = AppLocalizations.of(context).translate('passwordLengthError');
+            isLoading = false;
+          });
+          return;
+        }
 
-                          crearTablaTaller(Capitalize().capitalize(taller));
+        if (password != confirmPassword) {
+          setState(() {
+            confirmPasswordError = AppLocalizations.of(context).translate('passwordMismatchError');
+            isLoading = false;
+          });
+          return;
+        }
 
-                          EnviarWpp().sendWhatsAppMessage(
-                            "HXa9fb3930150f932869bc13f223f26628",
-                            'whatsapp:+549${phoneController.text}',
-                            [fullname, "", "", "", ""]
-                          );
+        // Si pasó todas las validaciones, continúa con el registro
+        try {
+          final AuthResponse res = await supabase.auth.signUp(
+            email: email,
+            password: password,
+            data: {
+              'fullname': Capitalize().capitalize(fullname),
+              "rubro": selectedRubro,
+              "taller": Capitalize().capitalize(taller),
+              "telefono": telefono,
+              "admin": true,
+              "created_at": DateTime.now().toIso8601String(),
+            },
+          );
 
-                          if (context.mounted) {
-                            context.go("/");
-                          }
+          if (res.user != null) {
+            print("✅ Usuario creado correctamente.");
+          } else {
+            print("❌ No se creó el usuario.");
+          }
 
-                          setState(() {
-                            isLoading = false;
-                          });
+          await supabase.from('usuarios').insert({
+            'id': await GenerarId().generarIdUsuario(),
+            'usuario': email,
+            'fullname': Capitalize().capitalize(fullname),
+            'user_uid': res.user?.id,
+            'sexo': "mujer",
+            'clases_disponibles': 0,
+            'trigger_alert': 0,
+            'clases_canceladas': [],
+            'taller': Capitalize().capitalize(taller),
+            "admin": true,
+            "created_at": DateTime.now().toIso8601String(),
+            "rubro": selectedRubro,
+            "telefono": telefono,
+          });
 
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                AppLocalizations.of(context).translate('workshopCreatedSuccess'),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.green,
-                            ));
-                          }
-                        } catch (e) {
-                          setState(() {
-                            isLoading = false;
-                          });
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              content: Text(
-                                AppLocalizations.of(context).translate('workshopCreationError', params: {'error': e.toString()}),
-                                style: const TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: Colors.red,
-                            ));
-                          }
-                        }
-                      },
+          await crearTablaTaller(Capitalize().capitalize(taller));
+
+          EnviarWpp().sendWhatsAppMessage(
+            "HXa9fb3930150f932869bc13f223f26628",
+            'whatsapp:+549$telefono',
+            [fullname, "", "", "", ""]
+          );
+
+          if (context.mounted) {
+            context.go("/");
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                AppLocalizations.of(context).translate('workshopCreatedSuccess'),
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.green,
+            ));
+          }
+        } catch (e) {
+          final error = e.toString().toLowerCase();
+          String mensajeError;
+
+          if (error.contains("user already registered")) {
+            mensajeError = "El correo electrónico ya está registrado.";
+          } else {
+            mensajeError = AppLocalizations.of(context).translate(
+              'workshopCreationError',
+              params: {'error': e.toString()},
+            );
+          }
+
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                mensajeError,
+                style: const TextStyle(color: Colors.white),
+              ),
+              backgroundColor: Colors.red,
+            ));
+          }
+        } finally {
+          setState(() {
+            isLoading = false;
+          });
+        }
+      },
+
                 child: isLoading
                     ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
                     : Text(AppLocalizations.of(context).translate('registerWorkshopButton')),

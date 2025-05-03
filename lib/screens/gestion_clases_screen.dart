@@ -187,6 +187,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
 
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {

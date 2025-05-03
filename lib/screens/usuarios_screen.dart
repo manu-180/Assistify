@@ -444,6 +444,7 @@ El alumno usará su correo y contraseña para iniciar sesión.
             await AlMenosUnaClase().tallerTieneDatos() ?
             showDialog(
               context: context,
+              barrierDismissible: false,
               builder: (BuildContext context) {
                 return CrearUsuarioDialog(
                   onUsuarioCreado: () async {
