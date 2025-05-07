@@ -99,10 +99,10 @@ final appRouter = GoRouter(
       path: "/creartaller",
       builder: (context, state) => const CrearTallerScreen(),
     ),
-    GoRoute(
-      path: "/subscription",
-      builder: (context, state) => SubscriptionScreen(),
-    ),
+    // GoRoute(
+    //   path: "/subscription",
+    //   builder: (context, state) => SubscriptionScreen(),
+    // ),
     GoRoute(
       path: "/chatscreen",
       builder: (context, state) => ChatScreen(),

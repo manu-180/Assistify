@@ -151,9 +151,14 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
         }
         seleccionarFecha(fechaSeleccionada!);
       } else {
-        fechaSeleccionada = fechasDisponibles[0];
-        seleccionarFecha(fechaSeleccionada!);
-      }
+  if (fechasDisponibles.isNotEmpty) {
+    fechaSeleccionada = fechasDisponibles[0];
+    seleccionarFecha(fechaSeleccionada!);
+  } else {
+    print("⚠️ No hay fechas disponibles");
+  }
+}
+
     });
   }
 
