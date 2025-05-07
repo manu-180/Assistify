@@ -47,7 +47,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
-  ios: false # En Windows, esto debe estar en false
+  ios: true
   remove_alpha_ios: true
   image_path: "assets/icon/aicon.png"
   adaptive_icon_foreground: "assets/icon/aicon.png"
