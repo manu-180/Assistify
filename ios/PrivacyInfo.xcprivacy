@@ -7,6 +7,22 @@
     {
       "identifier": "NSBluetoothAlwaysUsageDescription",
       "description": "This app uses Bluetooth to check connectivity status."
+    },
+    {
+      "identifier": "NSAppTrackingTransparencyUsageDescription",
+      "description": "This app uses tracking for in-app purchases and analytics."
+    },
+    {
+      "identifier": "NSCalendarsUsageDescription",
+      "description": "This app uses calendar access for in-app purchases and scheduling."
+    },
+    {
+      "identifier": "NSMicrophoneUsageDescription",
+      "description": "This app uses the microphone to play or record audio."
+    },
+    {
+      "identifier": "NSCameraUsageDescription",
+      "description": "This app uses the camera to play videos and interact with media."
     }
   ],
   "tracking": []
