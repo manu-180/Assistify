@@ -1,0 +1,13 @@
+{
+  "privacy": [
+    {
+      "identifier": "NSLocalNetworkUsageDescription",
+      "description": "This app uses local network access to check network connectivity."
+    },
+    {
+      "identifier": "NSBluetoothAlwaysUsageDescription",
+      "description": "This app uses Bluetooth to check connectivity status."
+    }
+  ],
+  "tracking": []
+}
