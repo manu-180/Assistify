@@ -26,6 +26,8 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
   List<ClaseModels> clasesDelUsuario = [];
   List<ClaseModels> listaDeEsperaDelUsuario = [];
   int mesActual = 1;
+  int _recargaCreditos = 0;
+
 
   @override
   void initState() {
@@ -85,22 +87,28 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
   }
 
   void cancelarClase(int claseId, String fullname) async {
-    final clase = clasesDelUsuario.firstWhere((clase) => clase.id == claseId);
-    clase.mails.remove(fullname);
-    setState(() {
-      clasesDelUsuario = clasesDelUsuario
-          .where((clase) => clase.mails.contains(fullname))
-          .toList();
-    });
-    await RemoverUsuario(supabase)
-        .removerUsuarioDeClase(claseId, fullname, false);
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context).translate('classCancelled')),
-      ),
-    );
-  }
+  final clase = clasesDelUsuario.firstWhere((clase) => clase.id == claseId);
+  clase.mails.remove(fullname);
+
+  await RemoverUsuario(supabase)
+      .removerUsuarioDeClase(claseId, fullname, false);
+
+  await Future.delayed(const Duration(milliseconds: 400));
+
+  setState(() {
+    clasesDelUsuario = clasesDelUsuario
+        .where((clase) => clase.mails.contains(fullname))
+        .toList();
+    _recargaCreditos++;
+  });
+
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(AppLocalizations.of(context).translate('classCancelled')),
+    ),
+  );
+}
 
   void cancelarClaseEnListaDeEspera(int claseId, String fullname) async {
     final clase =
@@ -221,8 +229,73 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                     ],
                   ),
                 )
-              : Column(
-                  children: [
+               : Column(
+  children: [
+
+    const SizedBox(height: 10),
+    Padding(
+      padding: const EdgeInsets.all(20),
+      child: Text(
+        'Para recuperar la clase debes cancelar con más de 24 hs de anticipación',
+        textAlign: TextAlign.start,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: color.primary,
+        ),
+      ),
+    ),
+    const SizedBox(height: 15),
+    FutureBuilder<int>(
+      future: Future.delayed(Duration.zero, () {
+  return ObtenerClasesDisponibles().clasesDisponibles(
+    user?.userMetadata?['fullname'] ?? '',
+  );
+}),
+key: ValueKey(_recargaCreditos),
+
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return const CircularProgressIndicator();
+        final cantidad = snapshot.data!;
+        String texto = '';
+        Color colorTexto;
+        IconData icono;
+
+        if (cantidad > 1) {
+          texto = '¡Tenés $cantidad créditos disponibles!';
+          colorTexto = color.primary;
+          icono = Icons.check_circle_outline;
+        } else if (cantidad == 1) {
+          texto = '¡Tenés 1 crédito disponible!';
+          colorTexto = color.primary;
+          icono = Icons.check_circle_outline;
+        } else {
+          texto = 'No tenés ningún crédito disponible';
+          colorTexto = color.primary;
+          icono = Icons.warning_amber_outlined;
+        }
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(icono, color: colorTexto),
+              const SizedBox(width: 8),
+              Text(
+                texto,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: colorTexto,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ),
+    const SizedBox(height: 30),
                     
                     const SizedBox(height: 50),
                     (clasesDelUsuario.isEmpty &&
