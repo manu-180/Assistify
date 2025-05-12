@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_numero_admin.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/models/clase_models.dart';
@@ -16,6 +17,7 @@ class AgregarUsuario {
 
   Future<void> agregarUsuarioAClase(
       int idClase, String user, bool parametro, ClaseModels claseModels) async {
+    final tellefonoAdmin = await ObtenerNumero().obtenerTelefonoAdmin();
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
     final usuarios = await ObtenerTotalInfo(
@@ -42,13 +44,10 @@ class AgregarUsuario {
               ModificarCredito().removerCreditoUsuario(user);
               EnviarWpp().sendWhatsAppMessage(
                   "HXb7f90c40c60e781a4c4be85825808e79",
-                  'whatsapp:+5491132820164',
-                  [user, clase.dia, clase.fecha, clase.hora, ""]);
-              EnviarWpp().sendWhatsAppMessage(
-                  "HXb7f90c40c60e781a4c4be85825808e79",
-                  'whatsapp:+5491134272488',
+                  'whatsapp:+549$tellefonoAdmin',
                   [user, clase.dia, clase.fecha, clase.hora, ""]);
             }
+            
           }
         }
       }

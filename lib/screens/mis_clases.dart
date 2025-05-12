@@ -93,7 +93,7 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
   await RemoverUsuario(supabase)
       .removerUsuarioDeClase(claseId, fullname, false);
 
-  await Future.delayed(const Duration(milliseconds: 400));
+  await Future.delayed(const Duration(milliseconds: 500));
 
   setState(() {
     clasesDelUsuario = clasesDelUsuario

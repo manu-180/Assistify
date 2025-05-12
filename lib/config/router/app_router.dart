@@ -8,7 +8,7 @@ import 'package:taller_ceramica/screens/mis_clases.dart';
 import 'package:taller_ceramica/screens/gestion_clases_screen.dart';
 import 'package:taller_ceramica/screens/gestion_horarios_screen.dart';
 import 'package:taller_ceramica/screens/prueba.dart';
-import 'package:taller_ceramica/screens/responsive_turnos_screen/clases_screen.dart';
+import 'package:taller_ceramica/screens/clases_screen.dart';
 import 'package:taller_ceramica/screens/subscription_screen.dart';
 import 'package:taller_ceramica/screens/usuarios_screen.dart';
 import 'package:taller_ceramica/screens/configuracion.dart';
