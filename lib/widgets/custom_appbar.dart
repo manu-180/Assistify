@@ -88,6 +88,7 @@ class CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
+    final size = MediaQuery.of(context).size;
 
     if (isLoading && !showLoader) {
       return AppBar(
@@ -107,14 +108,18 @@ class CustomAppBarState extends State<CustomAppBar> {
     if (errorMessage != null) {
       return AppBar(
         title: Text(
-          '${AppLocalizations.of(context).translate('errorLabel')}: $errorMessage',
-          style: TextStyle(color: Colors.white),
-        ),
+                        '${AppLocalizations.of(context).translate('errorLabel')}: $errorMessage',
+                        style: TextStyle(
+                          color: color.onPrimary,
+                          fontSize:  size.width * 0.05 ,
+                          fontFamily: 'Oxanium'
+                        ),
+                      ),
         backgroundColor: color.primary,
       );
     }
 
-    final size = MediaQuery.of(context).size;
+  
     final user = Supabase.instance.client.auth.currentUser;
 
     final adminRoutes = [
@@ -180,23 +185,24 @@ class CustomAppBarState extends State<CustomAppBar> {
             onTap: () {
               context.push("/home/${taller ?? ''}");
             },
-            child: Row(
-              children: [
-                Text(
-                  AppLocalizations.of(context).translate('appTitle'),
-                  style:  TextStyle(
-                      color: color.onPrimary, fontWeight: FontWeight.w500),
+            child: 
+               
+                Padding(
+                  padding: const EdgeInsets.only(left: 10),
+                  child: Text(
+                          AppLocalizations.of(context).translate('appTitle'),
+                          style: TextStyle(
+                            color: color.onPrimary,
+                            fontSize:  size.width * 0.065 ,
+                            fontFamily: 'Oxanium',
+                            fontWeight: FontWeight.w800
+                          ),
+                        ),
                 ),
-                SizedBox(width: 7),
-                FaIcon(
-                  FontAwesomeIcons.fileLines,
-                  color: color.onPrimary,
-                  size: size.width * 0.055,
-                ),
-              ],
-            ),
+           
+         
           ),
-          SizedBox(width: size.width * 0.02),
+          
           PopupMenuButton<String>(
             onSelected: (value) => context.push(value),
             itemBuilder: (BuildContext context) => menuItems

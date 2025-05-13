@@ -10,7 +10,7 @@ import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/providers/theme_provider.dart';
 import 'package:taller_ceramica/subscription/subscription_manager.dart';
 
-// Assistify
+// AssistifyPRUEBA MAIN
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/supabase/utiles/redirijir_usuario_al_taller.dart';
+import 'package:video_player/video_player.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -11,10 +12,34 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
+  late List<VideoPlayerController> _controllers;
+
   @override
   void initState() {
     super.initState();
-    _checkSession(); // Llamar a la función al inicializar el widget
+    _checkSession();
+    _controllers = [
+      VideoPlayerController.asset('assets/videos/video1.mp4'),
+      VideoPlayerController.asset('assets/videos/video2.mp4'),
+      VideoPlayerController.asset('assets/videos/video3.mp4'),
+    ];
+
+    for (var controller in _controllers) {
+      controller.initialize().then((_) {
+        controller.setLooping(true);
+        controller.setVolume(0.0);
+        controller.play();
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
   }
 
   Future<void> _checkSession() async {
@@ -41,15 +66,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Imagen (ocupa la mitad de la pantalla)
-                Image.asset(
-                  'assets/images/libreta.png',
-                  height: size.height * 0.5, // 50% de la altura de la pantalla
-                  width: size.width, // Ancho completo
-                  fit: BoxFit.cover, // Ajuste para cubrir el ancho
+               Padding(
+                  padding: EdgeInsets.only(top: size.height * 0.02),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: SizedBox(
+                      height: size.height * 0.5,
+                      width: size.width* 0.8,
+                      child: PageView(
+                        children: _controllers.map((controller) {
+                          return controller.value.isInitialized
+                              ? VideoPlayer(controller)
+                              : const Center(child: CircularProgressIndicator());
+                        }).toList(),
+                      ),
+                    ),
+                  ),
                 ),
-
-                // Otra mitad de la pantalla para los textos y botones
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(size.height * 0.03, 0,
