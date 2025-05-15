@@ -13,11 +13,17 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
   late List<VideoPlayerController> _controllers;
+  int _currentPage = 0;
+  bool _allInitialized = false;
 
   @override
   void initState() {
     super.initState();
     _checkSession();
+    _initVideos();
+  }
+
+  Future<void> _initVideos() async {
     _controllers = [
       VideoPlayerController.asset('assets/videos/video1.mp4'),
       VideoPlayerController.asset('assets/videos/video2.mp4'),
@@ -25,11 +31,36 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     ];
 
     for (var controller in _controllers) {
-      controller.initialize().then((_) {
-        controller.setLooping(true);
-        controller.setVolume(0.0);
-        controller.play();
-        if (mounted) setState(() {});
+      await controller.initialize();
+      controller.setLooping(false);
+      controller.setVolume(0.0);
+    }
+
+    _controllers[_currentPage].play();
+    _controllers[_currentPage].addListener(_videoListener);
+
+    if (mounted) {
+      setState(() {
+        _allInitialized = true;
+      });
+    }
+  }
+
+  void _videoListener() {
+    final controller = _controllers[_currentPage];
+    if (controller.value.position >= controller.value.duration &&
+        !controller.value.isPlaying) {
+      controller.removeListener(_videoListener);
+
+      final nextPage = (_currentPage + 1) % _controllers.length;
+
+      setState(() {
+        _currentPage = nextPage;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _controllers[nextPage].play();
+        _controllers[nextPage].addListener(_videoListener);
       });
     }
   }
@@ -43,10 +74,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> _checkSession() async {
-    // Recuperar la sesión desde Supabase
     final user = Supabase.instance.client.auth.currentUser;
-
-    // Si la sesión es válida, redirigir al usuario
     if (user != null) {
       await RedirigirUsuarioAlTaller().redirigirUsuario(context);
     }
@@ -54,55 +82,62 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size; // Tamaño de la pantalla
+    final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: Colors.black, // Fondo oscuro
+      backgroundColor: Colors.black,
       body: SafeArea(
         child: SingleChildScrollView(
           child: SizedBox(
-            height: size.height, // Altura total de la pantalla
-            width: size.width, // Ancho total de la pantalla
+            height: size.height,
+            width: size.width,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-               Padding(
+                Padding(
                   padding: EdgeInsets.only(top: size.height * 0.02),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(32),
                     child: SizedBox(
                       height: size.height * 0.5,
-                      width: size.width* 0.8,
-                      child: PageView(
-                        children: _controllers.map((controller) {
-                          return controller.value.isInitialized
-                              ? VideoPlayer(controller)
-                              : const Center(child: CircularProgressIndicator());
-                        }).toList(),
-                      ),
+                      width: size.width * 0.8,
+                      child: _allInitialized
+                          ? AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 800),
+                              switchInCurve: Curves.easeIn,
+                              switchOutCurve: Curves.easeOut,
+                              child: VideoPlayer(
+                                _controllers[_currentPage],
+                                key: UniqueKey(),
+
+                              ),
+                            )
+                          : const Center(child: CircularProgressIndicator()),
                     ),
                   ),
                 ),
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(size.height * 0.03, 0,
-                        size.height * 0.03, size.height * 0.03),
+                    padding: EdgeInsets.fromLTRB(
+                      size.height * 0.03,
+                      0,
+                      size.height * 0.03,
+                      size.height * 0.03,
+                    ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Título para empresa
                         const Text(
                           '¿Sos empresa?',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white, // Texto blanco
+                            color: Colors.white,
+                            fontFamily: "oxanium"
                           ),
                           textAlign: TextAlign.center,
                         ),
-
-                        // Botones para empresa
                         Column(
                           children: [
                             OutlinedButton(
@@ -111,11 +146,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size(size.width * 0.8, 50),
-                                side: BorderSide(
-                                    color: Colors.white), // Borde blanco
+                                side: const BorderSide(color: Colors.white),
                               ),
-                              child: const Text('Crea tu cuenta',
-                                  style: TextStyle(color: Colors.white)),
+                              child: const Text(
+                                'Crea tu cuenta',
+                                style: TextStyle(color: Colors.white),
+                              ),
                             ),
                             SizedBox(height: size.width * 0.04),
                             OutlinedButton(
@@ -124,8 +160,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size(size.width * 0.8, 50),
-                                side: BorderSide(
-                                    color: Colors.white), // Borde blanco
+                                side: const BorderSide(color: Colors.white),
                               ),
                               child: const Text(
                                 'Inicia sesión',
@@ -134,27 +169,23 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                           ],
                         ),
-
-                        // Título para alumno
                         const Text(
                           '¿Sos alumno?',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white, // Texto blanco
+                            color: Colors.white,
+                            fontFamily: "oxanium"
                           ),
                           textAlign: TextAlign.center,
                         ),
-
-                        // Botón para alumno
                         OutlinedButton(
                           onPressed: () {
                             context.push("/login");
                           },
                           style: OutlinedButton.styleFrom(
                             minimumSize: Size(size.width * 0.8, 50),
-                            side:
-                                BorderSide(color: Colors.white), // Borde blanco
+                            side: const BorderSide(color: Colors.white),
                           ),
                           child: const Text(
                             'Inicia sesión',
