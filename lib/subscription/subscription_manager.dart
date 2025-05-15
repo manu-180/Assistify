@@ -30,14 +30,12 @@ class SubscriptionManager {
     final restoredPurchases = await restorePurchases();
 
     final bool isSubscribed = restoredPurchases.any((purchase) =>
-    (purchase.productID == 'monthlysubscription' ||
-     purchase.productID == 'annualsubscription' ||
-     purchase.productID == 'cero' ||
-     purchase.productID == 'prueba') &&
-    (purchase.status == PurchaseStatus.purchased || 
-     purchase.status == PurchaseStatus.restored)
-);
-
+        (purchase.productID == 'monthlysubscription' ||
+            purchase.productID == 'annualsubscription' ||
+            purchase.productID == 'cero' ||
+            purchase.productID == 'prueba') &&
+        (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored));
 
     await Supabase.instance.client
         .from('subscriptions')
@@ -56,27 +54,26 @@ class SubscriptionManager {
 
     bool isSubscribed = false;
 
-for (final purchase in restoredPurchases) {
-  if ((purchase.productID == 'monthlysubscription' ||
-       purchase.productID == 'annualsubscription' ||
-       purchase.productID == 'cero' ||
-       purchase.productID == 'prueba') &&
-      (purchase.status == PurchaseStatus.purchased || purchase.status == PurchaseStatus.restored)) {
+    for (final purchase in restoredPurchases) {
+      if ((purchase.productID == 'monthlysubscription' ||
+              purchase.productID == 'annualsubscription' ||
+              purchase.productID == 'cero' ||
+              purchase.productID == 'prueba') &&
+          (purchase.status == PurchaseStatus.purchased ||
+              purchase.status == PurchaseStatus.restored)) {
+        final purchaseToken = purchase.verificationData.serverVerificationData;
 
-    final purchaseToken = purchase.verificationData.serverVerificationData;
+        final backendActiva = await verificarSuscripcionConBackend(
+          purchaseToken: purchaseToken,
+          subscriptionId: purchase.productID,
+        );
 
-    final backendActiva = await verificarSuscripcionConBackend(
-      purchaseToken: purchaseToken,
-      subscriptionId: purchase.productID,
-    );
-
-    if (backendActiva) {
-      isSubscribed = true;
-      break; // Ya con una activa nos alcanza
+        if (backendActiva) {
+          isSubscribed = true;
+          break; // Ya con una activa nos alcanza
+        }
+      }
     }
-  }
-}
-
 
     await supabase
         .from('subscriptions')

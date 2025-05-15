@@ -61,11 +61,15 @@ flutter_native_splash:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
+
 flutter:
   fonts:
     - family: Oxanium
       fonts:
         - asset: assets/fonts/Oxanium-VariableFont_wght.ttf
+
+
+
   uses-material-design: true
   generate: true
 
@@ -74,6 +78,8 @@ flutter:
     - assets/icon/
     - assets/videos/
     - .env
+
+
 
 l10n:
   arb-dir: lib/l10n

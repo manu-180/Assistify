@@ -48,53 +48,52 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   bool esAdmin = false;
 
   Future<void> cargarDatos({bool intentoDesdeOtraSemana = false}) async {
-  final usuarioActivo = Supabase.instance.client.auth.currentUser;
-  final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
+    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-  setState(() => isLoading = true);
+    setState(() => isLoading = true);
 
-  if (_cachePorSemana.containsKey(semanaSeleccionada)) {
-    final datosSemana = _cachePorSemana[semanaSeleccionada]!;
+    if (_cachePorSemana.containsKey(semanaSeleccionada)) {
+      final datosSemana = _cachePorSemana[semanaSeleccionada]!;
 
-    _procesarDatosSemana(datosSemana);
-    _generarAvisoConDatosLocales();
-    setState(() => isLoading = false);
-    _actualizarClasesDisponibles();
+      _procesarDatosSemana(datosSemana);
+      _generarAvisoConDatosLocales();
+      setState(() => isLoading = false);
+      _actualizarClasesDisponibles();
 
-    if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
-      // 👇 Volvemos a intentar con la siguiente semana
-      cambiarSemanaAdelante(forzar: true);
-    } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
-      // 👇 Ya intentamos una vez y sigue vacío: mostrar alerta
-      _mostrarDialogoSinClases(taller);
+      if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
+        // 👇 Volvemos a intentar con la siguiente semana
+        cambiarSemanaAdelante(forzar: true);
+      } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
+        // 👇 Ya intentamos una vez y sigue vacío: mostrar alerta
+        _mostrarDialogoSinClases(taller);
+      }
+
+      return;
     }
 
-    return;
+    // Si no está cacheada, seguimos
+    final datos = await ObtenerTotalInfo(
+      supabase: supabase,
+      usuariosTable: 'usuarios',
+      clasesTable: taller,
+    ).obtenerClases();
+
+    final datosSemana =
+        datos.where((clase) => clase.semana == semanaSeleccionada).toList();
+
+    _cachePorSemana[semanaSeleccionada] = datosSemana;
+
+    _procesarDatosSemana(datosSemana);
+    await _actualizarClasesDisponibles();
+    setState(() => isLoading = false);
+
+    if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
+      cambiarSemanaAdelante(forzar: true);
+    } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
+      _mostrarDialogoSinClases(taller);
+    }
   }
-
-  // Si no está cacheada, seguimos
-  final datos = await ObtenerTotalInfo(
-    supabase: supabase,
-    usuariosTable: 'usuarios',
-    clasesTable: taller,
-  ).obtenerClases();
-
-  final datosSemana =
-      datos.where((clase) => clase.semana == semanaSeleccionada).toList();
-
-  _cachePorSemana[semanaSeleccionada] = datosSemana;
-
-  _procesarDatosSemana(datosSemana);
-  await _actualizarClasesDisponibles();
-  setState(() => isLoading = false);
-
-  if (datosSemana.isEmpty && !intentoDesdeOtraSemana) {
-    cambiarSemanaAdelante(forzar: true);
-  } else if (datosSemana.isEmpty && intentoDesdeOtraSemana) {
-    _mostrarDialogoSinClases(taller);
-  }
-}
-
 
   void precargarTodasLasSemanas() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -292,18 +291,17 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   }
 
   void cambiarSemanaAdelante({bool forzar = false}) {
-  final indiceActual = semanas.indexOf(semanaSeleccionada);
-  final nuevoIndice = (indiceActual + 1) % semanas.length;
+    final indiceActual = semanas.indexOf(semanaSeleccionada);
+    final nuevoIndice = (indiceActual + 1) % semanas.length;
 
-  setState(() {
-    semanaSeleccionada = semanas[nuevoIndice];
-    isLoading = true;
-    avisoDeClasesDisponibles = null;
-  });
+    setState(() {
+      semanaSeleccionada = semanas[nuevoIndice];
+      isLoading = true;
+      avisoDeClasesDisponibles = null;
+    });
 
-  cargarDatos(intentoDesdeOtraSemana: forzar);
-}
-
+    cargarDatos(intentoDesdeOtraSemana: forzar);
+  }
 
   void cambiarSemanaAtras() {
     final indiceActual = semanas.indexOf(semanaSeleccionada);
@@ -319,31 +317,29 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   }
 
   void _mostrarDialogoSinClases(String taller) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Sin clases registradas'),
-      content: const Text('Primero debes cargar tus clases.'),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: const Text('Cancelar'),
-        ),
-        FilledButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-            context.push('/gestionclases/$taller');
- 
-          },
-          child: const Text('Ir a gestión'),
-        ),
-      ],
-    ),
-  );
-}
-
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sin clases registradas'),
+        content: const Text('Primero debes cargar tus clases.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              context.push('/gestionclases/$taller');
+            },
+            child: const Text('Ir a gestión'),
+          ),
+        ],
+      ),
+    );
+  }
 
   void mostrarConfirmacion(BuildContext context, ClaseModels clase) async {
     final user = Supabase.instance.client.auth.currentUser;
@@ -496,12 +492,12 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     return Scaffold(
       appBar: ResponsiveAppBar(isTablet: size.width > 600),
       body: Padding(
-        padding: EdgeInsets.fromLTRB(size.width *0.03,size.height * 0.06,size.width *0.03,0),
+        padding: EdgeInsets.fromLTRB(
+            size.width * 0.03, size.height * 0.06, size.width * 0.03, 0),
         child: Column(
           children: [
             Padding(
-              padding:
-                  EdgeInsets.fromLTRB(0,0,0, size.height *0.06),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, size.height * 0.06),
               child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
                   ? _AvisoDeClasesDisponibles(
                       colors: colors,
@@ -515,7 +511,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                       width: size.width * 0.9,
                     ),
             ),
-        
             SemanaNavigation(
               semanaSeleccionada: semanaSeleccionada,
               cambiarSemanaAdelante: cambiarSemanaAdelante,
@@ -533,7 +528,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                             children: List.generate(
                                 5,
                                 (index) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 20),
+                                      padding:
+                                          const EdgeInsets.only(bottom: 20),
                                       child: SizedBox(
                                         height: size.width * 0.113,
                                         child: ElevatedButton(
@@ -587,144 +583,139 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                 ],
               ),
             ),
-            
             const SizedBox(height: 30),
           ],
         ),
       ),
-      floatingActionButton: InformationButon(text: 
-            "1️⃣ Vas a ver botones de lunes a viernes. Tocá el día que te interese."
-
-"\n\n2️⃣ A la derecha se mostrarán los horarios para ese día. Si hay cupo, podés inscribirte tocando el botón verde."
-
-"\n\n3️⃣ Si la clase está llena, podés dejar el dedo presionado para unirte a la lista de espera."
-" Si un alumno cancela, y vos tenés crédito disponible, vas a ser agregado automáticamente y se te avisará por WhatsApp."
-          ),
+      floatingActionButton: InformationButon(
+          text:
+              "1️⃣ Vas a ver botones de lunes a viernes. Tocá el día que te interese."
+              "\n\n2️⃣ A la derecha se mostrarán los horarios para ese día. Si hay cupo, podés inscribirte tocando el botón verde."
+              "\n\n3️⃣ Si la clase está llena, podés dejar el dedo presionado para unirte a la lista de espera."
+              " Si un alumno cancela, y vos tenés crédito disponible, vas a ser agregado automáticamente y se te avisará por WhatsApp."),
     );
   }
 
   Widget construirBotonHorario(ClaseModels clase) {
-  final partesFecha = clase.fecha.split('/');
-  final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
-  final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
-  final screenWidth = MediaQuery.of(context).size.width;
-  
+    final partesFecha = clase.fecha.split('/');
+    final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
+    final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
+    final screenWidth = MediaQuery.of(context).size.width;
 
-  // 👉 Si es feriado, mostramos una tarjeta especial
-  if (clase.feriado) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Card(
-        color: Colors.amber.shade100,
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            children: [
-              Icon(Icons.celebration,
-                  size: screenWidth * 0.08, color: Colors.orange),
-              const SizedBox(width: 10),
-               Expanded(
-                
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "¡Es feriado!",
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.04,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.deepOrange,
-                      ),
-                    ),
-            
-                  ],
-                ),
-              ),
-            ],
+    // 👉 Si es feriado, mostramos una tarjeta especial
+    if (clase.feriado) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Card(
+          color: Colors.amber.shade100,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
-        ),
-      ),
-    );
-  }
-
-  // 🔁 Caso normal: clase habilitada o deshabilitada
-  return Column(
-    children: [
-      SizedBox(
-        width: screenWidth * 0.7,
-        height: screenWidth * 0.12,
-        child: GestureDetector(
-          child: ElevatedButton(
-            onPressed: esAdmin
-                ? () async {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            clase.mails.isEmpty
-                                ? AppLocalizations.of(context)
-                                    .translate('noStudents')
-                                : AppLocalizations.of(context).translate(
-                                    'studentsInClass',
-                                    params: {
-                                      'students': clase.mails.join(', ')
-                                    },
-                                  ),
-                          ),
-                          duration: const Duration(seconds: 5),
-                          behavior: SnackBarBehavior.fixed,
-                        ),
-                      );
-                    }
-                  }
-                : ((Calcular24hs().esMenorA0Horas(
-                            clase.fecha, clase.hora, mesActual) ||
-                        clase.lugaresDisponibles <= 0))
-                    ? null
-                    : () async {
-                        if (context.mounted) {
-                          mostrarConfirmacion(context, clase);
-                        }
-                      },
-            style: ButtonStyle(
-              backgroundColor: WidgetStateProperty.all(
-                Calcular24hs().esMenorA0Horas(
-                            clase.fecha, clase.hora, mesActual) ||
-                        clase.lugaresDisponibles <= 0
-                    ? Colors.grey.shade400
-                    : Colors.green,
-              ),
-              shape: WidgetStateProperty.all(
-                RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.03)),
-              ),
-              padding: WidgetStateProperty.all(EdgeInsets.zero),
-            ),
-            child: Stack(
-              alignment: Alignment.center,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
               children: [
-                Text(
-                  diaYHora,
-                  style: TextStyle(
-                      fontSize: screenWidth * 0.032, color: Colors.white),
+                Icon(Icons.celebration,
+                    size: screenWidth * 0.08, color: Colors.orange),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "¡Es feriado!",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          onLongPress: () {
-            mostrarAlertaListaEspera(context: context, clase: clase);
-          },
         ),
-      ),
-      const SizedBox(height: 18),
-    ],
-  );
-  }}
+      );
+    }
+
+    // 🔁 Caso normal: clase habilitada o deshabilitada
+    return Column(
+      children: [
+        SizedBox(
+          width: screenWidth * 0.7,
+          height: screenWidth * 0.12,
+          child: GestureDetector(
+            child: ElevatedButton(
+              onPressed: esAdmin
+                  ? () async {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              clase.mails.isEmpty
+                                  ? AppLocalizations.of(context)
+                                      .translate('noStudents')
+                                  : AppLocalizations.of(context).translate(
+                                      'studentsInClass',
+                                      params: {
+                                        'students': clase.mails.join(', ')
+                                      },
+                                    ),
+                            ),
+                            duration: const Duration(seconds: 5),
+                            behavior: SnackBarBehavior.fixed,
+                          ),
+                        );
+                      }
+                    }
+                  : ((Calcular24hs().esMenorA0Horas(
+                              clase.fecha, clase.hora, mesActual) ||
+                          clase.lugaresDisponibles <= 0))
+                      ? null
+                      : () async {
+                          if (context.mounted) {
+                            mostrarConfirmacion(context, clase);
+                          }
+                        },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Calcular24hs().esMenorA0Horas(
+                              clase.fecha, clase.hora, mesActual) ||
+                          clase.lugaresDisponibles <= 0
+                      ? Colors.grey.shade400
+                      : Colors.green,
+                ),
+                shape: WidgetStateProperty.all(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+                ),
+                padding: WidgetStateProperty.all(EdgeInsets.zero),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    diaYHora,
+                    style: TextStyle(
+                        fontSize: screenWidth * 0.032, color: Colors.white),
+                  ),
+                ],
+              ),
+            ),
+            onLongPress: () {
+              mostrarAlertaListaEspera(context: context, clase: clase);
+            },
+          ),
+        ),
+        const SizedBox(height: 18),
+      ],
+    );
+  }
+}
 
 class _AvisoDeClasesDisponibles extends StatelessWidget {
   const _AvisoDeClasesDisponibles({
@@ -741,45 +732,44 @@ class _AvisoDeClasesDisponibles extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return 
-  
-        Container(
-          padding: EdgeInsets.all(screenWidth * 0.04),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                colors.secondaryContainer,
-                colors.primary.withAlpha(70),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return Container(
+      padding: EdgeInsets.all(screenWidth * 0.04),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            colors.secondaryContainer,
+            colors.primary.withAlpha(70),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(screenWidth * 0.03),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            Icons.info,
+            color: color,
+            size: screenWidth * 0.08,
+          ),
+          SizedBox(width: screenWidth * 0.03),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: screenWidth * 0.04,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
             ),
-            borderRadius: BorderRadius.circular(screenWidth * 0.03),
           ),
-          child: Row(
-            children: [
-              Icon(
-                Icons.info,
-                color: color,
-                size: screenWidth * 0.08,
-              ),
-              SizedBox(width: screenWidth * 0.03),
-              Expanded(
-                child: Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: screenWidth * 0.04,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
- 
+        ],
+      ),
+    );
   }
-}class SemanaNavigation extends StatefulWidget {
+}
+
+class SemanaNavigation extends StatefulWidget {
   final String semanaSeleccionada;
   final VoidCallback cambiarSemanaAdelante;
   final VoidCallback cambiarSemanaAtras;
@@ -807,20 +797,20 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-       IconButton(
-      onPressed: widget.cambiarSemanaAtras,
-      icon: Icon(
-        Icons.arrow_back_ios_new,
-        size: screenWidth * 0.07,
-        color: color.primary,
-      ),
-      padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
-      visualDensity: VisualDensity.compact, // <- Esto ajusta aún más
-    ),
+        IconButton(
+          onPressed: widget.cambiarSemanaAtras,
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            size: screenWidth * 0.07,
+            color: color.primary,
+          ),
+          padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
+          visualDensity: VisualDensity.compact, // <- Esto ajusta aún más
+        ),
         Row(
           children: List.generate(semanas.length, (index) {
             final bool isActive = index == indiceSeleccionado;
-    
+
             return Container(
               margin: EdgeInsets.symmetric(horizontal: 2),
               width: screenWidth * 0.032,
@@ -844,13 +834,12 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
             color: color.primary,
           ),
           padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
-      visualDensity: VisualDensity.compact, // <- 
+          visualDensity: VisualDensity.compact, // <-
         ),
       ],
     );
   }
 }
-
 
 class _DiaSelection extends StatefulWidget {
   final List<ClaseModels> diasUnicos;
@@ -872,60 +861,57 @@ class _DiaSelection extends StatefulWidget {
 }
 
 class _DiaSelectionState extends State<_DiaSelection> {
-
-
   @override
-Widget build(BuildContext context) {
-  final screenWidth = MediaQuery.of(context).size.width;
-  final screenHeight = MediaQuery.of(context).size.height;
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-  final filteredFechas = widget.fechasDisponibles.where((dateString) {
-    final partes = dateString.split('/');
-    final fecha = DateTime(
-      int.parse(partes[2]),
-      int.parse(partes[1]),
-      int.parse(partes[0]),
-    );
-    return fecha.month == widget.mesActual;
-  }).toList();
+    final filteredFechas = widget.fechasDisponibles.where((dateString) {
+      final partes = dateString.split('/');
+      final fecha = DateTime(
+        int.parse(partes[2]),
+        int.parse(partes[1]),
+        int.parse(partes[0]),
+      );
+      return fecha.month == widget.mesActual;
+    }).toList();
 
-  final diasParaMostrar = widget.diasUnicos.where((clase) {
-    return filteredFechas.contains(clase.fecha);
-  }).toList();
+    final diasParaMostrar = widget.diasUnicos.where((clase) {
+      return filteredFechas.contains(clase.fecha);
+    }).toList();
 
+    return ListView.builder(
+      itemCount: diasParaMostrar.length,
+      itemBuilder: (context, index) {
+        final clase = diasParaMostrar[index];
+        final partesFecha = clase.fecha.split('/');
+        final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
+        final diaMesAnio = '${clase.dia} - ${clase.fecha}';
 
-  return ListView.builder(
-    itemCount: diasParaMostrar.length,
-    itemBuilder: (context, index) {
-      final clase = diasParaMostrar[index];
-      final partesFecha = clase.fecha.split('/');
-      final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
-      final diaMesAnio = '${clase.dia} - ${clase.fecha}';
-
-      return Column(
-        children: [
-          SizedBox(
-            width: screenWidth * 0.99,
-            height: screenHeight * 0.053,
-            child: ElevatedButton(
-              onPressed: () => widget.seleccionarDia(diaMesAnio),
-              style: ElevatedButton.styleFrom(
-                minimumSize: Size.zero,
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(screenWidth * 0.03),
+        return Column(
+          children: [
+            SizedBox(
+              width: screenWidth * 0.99,
+              height: screenHeight * 0.053,
+              child: ElevatedButton(
+                onPressed: () => widget.seleccionarDia(diaMesAnio),
+                style: ElevatedButton.styleFrom(
+                  minimumSize: Size.zero,
+                  padding: EdgeInsets.zero,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                  ),
+                ),
+                child: Text(
+                  '${clase.dia} - $diaMes',
+                  style: TextStyle(fontSize: screenWidth * 0.032),
                 ),
               ),
-              child: Text(
-                '${clase.dia} - $diaMes',
-                style: TextStyle(fontSize: screenWidth * 0.032),
-              ),
             ),
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    },
-  );
-}
+            const SizedBox(height: 20),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -38,7 +38,6 @@ Future<void> main() async {
   );
 }
 
-
 final supabase = Supabase.instance.client;
 
 class MyApp extends ConsumerWidget {

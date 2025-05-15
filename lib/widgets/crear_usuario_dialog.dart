@@ -32,42 +32,38 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
   String passwordError = '';
   String phoneError = '';
   String fullnameError = '';
-Future<void> validarNombre(String nombre) async {
-  final existingUsers = await supabase
-      .from('usuarios')
-      .select('fullname')
-      .ilike('fullname', nombre.trim());
+  Future<void> validarNombre(String nombre) async {
+    final existingUsers = await supabase
+        .from('usuarios')
+        .select('fullname')
+        .ilike('fullname', nombre.trim());
 
-  setState(() {
-    fullnameError = existingUsers.isNotEmpty
-        ? 'Ese nombre ya esta registrado.'
-        : '';
-  });
-}
+    setState(() {
+      fullnameError =
+          existingUsers.isNotEmpty ? 'Ese nombre ya esta registrado.' : '';
+    });
+  }
 
-Future<bool> telefonoYaRegistrado(String telefono) async {
-  final res = await supabase
-      .from('usuarios')
-      .select('telefono')
-      .eq('telefono', telefono.trim())
-      .maybeSingle();
+  Future<bool> telefonoYaRegistrado(String telefono) async {
+    final res = await supabase
+        .from('usuarios')
+        .select('telefono')
+        .eq('telefono', telefono.trim())
+        .maybeSingle();
 
-  return res != null;
-}
-
-
+    return res != null;
+  }
 
   Future<bool> emailYaRegistrado(String email) async {
-  final res = await supabase
-      .from('usuarios')
-      .select('usuario')
-      .eq('usuario', email.trim())
-      .limit(1)
-      .maybeSingle();
+    final res = await supabase
+        .from('usuarios')
+        .select('usuario')
+        .eq('usuario', email.trim())
+        .limit(1)
+        .maybeSingle();
 
-  return res != null;
-}
-
+    return res != null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +87,6 @@ Future<bool> telefonoYaRegistrado(String telefono) async {
                   if (context.mounted) {
                     showDialog(
                       context: context,
-                      
                       builder: (_) => AlertDialog(
                         title: Row(
                           children: [
@@ -180,24 +175,23 @@ Future<bool> telefonoYaRegistrado(String telefono) async {
               ),
               keyboardType: TextInputType.emailAddress,
               onChanged: (value) async {
-  final emailActual = value.trim();
+                final emailActual = value.trim();
 
-  if (!emailRegex.hasMatch(emailActual)) {
-    setState(() {
-      emailError = 'Correo electrónico inválido';
-    });
-    return;
-  }
+                if (!emailRegex.hasMatch(emailActual)) {
+                  setState(() {
+                    emailError = 'Correo electrónico inválido';
+                  });
+                  return;
+                }
 
-  final existe = await emailYaRegistrado(emailActual);
+                final existe = await emailYaRegistrado(emailActual);
 
-  if (emailActual == emailController.text.trim()) {
-    setState(() {
-      emailError = existe ? 'Ese mail ya fue registrado' : '';
-    });
-  }
-},
-
+                if (emailActual == emailController.text.trim()) {
+                  setState(() {
+                    emailError = existe ? 'Ese mail ya fue registrado' : '';
+                  });
+                }
+              },
             ),
             const SizedBox(height: 16),
             TextField(
@@ -237,23 +231,22 @@ Future<bool> telefonoYaRegistrado(String telefono) async {
               ),
               keyboardType: TextInputType.phone,
               onChanged: (value) async {
-  final numero = value.trim();
-  if (!phoneRegex.hasMatch(numero)) {
-    setState(() {
-      phoneError = 'Teléfono inválido';
-    });
-    return;
-  }
+                final numero = value.trim();
+                if (!phoneRegex.hasMatch(numero)) {
+                  setState(() {
+                    phoneError = 'Teléfono inválido';
+                  });
+                  return;
+                }
 
-  final existe = await telefonoYaRegistrado(numero);
+                final existe = await telefonoYaRegistrado(numero);
 
-  if (numero == phoneController.text.trim()) {
-    setState(() {
-      phoneError = existe ? 'Ese número ya está registrado' : '';
-    });
-  }
-},
-
+                if (numero == phoneController.text.trim()) {
+                  setState(() {
+                    phoneError = existe ? 'Ese número ya está registrado' : '';
+                  });
+                }
+              },
             ),
             const SizedBox(height: 16),
           ],
@@ -275,45 +268,44 @@ Future<bool> telefonoYaRegistrado(String telefono) async {
 
             final yaExiste = await emailYaRegistrado(email);
             final nombreYaExiste = await supabase
-    .from('usuarios')
-    .select('fullname')
-    .ilike('fullname', fullname)
-    .limit(1)
-    .maybeSingle();
-    final telExiste = await telefonoYaRegistrado(telefono);
-if (telExiste) {
-  setState(() => phoneError = 'Ese número ya está registrado');
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Ese número ya está registrado"),
-      backgroundColor: Colors.red,
-    ),
-  );
-  return;
-}
+                .from('usuarios')
+                .select('fullname')
+                .ilike('fullname', fullname)
+                .limit(1)
+                .maybeSingle();
+            final telExiste = await telefonoYaRegistrado(telefono);
+            if (telExiste) {
+              setState(() => phoneError = 'Ese número ya está registrado');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Ese número ya está registrado"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
 
+            if (nombreYaExiste != null) {
+              setState(() => fullnameError = 'Ya existe este nombre');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Ese nombre ya fue registrado"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
 
-if (nombreYaExiste != null) {
-  setState(() => fullnameError = 'Ya existe este nombre');
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Ese nombre ya fue registrado"),
-      backgroundColor: Colors.red,
-    ),
-  );
-  return;
-}
-
-if (yaExiste) {
-  setState(() => emailError = 'Ese mail ya fue registrado');
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text("Ese mail ya fue registrado"),
-      backgroundColor: Colors.red,
-    ),
-  );
-  return;
-}
+            if (yaExiste) {
+              setState(() => emailError = 'Ese mail ya fue registrado');
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("Ese mail ya fue registrado"),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return;
+            }
 
             if (fullname.isEmpty ||
                 email.isEmpty ||
@@ -381,29 +373,28 @@ if (yaExiste) {
                   await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
               final userId = await crearUsuarioAdmin(
-  email: email,
-  password: password,
-  fullname: fullname,
-  telefono: telefono,
-  rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
-  taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
+                email: email,
+                password: password,
+                fullname: fullname,
+                telefono: telefono,
+                rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
+                taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
+              );
 
-);
-
-await supabase.from('usuarios').insert({
-  'id': await GenerarId().generarIdUsuario(),
-  'usuario': email,
-  'fullname': Capitalize().capitalize(fullname),
-  'user_uid': userId,
-  'sexo': "mujer",
-  'clases_disponibles': 0,
-  'trigger_alert': 0,
-  'clases_canceladas': [],
-  'taller': taller,
-  'telefono': telefono,
-  'rubro': await ObtenerRubro().rubro(usuarioActivo.userMetadata?['fullname']),
-});
-
+              await supabase.from('usuarios').insert({
+                'id': await GenerarId().generarIdUsuario(),
+                'usuario': email,
+                'fullname': Capitalize().capitalize(fullname),
+                'user_uid': userId,
+                'sexo': "mujer",
+                'clases_disponibles': 0,
+                'trigger_alert': 0,
+                'clases_canceladas': [],
+                'taller': taller,
+                'telefono': telefono,
+                'rubro': await ObtenerRubro()
+                    .rubro(usuarioActivo.userMetadata?['fullname']),
+              });
 
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -416,14 +407,13 @@ await supabase.from('usuarios').insert({
               );
 
               final callback = widget.onUsuarioCreado;
-Navigator.of(context).pop();
+              Navigator.of(context).pop();
 
-if (callback != null) {
-  Future.microtask(() async {
-    await callback();
-  });
-}
-
+              if (callback != null) {
+                Future.microtask(() async {
+                  await callback();
+                });
+              }
             } on AuthException catch (e) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(

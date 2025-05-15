@@ -86,17 +86,16 @@ class LoginState extends State<Login> {
         toolbarHeight: kToolbarHeight * 1.1,
         title: GestureDetector(
           child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                          AppLocalizations.of(context).translate('appTitle'),
-                          style: TextStyle(
-                            color: color.onPrimary,
-                            fontSize:  size.width * 0.065 ,
-                            fontFamily: 'Oxanium',
-                            fontWeight: FontWeight.w800
-                          ),
-                        ),
-                ),
+            padding: const EdgeInsets.only(left: 10),
+            child: Text(
+              AppLocalizations.of(context).translate('appTitle'),
+              style: TextStyle(
+                  color: color.onPrimary,
+                  fontSize: size.width * 0.065,
+                  fontFamily: 'Oxanium',
+                  fontWeight: FontWeight.w800),
+            ),
+          ),
           onTap: () => context.go('/'),
         ),
         backgroundColor: color.primary,
@@ -112,8 +111,9 @@ class LoginState extends State<Login> {
                   localizations.translate('homeScreenIntro'),
                   style: TextStyle(
                     fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w900,
                     color: color.primary,
+                    letterSpacing: -0.4,
                   ),
                 ),
               ),
@@ -134,6 +134,7 @@ class LoginState extends State<Login> {
                               fontSize: 19,
                               fontWeight: FontWeight.bold,
                               color: color.primary,
+                              letterSpacing: -0.4,
                             ),
                             textAlign: TextAlign.center,
                           ),

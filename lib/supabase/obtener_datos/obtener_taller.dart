@@ -10,7 +10,8 @@ class ObtenerTaller {
           .maybeSingle();
 
       if (data == null) {
-        throw Exception("No se encontró un taller para el usuario especificado.");
+        throw Exception(
+            "No se encontró un taller para el usuario especificado.");
       }
 
       return data["taller"];

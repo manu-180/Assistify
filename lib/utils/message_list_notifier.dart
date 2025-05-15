@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../services/twilio_service.dart';
 
-class MessageListNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
+class MessageListNotifier
+    extends StateNotifier<AsyncValue<List<Map<String, dynamic>>>> {
   final TwilioService service;
   final String conversationSid;
 
-  MessageListNotifier(this.service, this.conversationSid) : super(const AsyncLoading()) {
+  MessageListNotifier(this.service, this.conversationSid)
+      : super(const AsyncLoading()) {
     _load();
   }
 

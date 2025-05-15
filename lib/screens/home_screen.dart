@@ -286,8 +286,6 @@ class HomeScreen extends StatelessWidget {
           }
         },
       ),
-      
-    
     );
   }
 
@@ -397,9 +395,10 @@ class HomeScreen extends StatelessWidget {
                               .replaceAll('\$taller', taller ?? ''),
                       style: TextStyle(
                         fontSize: 33,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w600,
                         color: color.primary,
-                        fontFamily: "oxanium"
+                        // fontFamily: "oxanium",
+                        letterSpacing: -0.6,
                       ),
                     ),
                     const SizedBox(height: 25),
@@ -425,13 +424,15 @@ class HomeScreen extends StatelessWidget {
                       localizations.translate('whatWeDo'),
                       style: TextStyle(
                         fontSize: 33,
-                        fontWeight: FontWeight.w900,
+                        fontWeight: FontWeight.w400,
                         color: color.primary,
-                        fontFamily: "oxanium"
+                        // fontFamily: "oxanium",
+                        letterSpacing: -0.6,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    TituloSeleccion(texto: localizations.translate(descripcion)),
+                    TituloSeleccion(
+                        texto: localizations.translate(descripcion)),
                     const SizedBox(height: 20),
                     _buildLoadingImage(
                       imagePath: imagen2,

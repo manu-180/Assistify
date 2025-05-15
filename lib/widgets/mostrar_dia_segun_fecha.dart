@@ -44,8 +44,8 @@ class MostrarDiaSegunFecha extends StatelessWidget {
           color2: colors.primary.withAlpha(60),
           text: text.isEmpty
               ? AppLocalizations.of(context).translate('selectDate')
-              : DiaConFecha().obtenerDiaDeLaSemana(
-                  text, AppLocalizations.of(context)),
+              : DiaConFecha()
+                  .obtenerDiaDeLaSemana(text, AppLocalizations.of(context)),
         ),
         SizedBox(width: screenWidth * 0.05),
         IconButton(

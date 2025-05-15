@@ -2,14 +2,12 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 
 class InformationButon extends StatelessWidget {
-
   final String text;
 
   const InformationButon({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {
-
     final color = Theme.of(context).colorScheme;
 
     return BounceInDown(
@@ -18,9 +16,8 @@ class InformationButon extends StatelessWidget {
       child: IconButton(
         icon: Icon(Icons.info_outline, color: color.primary, size: 28),
         onPressed: () async {
-        
           if (!context.mounted) return;
-        
+
           showDialog(
             context: context,
             builder: (_) => AlertDialog(
@@ -34,11 +31,7 @@ class InformationButon extends StatelessWidget {
                   ),
                 ],
               ),
-              content: Text(
-    text
-        ),
-        
-        
+              content: Text(text),
               actions: [
                 TextButton(
                   child: const Text("Entendido"),

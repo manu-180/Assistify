@@ -23,7 +23,8 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   final TextEditingController tallerController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   String? sexoSeleccionado;
 
   final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -85,34 +86,29 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   }
 
   Future<bool> emailYaRegistrado(String email) async {
-  final res = await supabase
-      .from('usuarios')
-      .select('usuario')
-      .eq('usuario', email)
-      .limit(1)
-      .maybeSingle();
+    final res = await supabase
+        .from('usuarios')
+        .select('usuario')
+        .eq('usuario', email)
+        .limit(1)
+        .maybeSingle();
 
-  return res != null;
-}
-
+    return res != null;
+  }
 
   Future<bool> tallerYaExiste(String nombre) async {
-  final res = await supabase
-      .from('usuarios')
-      .select('taller')
-      .ilike('taller', nombre.trim()); // insensitive LIKE
+    final res = await supabase
+        .from('usuarios')
+        .select('taller')
+        .ilike('taller', nombre.trim()); // insensitive LIKE
 
-  return res.isNotEmpty;
-}
-
-
+    return res.isNotEmpty;
+  }
 
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
-    
-
 
     return Scaffold(
       appBar: AppBar(
@@ -124,10 +120,12 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
             children: [
               Text(
                 AppLocalizations.of(context).translate('appTitle'),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.w500),
               ),
               const SizedBox(width: 7),
-              FaIcon(FontAwesomeIcons.fileLines, color: Colors.white, size: size.width * 0.055),
+              FaIcon(FontAwesomeIcons.fileLines,
+                  color: Colors.white, size: size.width * 0.055),
             ],
           ),
           onTap: () => context.go('/'),
@@ -135,530 +133,608 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
         backgroundColor: color.primary,
       ),
       body: Column(
-  children: [
-    Expanded(
-      child: SingleChildScrollView(
-        padding: EdgeInsets.all(size.width * 0.05),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              children: [
-               TituloSeleccion(texto: AppLocalizations.of(context).translate('createWorkshopIntro'),),
-          const SizedBox(height: 16),
-          
-                ElevatedButton.icon(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text(AppLocalizations.of(context)
-                              .translate('infoTitle')),
-                          content: SingleChildScrollView(
-                            child: Text(AppLocalizations.of(context)
-                                .translate('infoContent')),
-                          ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pop(),
-                              child: Text(AppLocalizations.of(context)
-                                  .translate('closeButton')),
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(size.width * 0.05),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Column(
+                    children: [
+                      TituloSeleccion(
+                        texto: AppLocalizations.of(context)
+                            .translate('createWorkshopIntro'),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text(AppLocalizations.of(context)
+                                    .translate('infoTitle')),
+                                content: SingleChildScrollView(
+                                  child: Text(AppLocalizations.of(context)
+                                      .translate('infoContent')),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
+                                    child: Text(AppLocalizations.of(context)
+                                        .translate('closeButton')),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        icon:
+                            const Icon(Icons.info_outline), // Icono en el botón
+                        label: Text(AppLocalizations.of(context)
+                            .translate('moreInfoButton')),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: fullnameController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)
+                              .translate('fullNameLabel'),
+                          border: const OutlineInputBorder(),
+                          errorText:
+                              fullnameError.isEmpty ? null : fullnameError,
+                        ),
+                        keyboardType: TextInputType.name,
+                        onChanged: (value) async {
+                          final nombre = value.trim();
+                          if (nombre.isEmpty) {
+                            setState(() => fullnameError = "");
+                            return;
+                          }
+
+                          final existe = await supabase
+                              .from('usuarios')
+                              .select('fullname')
+                              .ilike('fullname', nombre)
+                              .limit(1)
+                              .maybeSingle();
+
+                          setState(() {
+                            fullnameError = existe != null
+                                ? "Ese nombre ya está registrado."
+                                : "";
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: tallerController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)
+                              .translate('workshopNameLabel'),
+                          border: const OutlineInputBorder(),
+                          errorText: tallerError.isEmpty ? null : tallerError,
+                        ),
+                        keyboardType: TextInputType.text,
+                        onChanged: (value) async {
+                          final nombre = value.trim();
+
+                          if (nombre.isEmpty) {
+                            setState(() {
+                              tallerError = AppLocalizations.of(context)
+                                  .translate('emptyWorkshopNameError');
+                            });
+                            return;
+                          }
+
+                          final existe = await tallerYaExiste(nombre);
+
+                          setState(() {
+                            tallerError = existe
+                                ? "Ya existe ese nombre de empresa."
+                                : '';
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)
+                              .translate('emailLabel'),
+                          border: const OutlineInputBorder(),
+                          errorText: mailError.isEmpty ? null : mailError,
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        onChanged: (value) async {
+                          final emailActual = value.trim();
+                          final emailRegex = RegExp(
+                            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+                            r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
+                            r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
+                          );
+
+                          if (!emailRegex.hasMatch(emailActual)) {
+                            setState(() {
+                              mailError = AppLocalizations.of(context)
+                                  .translate('invalidEmailError');
+                            });
+                            return;
+                          }
+
+                          final existe = await emailYaRegistrado(emailActual);
+
+                          // solo mostrar el error si el valor no cambió durante el await
+                          if (emailActual == emailController.text.trim()) {
+                            setState(() {
+                              mailError = existe
+                                  ? 'Este correo electrónico ya está registrado.'
+                                  : '';
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: phoneController,
+                        decoration: InputDecoration(
+                          labelText: "Teléfono",
+                          border: const OutlineInputBorder(),
+                          errorText: phoneError.isEmpty ? null : phoneError,
+                        ),
+                        keyboardType: TextInputType.phone,
+                        onChanged: (value) async {
+                          final phone = value.trim();
+                          final regex = RegExp(r'^[0-9]{7,15}$');
+
+                          if (!regex.hasMatch(phone)) {
+                            setState(() => phoneError =
+                                "Número inválido. (ej: 1134272488)");
+                            return;
+                          }
+
+                          final existe = await supabase
+                              .from('usuarios')
+                              .select('telefono')
+                              .eq('telefono', phone)
+                              .limit(1)
+                              .maybeSingle();
+
+                          setState(() {
+                            phoneError = existe != null
+                                ? "Ese número ya está registrado."
+                                : "";
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children:
+                            ['Hombre', 'Mujer'].asMap().entries.map((entry) {
+                          final index = entry.key;
+                          final opcion = entry.value;
+                          final esSeleccionado = sexoSeleccionado == opcion;
+
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  sexoSeleccionado = opcion;
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.only(
+                                  left: index == 1 ? 8 : 0,
+                                  right: index == 0 ? 8 : 0,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: esSeleccionado
+                                      ? color.primary.withOpacity(0.1)
+                                      : color.background,
+                                  border: Border.all(
+                                    color: esSeleccionado
+                                        ? color.primary
+                                        : Colors.grey.shade400,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 14),
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 18),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Icon(
+                                        esSeleccionado
+                                            ? Icons.radio_button_checked
+                                            : Icons.radio_button_off,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        opcion,
+                                        style: TextStyle(
+                                          fontWeight: esSeleccionado
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          color: esSeleccionado
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                              : Theme.of(context)
+                                                  .colorScheme
+                                                  .onBackground,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  icon: const Icon(Icons.info_outline), // Icono en el botón
-                  label: Text(
-                      AppLocalizations.of(context).translate('moreInfoButton')),
-                ),
-          const SizedBox(height: 16),
-          TextField(
-  controller: fullnameController,
-  decoration: InputDecoration(
-    labelText: AppLocalizations.of(context).translate('fullNameLabel'),
-    border: const OutlineInputBorder(),
-    errorText: fullnameError.isEmpty ? null : fullnameError,
-  ),
-  keyboardType: TextInputType.name,
-  onChanged: (value) async {
-    final nombre = value.trim();
-    if (nombre.isEmpty) {
-      setState(() => fullnameError = "");
-      return;
-    }
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: InputDecoration(
+                          labelText: "Seleccione su rubro",
+                          border: const OutlineInputBorder(),
+                        ),
+                        value: selectedRubro,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedRubro = newValue;
+                          });
+                        },
+                        items: rubros
+                            .map((rubro) => DropdownMenuItem(
+                                value: rubro, child: Text(rubro)))
+                            .toList(),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)
+                              .translate('passwordLabel'),
+                          border: const OutlineInputBorder(),
+                          errorText:
+                              passwordError.isEmpty ? null : passwordError,
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            passwordError = value.length < 6
+                                ? AppLocalizations.of(context)
+                                    .translate('passwordLengthError')
+                                : '';
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: confirmPasswordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)
+                              .translate('confirmPasswordLabel'),
+                          border: const OutlineInputBorder(),
+                          errorText: confirmPasswordError.isEmpty
+                              ? null
+                              : confirmPasswordError,
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            confirmPasswordError =
+                                value != passwordController.text
+                                    ? AppLocalizations.of(context)
+                                        .translate('passwordMismatchError')
+                                    : '';
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => context.go("/"),
+                            child: Text(AppLocalizations.of(context)
+                                .translate('goBackButton')),
+                          ),
+                          const SizedBox(width: 15),
+                          FilledButton(
+                            onPressed: isLoading
+                                ? null
+                                : () async {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
 
-    final existe = await supabase
-        .from('usuarios')
-        .select('fullname')
-        .ilike('fullname', nombre)
-        .limit(1)
-        .maybeSingle();
+                                    FocusScope.of(context).unfocus();
+                                    final fullname =
+                                        fullnameController.text.trim();
+                                    final email = emailController.text.trim();
+                                    final taller = tallerController.text.trim();
+                                    final telefono =
+                                        phoneController.text.trim();
+                                    final password =
+                                        passwordController.text.trim();
+                                    final confirmPassword =
+                                        confirmPasswordController.text.trim();
 
-    setState(() {
-      fullnameError = existe != null ? "Ese nombre ya está registrado." : "";
-    });
-  },
-),
+                                    // Validaciones iniciales
+                                    final existeTaller =
+                                        await tallerYaExiste(taller);
+                                    final existeMail =
+                                        await emailYaRegistrado(email);
+                                    final existeNombre = await supabase
+                                            .from('usuarios')
+                                            .select('fullname')
+                                            .ilike('fullname', fullname)
+                                            .limit(1)
+                                            .maybeSingle() !=
+                                        null;
+                                    final existeTelefono = await supabase
+                                            .from('usuarios')
+                                            .select('telefono')
+                                            .eq('telefono', telefono)
+                                            .limit(1)
+                                            .maybeSingle() !=
+                                        null;
 
+                                    if (existeNombre) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "El nombre ya está registrado"),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
+                                    if (existeMail) {
+                                      setState(() {
+                                        mailError =
+                                            'Este correo electrónico ya está registrado.';
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Este correo electrónico ya está registrado."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-          const SizedBox(height: 16),
-          TextField(
-  controller: tallerController,
-  decoration: InputDecoration(
-    labelText: AppLocalizations.of(context).translate('workshopNameLabel'),
-    border: const OutlineInputBorder(),
-    errorText: tallerError.isEmpty ? null : tallerError,
-  ),
-  keyboardType: TextInputType.text,
-  onChanged: (value) async {
-    final nombre = value.trim();
+                                    if (existeTaller) {
+                                      setState(() {
+                                        tallerError =
+                                            "Ya existe ese nombre de empresa.";
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "El nombre de empresa ya existe."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-    if (nombre.isEmpty) {
-      setState(() {
-        tallerError = AppLocalizations.of(context).translate('emptyWorkshopNameError');
-      });
-      return;
-    }
+                                    if (existeTelefono) {
+                                      setState(() {
+                                        phoneError =
+                                            "Ese número ya está registrado.";
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Ese número ya está registrado."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    if (sexoSeleccionado == null) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Por favor, seleccioná el sexo."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-    final existe = await tallerYaExiste(nombre);
+                                    if (fullname.isEmpty ||
+                                        email.isEmpty ||
+                                        taller.isEmpty ||
+                                        telefono.isEmpty ||
+                                        password.isEmpty ||
+                                        confirmPassword.isEmpty) {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                                    'allFieldsRequiredError'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                      return;
+                                    }
 
-    setState(() {
-      tallerError = existe ? "Ya existe ese nombre de empresa." : '';
-    });
-  },
-),
+                                    if (password.length < 6) {
+                                      setState(() {
+                                        passwordError = AppLocalizations.of(
+                                                context)
+                                            .translate('passwordLengthError');
+                                        isLoading = false;
+                                      });
+                                      return;
+                                    }
 
-          const SizedBox(height: 16),
-         
-          TextField(
-  controller: emailController,
-  decoration: InputDecoration(
-    labelText: AppLocalizations.of(context).translate('emailLabel'),
-    border: const OutlineInputBorder(),
-    errorText: mailError.isEmpty ? null : mailError,
-  ),
-  keyboardType: TextInputType.emailAddress,
-  onChanged: (value) async {
-  final emailActual = value.trim();
-  final emailRegex = RegExp(
-    r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
-    r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
-    r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
-  );
+                                    if (password != confirmPassword) {
+                                      setState(() {
+                                        confirmPasswordError =
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                                    'passwordMismatchError');
+                                        isLoading = false;
+                                      });
+                                      return;
+                                    }
 
-  if (!emailRegex.hasMatch(emailActual)) {
-    setState(() {
-      mailError = AppLocalizations.of(context).translate('invalidEmailError');
-    });
-    return;
-  }
+                                    // Si pasó todas las validaciones, continúa con el registro
+                                    try {
+                                      final AuthResponse res =
+                                          await supabase.auth.signUp(
+                                        email: email,
+                                        password: password,
+                                        data: {
+                                          'fullname':
+                                              Capitalize().capitalize(fullname),
+                                          "rubro": selectedRubro,
+                                          "taller":
+                                              Capitalize().capitalize(taller),
+                                          "telefono": telefono,
+                                          "sexo": sexoSeleccionado,
+                                          "admin": true,
+                                          "created_at":
+                                              DateTime.now().toIso8601String(),
+                                        },
+                                      );
 
-  final existe = await emailYaRegistrado(emailActual);
+                                      if (res.user != null) {
+                                        print(
+                                            "✅ Usuario creado correctamente.");
+                                      } else {
+                                        print("❌ No se creó el usuario.");
+                                      }
 
-  // solo mostrar el error si el valor no cambió durante el await
-  if (emailActual == emailController.text.trim()) {
-    setState(() {
-      mailError = existe
-          ? 'Este correo electrónico ya está registrado.'
-          : '';
-    });
-  }
-},
+                                      await supabase.from('usuarios').insert({
+                                        'id': await GenerarId()
+                                            .generarIdUsuario(),
+                                        'usuario': email,
+                                        'fullname':
+                                            Capitalize().capitalize(fullname),
+                                        'user_uid': res.user?.id,
+                                        "sexo": sexoSeleccionado,
+                                        'clases_disponibles': 0,
+                                        'trigger_alert': 0,
+                                        'clases_canceladas': [],
+                                        'taller':
+                                            Capitalize().capitalize(taller),
+                                        "admin": true,
+                                        "created_at":
+                                            DateTime.now().toIso8601String(),
+                                        "rubro": selectedRubro,
+                                        "telefono": telefono,
+                                      });
 
-),
+                                      await crearTablaTaller(
+                                          Capitalize().capitalize(taller));
 
-          const SizedBox(height: 16),
-          TextField(
-  controller: phoneController,
-  decoration: InputDecoration(
-    labelText: "Teléfono",
-    border: const OutlineInputBorder(),
-    errorText: phoneError.isEmpty ? null : phoneError,
-  ),
-  keyboardType: TextInputType.phone,
-  onChanged: (value) async {
-    final phone = value.trim();
-    final regex = RegExp(r'^[0-9]{7,15}$');
+                                      EnviarWpp().sendWhatsAppMessage(
+                                          "HXa9fb3930150f932869bc13f223f26628",
+                                          'whatsapp:+549$telefono',
+                                          [fullname, "", "", "", ""]);
 
-    if (!regex.hasMatch(phone)) {
-      setState(() => phoneError = "Número inválido. (ej: 1134272488)");
-      return;
-    }
+                                      if (context.mounted) {
+                                        context.go("/");
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                                    'workshopCreatedSuccess'),
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.green,
+                                        ));
+                                      }
+                                    } catch (e) {
+                                      final error = e.toString().toLowerCase();
+                                      String mensajeError;
 
-    final existe = await supabase
-        .from('usuarios')
-        .select('telefono')
-        .eq('telefono', phone)
-        .limit(1)
-        .maybeSingle();
+                                      if (error.contains(
+                                          "user already registered")) {
+                                        mensajeError =
+                                            "El correo electrónico ya está registrado.";
+                                      } else {
+                                        mensajeError =
+                                            AppLocalizations.of(context)
+                                                .translate(
+                                          'workshopCreationError',
+                                          params: {'error': e.toString()},
+                                        );
+                                      }
 
-    setState(() {
-      phoneError = existe != null ? "Ese número ya está registrado." : "";
-    });
-  },
-),
-const SizedBox(height: 16),
-Row(
-  children: ['Hombre', 'Mujer'].asMap().entries.map((entry) {
-    final index = entry.key;
-    final opcion = entry.value;
-    final esSeleccionado = sexoSeleccionado == opcion;
-
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            sexoSeleccionado = opcion;
-          });
-        },
-        child: Container(
-          margin: EdgeInsets.only(
-            left: index == 1 ? 8 : 0,
-            right: index == 0 ? 8 : 0,
-          ),
-          decoration: BoxDecoration(
-            color: esSeleccionado
-                ? color.primary.withOpacity(0.1)
-                : color.background,
-            border: Border.all(
-              color: esSeleccionado
-                  ? color.primary
-                  : Colors.grey.shade400,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Padding(
-            padding: const EdgeInsets.only(left: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Icon(
-                  esSeleccionado
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 10),
-                Text(
-                  opcion,
-                  style: TextStyle(
-                    fontWeight: esSeleccionado ? FontWeight.bold : FontWeight.normal,
-                    color: esSeleccionado
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.onBackground,
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                            mensajeError,
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                          backgroundColor: Colors.red,
+                                        ));
+                                      }
+                                    } finally {
+                                      setState(() {
+                                        isLoading = false;
+                                      });
+                                    }
+                                  },
+                            child: isLoading
+                                ? const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white))
+                                : Text(AppLocalizations.of(context)
+                                    .translate('registerWorkshopButton')),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
-    );
-  }).toList(),
-),
-
-
-
-
-
-
-          const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            decoration: InputDecoration(
-              labelText: "Seleccione su rubro",
-              border: const OutlineInputBorder(),
-            ),
-            value: selectedRubro,
-            onChanged: (String? newValue) {
-              setState(() {
-                selectedRubro = newValue;
-              });
-            },
-            items: rubros.map((rubro) => DropdownMenuItem(value: rubro, child: Text(rubro))).toList(),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).translate('passwordLabel'),
-              border: const OutlineInputBorder(),
-              errorText: passwordError.isEmpty ? null : passwordError,
-            ),
-            onChanged: (value) {
-              setState(() {
-                passwordError = value.length < 6 ? AppLocalizations.of(context).translate('passwordLengthError') : '';
-              });
-            },
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: confirmPasswordController,
-            obscureText: true,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.of(context).translate('confirmPasswordLabel'),
-              border: const OutlineInputBorder(),
-              errorText: confirmPasswordError.isEmpty ? null : confirmPasswordError,
-            ),
-            onChanged: (value) {
-              setState(() {
-                confirmPasswordError = value != passwordController.text ? AppLocalizations.of(context).translate('passwordMismatchError') : '';
-              });
-            },
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => context.go("/"),
-                child: Text(AppLocalizations.of(context).translate('goBackButton')),
-              ),
-              const SizedBox(width: 15),
-              FilledButton(
-                onPressed: isLoading
-    ? null
-    : () async {
-        setState(() {
-          isLoading = true;
-        });
-
-        FocusScope.of(context).unfocus();
-        final fullname = fullnameController.text.trim();
-        final email = emailController.text.trim();
-        final taller = tallerController.text.trim();
-        final telefono = phoneController.text.trim();
-        final password = passwordController.text.trim();
-        final confirmPassword = confirmPasswordController.text.trim();
-
-        // Validaciones iniciales
-        final existeTaller = await tallerYaExiste(taller);
-        final existeMail = await emailYaRegistrado(email);
-        final existeNombre = await supabase
-            .from('usuarios')
-            .select('fullname')
-            .ilike('fullname', fullname)
-            .limit(1)
-            .maybeSingle() !=
-            null;
-        final existeTelefono = await supabase
-            .from('usuarios')
-            .select('telefono')
-            .eq('telefono', telefono)
-            .limit(1)
-            .maybeSingle() !=
-            null;
-
-        if (existeNombre) {
-          setState(() {
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("El nombre ya está registrado"),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-
-        if (existeMail) {
-          setState(() {
-            mailError = 'Este correo electrónico ya está registrado.';
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Este correo electrónico ya está registrado."),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-
-        if (existeTaller) {
-          setState(() {
-            tallerError = "Ya existe ese nombre de empresa.";
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("El nombre de empresa ya existe."),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-
-        if (existeTelefono) {
-          setState(() {
-            phoneError = "Ese número ya está registrado.";
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Ese número ya está registrado."),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-        if (sexoSeleccionado == null) {
-  setState(() {
-    isLoading = false;
-  });
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text("Por favor, seleccioná el sexo."),
-      backgroundColor: Colors.red,
-    ),
-  );
-  return;
-}
-
-        if (fullname.isEmpty ||
-            email.isEmpty ||
-            taller.isEmpty ||
-            telefono.isEmpty ||
-            password.isEmpty ||
-            confirmPassword.isEmpty) {
-          setState(() {
-            isLoading = false;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context).translate('allFieldsRequiredError'),
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-          return;
-        }
-
-        if (password.length < 6) {
-          setState(() {
-            passwordError = AppLocalizations.of(context).translate('passwordLengthError');
-            isLoading = false;
-          });
-          return;
-        }
-
-        if (password != confirmPassword) {
-          setState(() {
-            confirmPasswordError = AppLocalizations.of(context).translate('passwordMismatchError');
-            isLoading = false;
-          });
-          return;
-        }
-
-        // Si pasó todas las validaciones, continúa con el registro
-        try {
-          final AuthResponse res = await supabase.auth.signUp(
-            email: email,
-            password: password,
-            data: {
-              'fullname': Capitalize().capitalize(fullname),
-              "rubro": selectedRubro,
-              "taller": Capitalize().capitalize(taller),
-              "telefono": telefono,
-              "sexo": sexoSeleccionado,
-              "admin": true,
-              "created_at": DateTime.now().toIso8601String(),
-            },
-          );
-
-          if (res.user != null) {
-            print("✅ Usuario creado correctamente.");
-          } else {
-            print("❌ No se creó el usuario.");
-          }
-
-          await supabase.from('usuarios').insert({
-            'id': await GenerarId().generarIdUsuario(),
-            'usuario': email,
-            'fullname': Capitalize().capitalize(fullname),
-            'user_uid': res.user?.id,
-            "sexo": sexoSeleccionado,
-            'clases_disponibles': 0,
-            'trigger_alert': 0,
-            'clases_canceladas': [],
-            'taller': Capitalize().capitalize(taller),
-            "admin": true,
-            "created_at": DateTime.now().toIso8601String(),
-            "rubro": selectedRubro,
-            "telefono": telefono,
-          });
-
-          await crearTablaTaller(Capitalize().capitalize(taller));
-
-          EnviarWpp().sendWhatsAppMessage(
-            "HXa9fb3930150f932869bc13f223f26628",
-            'whatsapp:+549$telefono',
-            [fullname, "", "", "", ""]
-          );
-
-          if (context.mounted) {
-            context.go("/");
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                AppLocalizations.of(context).translate('workshopCreatedSuccess'),
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.green,
-            ));
-          }
-        } catch (e) {
-          final error = e.toString().toLowerCase();
-          String mensajeError;
-
-          if (error.contains("user already registered")) {
-            mensajeError = "El correo electrónico ya está registrado.";
-          } else {
-            mensajeError = AppLocalizations.of(context).translate(
-              'workshopCreationError',
-              params: {'error': e.toString()},
-            );
-          }
-
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                mensajeError,
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: Colors.red,
-            ));
-          }
-        } finally {
-          setState(() {
-            isLoading = false;
-          });
-        }
-      },
-
-                child: isLoading
-                    ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
-                    : Text(AppLocalizations.of(context).translate('registerWorkshopButton')),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-  ],
-),
-
     );
   }
 }

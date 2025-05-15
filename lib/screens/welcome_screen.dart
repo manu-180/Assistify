@@ -109,7 +109,6 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               child: VideoPlayer(
                                 _controllers[_currentPage],
                                 key: UniqueKey(),
-
                               ),
                             )
                           : const Center(child: CircularProgressIndicator()),
@@ -131,11 +130,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const Text(
                           '¿Sos empresa?',
                           style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: "oxanium"
-                          ),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: "oxanium"),
                           textAlign: TextAlign.center,
                         ),
                         Column(
@@ -172,11 +170,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         const Text(
                           '¿Sos alumno?',
                           style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: "oxanium"
-                          ),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                              fontFamily: "oxanium"),
                           textAlign: TextAlign.center,
                         ),
                         OutlinedButton(

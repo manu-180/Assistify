@@ -14,6 +14,7 @@ import 'package:taller_ceramica/providers/auth_notifier.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
+import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 
 class MisClasesScreen extends ConsumerStatefulWidget {
   const MisClasesScreen({super.key, String? taller});
@@ -27,7 +28,6 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
   List<ClaseModels> listaDeEsperaDelUsuario = [];
   int mesActual = 1;
   int _recargaCreditos = 0;
-
 
   @override
   void initState() {
@@ -87,28 +87,28 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
   }
 
   void cancelarClase(int claseId, String fullname) async {
-  final clase = clasesDelUsuario.firstWhere((clase) => clase.id == claseId);
-  clase.mails.remove(fullname);
+    final clase = clasesDelUsuario.firstWhere((clase) => clase.id == claseId);
+    clase.mails.remove(fullname);
 
-  await RemoverUsuario(supabase)
-      .removerUsuarioDeClase(claseId, fullname, false);
+    await RemoverUsuario(supabase)
+        .removerUsuarioDeClase(claseId, fullname, false);
 
-  await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
 
-  setState(() {
-    clasesDelUsuario = clasesDelUsuario
-        .where((clase) => clase.mails.contains(fullname))
-        .toList();
-    _recargaCreditos++;
-  });
+    setState(() {
+      clasesDelUsuario = clasesDelUsuario
+          .where((clase) => clase.mails.contains(fullname))
+          .toList();
+      _recargaCreditos++;
+    });
 
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(AppLocalizations.of(context).translate('classCancelled')),
-    ),
-  );
-}
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).translate('classCancelled')),
+      ),
+    );
+  }
 
   void cancelarClaseEnListaDeEspera(int claseId, String fullname) async {
     final clase =
@@ -204,194 +204,103 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
     final localizations = AppLocalizations.of(context);
 
     return Scaffold(
-      appBar:
-          ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 600),
-          child: user == null
-              ? Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.lock_outline,
-                          size: 80, color: Colors.grey),
-                      const SizedBox(height: 20),
-                      Text(
-                        localizations.translate('loginToViewClasses'),
-                        style: TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: color.primary,
+        appBar:
+            ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: user == null
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.lock_outline,
+                            size: 80, color: Colors.grey),
+                        const SizedBox(height: 20),
+                        Text(
+                          localizations.translate('loginToViewClasses'),
+                          style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
+                              color: color.primary,
+                              fontFamily: "oxanium"),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
+                      ],
+                    ),
+                  )
+                : Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TituloSeleccion(
+                          texto:
+                              'Para recuperar la clase debes cancelar con más de 24 hs de anticipación',
+                        ),
                       ),
-                    ],
-                  ),
-                )
-               : Column(
-  children: [
 
-    const SizedBox(height: 10),
-    Padding(
-      padding: const EdgeInsets.all(20),
-      child: Text(
-        'Para recuperar la clase debes cancelar con más de 24 hs de anticipación',
-        textAlign: TextAlign.start,
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: color.primary,
-        ),
-      ),
-    ),
-    const SizedBox(height: 15),
-    FutureBuilder<int>(
-      future: Future.delayed(Duration.zero, () {
-  return ObtenerClasesDisponibles().clasesDisponibles(
-    user?.userMetadata?['fullname'] ?? '',
-  );
-}),
-key: ValueKey(_recargaCreditos),
+                      FutureBuilder<int>(
+                        future: Future.delayed(Duration.zero, () {
+                          return ObtenerClasesDisponibles().clasesDisponibles(
+                            user?.userMetadata?['fullname'] ?? '',
+                          );
+                        }),
+                        key: ValueKey(_recargaCreditos),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) return const SizedBox();
+                          final cantidad = snapshot.data!;
+                          String texto = '';
 
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const CircularProgressIndicator();
-        final cantidad = snapshot.data!;
-        String texto = '';
-        Color colorTexto;
-        IconData icono;
+                          if (cantidad > 1) {
+                            texto = '¡Tenés $cantidad créditos disponibles!';
+                          } else if (cantidad == 1) {
+                            texto = '¡Tenés 1 crédito disponible!';
+                          } else {
+                            texto = 'No tenés ningún crédito disponible';
+                          }
 
-        if (cantidad > 1) {
-          texto = '¡Tenés $cantidad créditos disponibles!';
-          colorTexto = color.primary;
-          icono = Icons.check_circle_outline;
-        } else if (cantidad == 1) {
-          texto = '¡Tenés 1 crédito disponible!';
-          colorTexto = color.primary;
-          icono = Icons.check_circle_outline;
-        } else {
-          texto = 'No tenés ningún crédito disponible';
-          colorTexto = color.primary;
-          icono = Icons.warning_amber_outlined;
-        }
+                          return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: TituloSeleccion(texto: texto));
+                        },
+                      ),
+                      // const SizedBox(height: 30),
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(icono, color: colorTexto),
-              const SizedBox(width: 8),
-              Text(
-                texto,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: colorTexto,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    ),
-    const SizedBox(height: 30),
-                    
-                    const SizedBox(height: 50),
-                    (clasesDelUsuario.isEmpty &&
-                            listaDeEsperaDelUsuario.isEmpty)
-                        ? Center(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.event_busy,
-                                    size: 80, color: Colors.grey),
-                                const SizedBox(height: 20),
-                                Text(
-                                  localizations.translate('noClassesEnrolled'),
-                                  style: TextStyle(
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.bold,
-                                    color: color.primary,
+                      (clasesDelUsuario.isEmpty &&
+                              listaDeEsperaDelUsuario.isEmpty)
+                          ? Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const SizedBox(height: 30),
+                                  const Icon(Icons.event_busy,
+                                      size: 80, color: Colors.grey),
+                                  const SizedBox(height: 20),
+                                  Text(
+                                    localizations
+                                        .translate('noClassesEnrolled'),
+                                    style: TextStyle(
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.w500,
+                                      color: color.primary,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          )
-                        : Expanded(
-                            child: Column(
-                              children: [
-                                Expanded(
-                                  flex: listaDeEsperaDelUsuario.isEmpty ? 8 : 5,
-                                  child: ListView.builder(
-                                    itemCount: clasesDelUsuario.length,
-                                    itemBuilder: (context, index) {
-                                      final clase = clasesDelUsuario[index];
-                                      final partesFecha =
-                                          clase.fecha.split('/');
-                                      final diaMes =
-                                          '${partesFecha[0]}/${partesFecha[1]}';
-                                      final diaMesAnio = '${clase.dia} $diaMes';
-                                      final claseInfo =
-                                          '$diaMesAnio - ${clase.hora}';
-
-                                      final bool claseYaPaso = Calcular24hs()
-                                          .esMenorA0Horas(clase.fecha,
-                                              clase.hora, mesActual);
-
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 20,
-                                          vertical: 10,
-                                        ),
-                                        child: Opacity(
-                                          opacity: claseYaPaso ? 0.5 : 1.0,
-                                          child: Card(
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: ListTile(
-                                              title: Text(
-                                                claseInfo,
-                                                style: const TextStyle(
-                                                    fontSize: 14),
-                                              ),
-                                              trailing: ElevatedButton(
-                                                onPressed: () {
-                                                  mostrarCancelacion(
-                                                      context, clase, false);
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color.fromARGB(
-                                                          166, 252, 93, 93),
-                                                ),
-                                                child: Text(
-                                                  localizations.translate(
-                                                      'cancelButton'),
-                                                  style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                                if (listaDeEsperaDelUsuario.isNotEmpty)
+                                ],
+                              ),
+                            )
+                          : Expanded(
+                              child: Column(
+                                children: [
                                   Expanded(
-                                    flex: 3,
+                                    flex:
+                                        listaDeEsperaDelUsuario.isEmpty ? 8 : 5,
                                     child: ListView.builder(
-                                      itemCount: listaDeEsperaDelUsuario.length,
+                                      itemCount: clasesDelUsuario.length,
                                       itemBuilder: (context, index) {
-                                        final clase =
-                                            listaDeEsperaDelUsuario[index];
+                                        final clase = clasesDelUsuario[index];
                                         final partesFecha =
                                             clase.fecha.split('/');
                                         final diaMes =
@@ -401,57 +310,45 @@ key: ValueKey(_recargaCreditos),
                                         final claseInfo =
                                             '$diaMesAnio - ${clase.hora}';
 
+                                        final bool claseYaPaso = Calcular24hs()
+                                            .esMenorA0Horas(clase.fecha,
+                                                clase.hora, mesActual);
+
                                         return Padding(
                                           padding: const EdgeInsets.symmetric(
                                             horizontal: 20,
                                             vertical: 10,
                                           ),
-                                          child: Card(
-                                            elevation: 4,
-                                            color: const Color(0xFFE3F2FD),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: ListTile(
-                                              title: Text(
-                                                claseInfo,
-                                                style: const TextStyle(
-                                                  color: Colors.blue,
-                                                  fontSize: 14,
-                                                ),
+                                          child: Opacity(
+                                            opacity: claseYaPaso ? 0.5 : 1.0,
+                                            child: Card(
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
                                               ),
-                                              subtitle: Text(
-                                                localizations.translate(
-                                                    'waitlistPosition',
-                                                    params: {
-                                                      'position': (clase.espera
-                                                                  .indexOf(user
-                                                                          .userMetadata?[
-                                                                      'fullname']) +
-                                                              1)
-                                                          .toString()
-                                                    }),
-                                                style: const TextStyle(
-                                                  color: Colors.blue,
-                                                  fontSize: 10,
-                                                ),
-                                              ),
-                                              trailing: ElevatedButton(
-                                                onPressed: () {
-                                                  mostrarCancelacion(
-                                                      context, clase, true);
-                                                },
-                                                style: TextButton.styleFrom(
-                                                  backgroundColor:
-                                                      const Color(0xFF4FC3F7),
-                                                ),
-                                                child: Text(
-                                                  localizations.translate(
-                                                      'cancelButton'),
+                                              child: ListTile(
+                                                title: Text(
+                                                  claseInfo,
                                                   style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.white,
+                                                      fontSize: 14),
+                                                ),
+                                                trailing: ElevatedButton(
+                                                  onPressed: () {
+                                                    mostrarCancelacion(
+                                                        context, clase, false);
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color.fromARGB(
+                                                            166, 252, 93, 93),
+                                                  ),
+                                                  child: Text(
+                                                    localizations.translate(
+                                                        'cancelButton'),
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -461,16 +358,96 @@ key: ValueKey(_recargaCreditos),
                                       },
                                     ),
                                   ),
-                              ],
+                                  if (listaDeEsperaDelUsuario.isNotEmpty)
+                                    Expanded(
+                                      flex: 3,
+                                      child: ListView.builder(
+                                        itemCount:
+                                            listaDeEsperaDelUsuario.length,
+                                        itemBuilder: (context, index) {
+                                          final clase =
+                                              listaDeEsperaDelUsuario[index];
+                                          final partesFecha =
+                                              clase.fecha.split('/');
+                                          final diaMes =
+                                              '${partesFecha[0]}/${partesFecha[1]}';
+                                          final diaMesAnio =
+                                              '${clase.dia} $diaMes';
+                                          final claseInfo =
+                                              '$diaMesAnio - ${clase.hora}';
+
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 20,
+                                              vertical: 10,
+                                            ),
+                                            child: Card(
+                                              elevation: 4,
+                                              color: const Color(0xFFE3F2FD),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                              child: ListTile(
+                                                title: Text(
+                                                  claseInfo,
+                                                  style: const TextStyle(
+                                                    color: Colors.blue,
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                                subtitle: Text(
+                                                  localizations.translate(
+                                                      'waitlistPosition',
+                                                      params: {
+                                                        'position': (clase
+                                                                    .espera
+                                                                    .indexOf(user
+                                                                            .userMetadata?[
+                                                                        'fullname']) +
+                                                                1)
+                                                            .toString()
+                                                      }),
+                                                  style: const TextStyle(
+                                                    color: Colors.blue,
+                                                    fontSize: 10,
+                                                  ),
+                                                ),
+                                                trailing: ElevatedButton(
+                                                  onPressed: () {
+                                                    mostrarCancelacion(
+                                                        context, clase, true);
+                                                  },
+                                                  style: TextButton.styleFrom(
+                                                    backgroundColor:
+                                                        const Color(0xFF4FC3F7),
+                                                  ),
+                                                  child: Text(
+                                                    localizations.translate(
+                                                        'cancelButton'),
+                                                    style: const TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                  ],
-                ),
+                    ],
+                  ),
+          ),
         ),
-      ),
-      floatingActionButton: InformationButon(text:  "1️⃣ Desde aquí podés ver todas las clases en las que estás anotado durante el mes.\n\n"
-  "2️⃣ Si necesitás cancelar una clase, presioná el botón \"Cancelar\". Se abrirá una alerta para confirmar. Si cancelás con más de 24 hs de anticipación, vas a obtener un crédito para recuperar esa clase en otro momento. Si lo hacés con menos de 24 hs, no se genera crédito.\n\n"
-  "3️⃣ También vas a ver tus clases en lista de espera. Si alguien cancela su lugar en una clase donde estás en espera, se te asignará automáticamente ese espacio y recibirás una notificación por WhatsApp.")
-    );
+        floatingActionButton: InformationButon(
+            text:
+                "1️⃣ Desde aquí podés ver todas las clases en las que estás anotado durante el mes.\n\n"
+                "2️⃣ Si necesitás cancelar una clase, presioná el botón \"Cancelar\". Se abrirá una alerta para confirmar. Si cancelás con más de 24 hs de anticipación, vas a obtener un crédito para recuperar esa clase en otro momento. Si lo hacés con menos de 24 hs, no se genera crédito.\n\n"
+                "3️⃣ También vas a ver tus clases en lista de espera. Si alguien cancela su lugar en una clase donde estás en espera, se te asignará automáticamente ese espacio y recibirás una notificación por WhatsApp."));
   }
 }

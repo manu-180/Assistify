@@ -151,14 +151,13 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
         }
         seleccionarFecha(fechaSeleccionada!);
       } else {
-  if (fechasDisponibles.isNotEmpty) {
-    fechaSeleccionada = fechasDisponibles[0];
-    seleccionarFecha(fechaSeleccionada!);
-  } else {
-    print("⚠️ No hay fechas disponibles");
-  }
-}
-
+        if (fechasDisponibles.isNotEmpty) {
+          fechaSeleccionada = fechasDisponibles[0];
+          seleccionarFecha(fechaSeleccionada!);
+        } else {
+          print("⚠️ No hay fechas disponibles");
+        }
+      }
     });
   }
 
@@ -288,16 +287,18 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                     }
                                   },
                                 );
-                                print("SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
+                                print(
+                                    "SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
                                 EnviarWpp().sendWhatsAppMessage(
                                     "HX6dad986ed219654d62aed35763d10ccb",
-                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}', [
-                                  usuarioSeleccionado,
-                                  clase.dia,
-                                  clase.fecha,
-                                  clase.hora,
-                                  ""
-                                ]);
+                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}',
+                                    [
+                                      usuarioSeleccionado,
+                                      clase.dia,
+                                      clase.fecha,
+                                      clase.hora,
+                                      ""
+                                    ]);
                               } else {
                                 await AgregarUsuario(supabase)
                                     .agregarUsuarioAClase(
@@ -306,18 +307,20 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                   true,
                                   clase,
                                 );
-                                print("SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
+                                print(
+                                    "SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
 
                                 EnviarWpp().sendWhatsAppMessage(
                                     "HX13d84cd6816c60f21f172fe42bb3b0bb",
-                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}', [
-                                  usuarioSeleccionado,
-                                  clase.dia,
-                                  clase.fecha,
-                                  clase.hora,
-                                  ""
-                                ]);
-                                
+                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}',
+                                    [
+                                      usuarioSeleccionado,
+                                      clase.dia,
+                                      clase.fecha,
+                                      clase.hora,
+                                      ""
+                                    ]);
+
                                 if (mounted) {
                                   setState(() {
                                     clase.mails.add(usuarioSeleccionado);
@@ -353,14 +356,14 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                     }
                                   },
                                 );
-                                print("SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
+                                print(
+                                    "SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
 
                                 EnviarWpp().sendWhatsAppMessage(
                                   "HX5a0f97cd3b0363325e3b1cc6c4d6a372",
                                   'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}',
                                   [usuarioSeleccionado, clase.dia, "", "", ""],
                                 );
-                                
                               } else {
                                 await RemoverUsuario(supabase)
                                     .removerUsuarioDeClase(
@@ -368,18 +371,20 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                   usuarioSeleccionado,
                                   true,
                                 );
-                                print("SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
+                                print(
+                                    "SE LE MANDA MENSAJE AL NUMERO : ${usuarioActivo!.userMetadata?["telefono"]}");
 
                                 EnviarWpp().sendWhatsAppMessage(
                                     "HXc0f22718dded5d710b659d89b4117bb1",
-                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}', [
-                                  usuarioSeleccionado,
-                                  clase.dia,
-                                  clase.fecha,
-                                  clase.hora,
-                                  ""
-                                ]);
-                               
+                                    'whatsapp:+549${usuarioActivo.userMetadata?["telefono"]}',
+                                    [
+                                      usuarioSeleccionado,
+                                      clase.dia,
+                                      clase.fecha,
+                                      clase.hora,
+                                      ""
+                                    ]);
+
                                 if (mounted) {
                                   setState(() {
                                     clase.mails.remove(usuarioSeleccionado);
@@ -759,12 +764,11 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
         ),
       ),
       floatingActionButton: InformationButon(
-        text: "1️⃣ Seleccioná una fecha del mes para ver todas las clases de ese día.\n\n"
-  "2️⃣ En cada clase vas a poder agregar o quitar alumnos. También podés usar la opción \"x4\" para hacerlo automáticamente en todas las clases iguales del mes (por ejemplo, todos los lunes a la misma hora).\n\n"
-  "3️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n",
+        text:
+            "1️⃣ Seleccioná una fecha del mes para ver todas las clases de ese día.\n\n"
+            "2️⃣ En cada clase vas a poder agregar o quitar alumnos. También podés usar la opción \"x4\" para hacerlo automáticamente en todas las clases iguales del mes (por ejemplo, todos los lunes a la misma hora).\n\n"
+            "3️⃣ Si hay un día que no se va a trabajar, podés marcarlo como feriado dejando presionada la clase correspondiente. Es mejor hacerlo antes de cargar alumnos, así se evita incluir ese día.\n\n",
       ),
     );
-
-    
   }
 }

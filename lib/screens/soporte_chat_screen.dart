@@ -25,7 +25,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
     super.initState();
     controller = TextEditingController();
 
-    final messagesNotifier = ref.read(messagesProvider(widget.conversationSid).notifier);
+    final messagesNotifier =
+        ref.read(messagesProvider(widget.conversationSid).notifier);
     _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
       messagesNotifier.refreshIfChanged();
     });
@@ -64,8 +65,12 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                   final isOwn = author.contains('system');
                   final bgColor = isOwn
                       ? Theme.of(context).colorScheme.primary
-                      : Theme.of(context).colorScheme.secondary.withOpacity(0.2);
-                  final align = isOwn ? Alignment.centerRight : Alignment.centerLeft;
+                      : Theme.of(context)
+                          .colorScheme
+                          .secondary
+                          .withOpacity(0.2);
+                  final align =
+                      isOwn ? Alignment.centerRight : Alignment.centerLeft;
                   final textColor = isOwn ? Colors.white : Colors.black87;
 
                   // 🧠 MEDIA (audio / imagen / otros)
@@ -77,7 +82,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                     return FutureBuilder<String>(
                       future: service.getMediaUrl(mediaSid),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return const Padding(
                             padding: EdgeInsets.all(8),
                             child: SizedBox(),
@@ -95,7 +101,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                           return Align(
                             alignment: align,
                             child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
                                 color: bgColor,
@@ -116,7 +123,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                           return Align(
                             alignment: align,
                             child: Container(
-                              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 color: bgColor,
@@ -138,7 +146,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                         return Align(
                           alignment: align,
                           child: Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: bgColor,
@@ -158,7 +167,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                   return Align(
                     alignment: align,
                     child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: bgColor,
@@ -181,7 +191,8 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
                 Expanded(
                   child: TextField(
                     controller: controller,
-                    decoration: const InputDecoration(hintText: 'Escribí un mensaje...'),
+                    decoration: const InputDecoration(
+                        hintText: 'Escribí un mensaje...'),
                   ),
                 ),
                 IconButton(
@@ -200,8 +211,6 @@ class _SoporteChatScreenState extends ConsumerState<SoporteChatScreen> {
           )
         ],
       ),
-  
-
     );
   }
 }

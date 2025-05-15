@@ -69,122 +69,125 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
     return Scaffold(
         appBar: ResponsiveAppBar(isTablet: size.width > 600),
         body: Stack(
-  children: [
-    Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: user == null
-            ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.lock_outline,
-                        size: 80, color: Colors.grey),
-                    const SizedBox(height: 20),
-                    Text(
-                      AppLocalizations.of(context)
-                          .translate('loginRequired'),
-                      style: TextStyle(
-                        fontSize: 19,
-                        fontWeight: FontWeight.bold,
-                        color: color.primary,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 150),
-                  ],
-                ),
-              )
-            : ListView(
-                children: [
-                
-                  const SizedBox(height: 30),
-                  ExpansionTile(
-                    title: Text(
-                      AppLocalizations.of(context).translate('chooseColor'),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: colors.length,
-                        itemBuilder: (context, index) {
-                          final color = colors[index];
-                          return RadioListTile(
-                            title: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(Icons.palette_outlined,
-                                    color: color, size: 35),
-                                const SizedBox(width: 15),
-                                Icon(Icons.palette_outlined,
-                                    color: color, size: 35),
-                                const SizedBox(width: 15),
-                                Icon(Icons.palette_outlined,
-                                    color: color, size: 35),
-                                const SizedBox(width: 15),
-                              ],
+          children: [
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 600),
+                child: user == null
+                    ? Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.lock_outline,
+                                size: 80, color: Colors.grey),
+                            const SizedBox(height: 20),
+                            Text(
+                              AppLocalizations.of(context)
+                                  .translate('loginRequired'),
+                              style: TextStyle(
+                                fontSize: 19,
+                                fontWeight: FontWeight.bold,
+                                color: color.primary,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
-                            activeColor: color,
-                            value: index,
-                            groupValue: selectedColor,
-                            onChanged: (value) {
-                              ref
-                                  .read(themeNotifyProvider.notifier)
-                                  .changeColor(index);
-                            },
-                          );
-                        },
-                      ),
-                      ListTile(
-                        title: Text(
-                          isDark
-                              ? AppLocalizations.of(context)
-                                  .translate('lightMode')
-                              : AppLocalizations.of(context)
-                                  .translate('darkMode'),
+                            const SizedBox(height: 150),
+                          ],
                         ),
-                        onTap: () {
-                          ref
-                              .read(themeNotifyProvider.notifier)
-                              .toggleDarkMode();
-                        },
-                        leading: isDark
-                            ? const Icon(Icons.light_mode_outlined)
-                            : const Icon(Icons.dark_mode_outlined),
+                      )
+                    : ListView(
+                        children: [
+                          const SizedBox(height: 30),
+                          ExpansionTile(
+                            title: Text(
+                              AppLocalizations.of(context)
+                                  .translate('chooseColor'),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: colors.length,
+                                itemBuilder: (context, index) {
+                                  final color = colors[index];
+                                  return RadioListTile(
+                                    title: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Icon(Icons.palette_outlined,
+                                            color: color, size: 35),
+                                        const SizedBox(width: 15),
+                                        Icon(Icons.palette_outlined,
+                                            color: color, size: 35),
+                                        const SizedBox(width: 15),
+                                        Icon(Icons.palette_outlined,
+                                            color: color, size: 35),
+                                        const SizedBox(width: 15),
+                                      ],
+                                    ),
+                                    activeColor: color,
+                                    value: index,
+                                    groupValue: selectedColor,
+                                    onChanged: (value) {
+                                      ref
+                                          .read(themeNotifyProvider.notifier)
+                                          .changeColor(index);
+                                    },
+                                  );
+                                },
+                              ),
+                              ListTile(
+                                title: Text(
+                                  isDark
+                                      ? AppLocalizations.of(context)
+                                          .translate('lightMode')
+                                      : AppLocalizations.of(context)
+                                          .translate('darkMode'),
+                                ),
+                                onTap: () {
+                                  ref
+                                      .read(themeNotifyProvider.notifier)
+                                      .toggleDarkMode();
+                                },
+                                leading: isDark
+                                    ? const Icon(Icons.light_mode_outlined)
+                                    : const Icon(Icons.dark_mode_outlined),
+                              ),
+                            ],
+                          ),
+                          ExpansionTile(
+                            title: Text(
+                              AppLocalizations.of(context)
+                                  .translate('updateData'),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            children: [
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: options.length,
+                                itemBuilder: (context, index) {
+                                  final option = options[index];
+                                  return ListTile(
+                                    title: Text(option['title']!),
+                                    onTap: () => context.push(option['route']!),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  ExpansionTile(
-                    title: Text(
-                      AppLocalizations.of(context).translate('updateData'),
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    children: [
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: options.length,
-                        itemBuilder: (context, index) {
-                          final option = options[index];
-                          return ListTile(
-                            title: Text(option['title']!),
-                            onTap: () => context.push(option['route']!),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ],
               ),
-      ),
-    ),
-    Positioned(
-      bottom: 90, // espacio para no tapar el botón de Contactanos
-      right: 20,
-      child: InformationButon(
-        text: '''
+            ),
+            Positioned(
+              bottom: 90, // espacio para no tapar el botón de Contactanos
+              right: 20,
+              child: InformationButon(text: '''
 1️⃣ Desde esta pantalla podés personalizar los colores de la app.
 Elegí el color de tema que más te guste para tu experiencia.
 
@@ -202,12 +205,10 @@ Al presionar se despliegan tres opciones:
 📧 Enviar un mensaje por mail a soporte, que será respondido en tu correo.
 
 🤖 Iniciar un chat con un chatbot inteligente para obtener asistencia más rápida.
-'''
-      ),
-    ),
-  ],
-),
-
+'''),
+            ),
+          ],
+        ),
         floatingActionButton: Contactanos());
   }
 }

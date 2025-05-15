@@ -49,7 +49,6 @@
 //   });
 // }
 
-
 //   @override
 //   void dispose() {
 //     _subscription?.cancel();
@@ -129,7 +128,6 @@
 //   subscriptionId: productId,
 // );
 
-
 //     await SuscribirUsuario(supabaseClient: supabase).insertSubscription(
 //       userId: usuarioActivo.id,
 //       productId: productId,
@@ -172,8 +170,6 @@
 //     }
 //   }
 // }
-
-
 
 //   @override
 //   Widget build(BuildContext context) {

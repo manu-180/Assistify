@@ -45,6 +45,8 @@ class RemoverUsuario {
               0) {
             clase.mails.add(userEspera);
             clase.espera.remove(userEspera);
+            final telefonoUserEspera =
+                await ObtenerNumero().obtenerTelefonoPorNombre(userEspera);
 
             await supabaseClient
                 .from(taller)
@@ -54,7 +56,15 @@ class RemoverUsuario {
                 .update({'mails': clase.mails}).eq('id', idClase);
 
             ModificarCredito().removerCreditoUsuario(userEspera);
+            ModificarCredito().agregarCreditoUsuario(user);
             ModificarLugarDisponible().removerLugarDisponible(idClase);
+            print(
+                "📤 Enviando mensaje a $user al número +549$telefonoUserEspera");
+            EnviarWpp().sendWhatsAppMessage(
+              "HX28a321ebed0fb2ed0b0c2c5ac524748a",
+              'whatsapp:+549$telefonoUserEspera',
+              [userEspera, clase.dia, clase.fecha, clase.hora, ""],
+            );
 
             return;
           }
@@ -88,7 +98,6 @@ class RemoverUsuario {
                   "Cancelo con menos de 24 horas de anticipacion, no podra recuperar la clase"
                 ],
         );
-
       }
     }
   }
@@ -127,55 +136,47 @@ class RemoverUsuario {
   }
 
   Future<void> removerUsuarioDeListaDeEspera(int idClase, String user) async {
-  print("🟡 Iniciando función removerUsuarioDeListaDeEspera");
+    print("🟡 Iniciando función removerUsuarioDeListaDeEspera");
 
-  final usuarioActivo = Supabase.instance.client.auth.currentUser;
-  if (usuarioActivo == null) {
-    print("❌ No hay usuario activo");
-    return;
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
+    if (usuarioActivo == null) {
+      print("❌ No hay usuario activo");
+      return;
+    }
+    print("✅ Usuario activo: ${usuarioActivo.email}");
+
+    final taller = await ObtenerTaller().retornarTaller(usuarioActivo.id);
+    print("📍 Taller del usuario activo: $taller");
+
+    final telefono = await ObtenerNumero().obtenerTelefonoPorNombre(user);
+    print("📞 Teléfono del usuario '$user': $telefono");
+
+    if (telefono == null) {
+      print("❌ No se encontró el teléfono del usuario $user");
+      return;
+    }
+
+    final data =
+        await supabaseClient.from(taller).select().eq('id', idClase).single();
+    print("📦 Datos de la clase obtenidos: $data");
+
+    final clase = ClaseModels.fromMap(data);
+    print("📚 Clase creada desde datos: ${clase.toString()}");
+
+    if (clase.espera.contains(user)) {
+      print(
+          "✅ El usuario '$user' está en la lista de espera. Se procede a eliminarlo.");
+      clase.espera.remove(user);
+
+      await supabaseClient
+          .from(taller)
+          .update({"espera": clase.espera}).eq('id', idClase);
+
+      print("✏️ Lista de espera actualizada: ${clase.espera}");
+    } else {
+      print("ℹ️ El usuario '$user' NO estaba en la lista de espera.");
+    }
+
+    print("✅ Función finalizada");
   }
-  print("✅ Usuario activo: ${usuarioActivo.email}");
-
-  final taller = await ObtenerTaller().retornarTaller(usuarioActivo.id);
-  print("📍 Taller del usuario activo: $taller");
-
-  final telefono = await ObtenerNumero().obtenerTelefonoPorNombre(user);
-  print("📞 Teléfono del usuario '$user': $telefono");
-
-  if (telefono == null) {
-    print("❌ No se encontró el teléfono del usuario $user");
-    return;
-  }
-
-  final data = await supabaseClient.from(taller).select().eq('id', idClase).single();
-  print("📦 Datos de la clase obtenidos: $data");
-
-  final clase = ClaseModels.fromMap(data);
-  print("📚 Clase creada desde datos: ${clase.toString()}");
-
-  if (clase.espera.contains(user)) {
-    print("✅ El usuario '$user' está en la lista de espera. Se procede a eliminarlo.");
-    clase.espera.remove(user);
-
-    await supabaseClient
-        .from(taller)
-        .update({"espera": clase.espera}).eq('id', idClase);
-
-    print("✏️ Lista de espera actualizada: ${clase.espera}");
-
-    print("📤 Enviando mensaje a $user al número +549$telefono");
-    EnviarWpp().sendWhatsAppMessage(
-      "HX28a321ebed0fb2ed0b0c2c5ac524748a",
-      'whatsapp:+549$telefono',
-      [user, clase.dia, clase.fecha, clase.hora, ""],
-    );
-  } else {
-    print("ℹ️ El usuario '$user' NO estaba en la lista de espera.");
-  }
-
-  print("✅ Función finalizada");
-}
-
-
-
 }

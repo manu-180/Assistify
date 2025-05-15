@@ -42,7 +42,6 @@ class UsuarioModels {
       createdAt: DateTime.parse(map['created_at']),
       rubro: map['rubro'],
       telefono: map['telefono'],
-
     );
   }
 

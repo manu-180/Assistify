@@ -34,65 +34,68 @@ class _ContactanosState extends State<Contactanos>
   }
 
   Future<void> enviarConfirmacionPorSendGrid({
-  required BuildContext context,
-  required String destinatario,
-  required String nombreUsuario,
-  required String message,
-}) async {
-  final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
+    required BuildContext context,
+    required String destinatario,
+    required String nombreUsuario,
+    required String message,
+  }) async {
+    final url = Uri.parse('https://api.sendgrid.com/v3/mail/send');
 
-  try {
-    final response = await http.post(
-      url,
-      headers: {
-        'Authorization': 'Bearer ${dotenv.env['SENDGRID_API_KEY']}',
-        'Content-Type': 'application/json',
-      },
-      body: json.encode({
-        "personalizations": [
-          {
-            "to": [
-              {"email": destinatario}
-            ],
-            "subject": "Confirmación de contacto"
-          }
-        ],
-        "from": {"email": "soporte@assistify.lat", "name": "Soporte Assistify"},
-        "content": [
-          {
-            "type": "text/plain",
-            "value":
-                'Hola $nombreUsuario,\n\nEste es un mensaje automático para confirmarte que hemos recibido tu consulta: \n\n"$message" \n\nEn breve nos estaremos comunicando para ayudarte con todas tus dudas.\n\nSaludos,\nEquipo de Assistify.'
-          }
-        ]
-      }),
-    );
-
-    if (response.statusCode == 202) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("✅ ¡Recibimos exitosamente tu consulta!"),
-          backgroundColor: Colors.green,
-        ),
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Authorization': 'Bearer ${dotenv.env['SENDGRID_API_KEY']}',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "personalizations": [
+            {
+              "to": [
+                {"email": destinatario}
+              ],
+              "subject": "Confirmación de contacto"
+            }
+          ],
+          "from": {
+            "email": "soporte@assistify.lat",
+            "name": "Soporte Assistify"
+          },
+          "content": [
+            {
+              "type": "text/plain",
+              "value":
+                  'Hola $nombreUsuario,\n\nEste es un mensaje automático para confirmarte que hemos recibido tu consulta: \n\n"$message" \n\nEn breve nos estaremos comunicando para ayudarte con todas tus dudas.\n\nSaludos,\nEquipo de Assistify.'
+            }
+          ]
+        }),
       );
-    } else {
+
+      if (response.statusCode == 202) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("✅ ¡Recibimos exitosamente tu consulta!"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                "❌ Error al enviar el correo. Contactá a soporte por WhatsApp."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("❌ Error al enviar el correo. Contactá a soporte por WhatsApp."),
+          content: Text("❌ Error inesperado. Contactá a soporte por WhatsApp."),
           backgroundColor: Colors.red,
         ),
       );
     }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("❌ Error inesperado. Contactá a soporte por WhatsApp."),
-        backgroundColor: Colors.red,
-      ),
-    );
   }
-}
-
 
   void _launchEmail() async {
     final user = Supabase.instance.client.auth.currentUser;

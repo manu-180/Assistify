@@ -108,18 +108,16 @@ class CustomAppBarState extends State<CustomAppBar> {
     if (errorMessage != null) {
       return AppBar(
         title: Text(
-                        '${AppLocalizations.of(context).translate('errorLabel')}: $errorMessage',
-                        style: TextStyle(
-                          color: color.onPrimary,
-                          fontSize:  size.width * 0.05 ,
-                          fontFamily: 'Oxanium'
-                        ),
-                      ),
+          '${AppLocalizations.of(context).translate('errorLabel')}: $errorMessage',
+          style: TextStyle(
+              color: color.onPrimary,
+              fontSize: size.width * 0.05,
+              fontFamily: 'Oxanium'),
+        ),
         backgroundColor: color.primary,
       );
     }
 
-  
     final user = Supabase.instance.client.auth.currentUser;
 
     final adminRoutes = [
@@ -185,24 +183,18 @@ class CustomAppBarState extends State<CustomAppBar> {
             onTap: () {
               context.push("/home/${taller ?? ''}");
             },
-            child: 
-               
-                Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Text(
-                          AppLocalizations.of(context).translate('appTitle'),
-                          style: TextStyle(
-                            color: color.onPrimary,
-                            fontSize:  size.width * 0.065 ,
-                            fontFamily: 'Oxanium',
-                            fontWeight: FontWeight.w800
-                          ),
-                        ),
-                ),
-           
-         
+            child: Padding(
+              padding: const EdgeInsets.only(left: 10),
+              child: Text(
+                AppLocalizations.of(context).translate('appTitle'),
+                style: TextStyle(
+                    color: color.onPrimary,
+                    fontSize: size.width * 0.065,
+                    fontFamily: 'Oxanium',
+                    fontWeight: FontWeight.w800),
+              ),
+            ),
           ),
-          
           PopupMenuButton<String>(
             onSelected: (value) => context.push(value),
             itemBuilder: (BuildContext context) => menuItems
