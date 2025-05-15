@@ -14,7 +14,7 @@ class IsMujer {
         .obtenerUsuarios();
 
     for (final user in users) {
-      if (user.fullname == usuario && user.sexo == "mujer") {
+      if (user.fullname == usuario && user.sexo == "Mujer") {
         return true;
       }
     }

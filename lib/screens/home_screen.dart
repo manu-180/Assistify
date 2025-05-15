@@ -7,6 +7,7 @@ import 'package:taller_ceramica/supabase/obtener_datos/is_mujer.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/widgets/shimmer_loader.dart';
+import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 
 class HomeScreen extends StatelessWidget {
   final String? taller;
@@ -396,13 +397,14 @@ class HomeScreen extends StatelessWidget {
                               .replaceAll('\$taller', taller ?? ''),
                       style: TextStyle(
                         fontSize: 33,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                         color: color.primary,
+                        fontFamily: "oxanium"
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    BoxText(
-                      text: user == null
+                    const SizedBox(height: 25),
+                    TituloSeleccion(
+                      texto: user == null
                           ? localizations.translate(anonimo)
                           : isMujer
                               ? localizations
@@ -423,22 +425,13 @@ class HomeScreen extends StatelessWidget {
                       localizations.translate('whatWeDo'),
                       style: TextStyle(
                         fontSize: 33,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w900,
                         color: color.primary,
+                        fontFamily: "oxanium"
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: themeColor.withAlpha(50),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        localizations.translate(descripcion),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
+                    TituloSeleccion(texto: localizations.translate(descripcion)),
                     const SizedBox(height: 20),
                     _buildLoadingImage(
                       imagePath: imagen2,
@@ -446,17 +439,7 @@ class HomeScreen extends StatelessWidget {
                       width: size.width * 0.9,
                     ),
                     const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: themeColor.withAlpha(50),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Text(
-                        localizations.translate(clases),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
+                    TituloSeleccion(texto: localizations.translate(clases)),
                     const SizedBox(height: 30),
                   ],
                 ),

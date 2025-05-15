@@ -7,6 +7,7 @@ import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/utils_barril.dart';
+import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CrearTallerScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
+  String? sexoSeleccionado;
 
   final RegExp emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
@@ -132,14 +134,17 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
         ),
         backgroundColor: color.primary,
       ),
-      body: SingleChildScrollView(
-  padding: EdgeInsets.all(size.width * 0.05),
-  child: Center(
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 600),
-      child: Column(
-        children: [
-          BoxText(text: AppLocalizations.of(context).translate('createWorkshopIntro')),
+      body: Column(
+  children: [
+    Expanded(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(size.width * 0.05),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
+            child: Column(
+              children: [
+               TituloSeleccion(texto: AppLocalizations.of(context).translate('createWorkshopIntro'),),
           const SizedBox(height: 16),
           
                 ElevatedButton.icon(
@@ -296,6 +301,70 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
     });
   },
 ),
+const SizedBox(height: 16),
+Row(
+  children: ['Hombre', 'Mujer'].asMap().entries.map((entry) {
+    final index = entry.key;
+    final opcion = entry.value;
+    final esSeleccionado = sexoSeleccionado == opcion;
+
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            sexoSeleccionado = opcion;
+          });
+        },
+        child: Container(
+          margin: EdgeInsets.only(
+            left: index == 1 ? 8 : 0,
+            right: index == 0 ? 8 : 0,
+          ),
+          decoration: BoxDecoration(
+            color: esSeleccionado
+                ? color.primary.withOpacity(0.1)
+                : color.background,
+            border: Border.all(
+              color: esSeleccionado
+                  ? color.primary
+                  : Colors.grey.shade400,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 18),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  esSeleccionado
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  opcion,
+                  style: TextStyle(
+                    fontWeight: esSeleccionado ? FontWeight.bold : FontWeight.normal,
+                    color: esSeleccionado
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.onBackground,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }).toList(),
+),
+
+
+
+
 
 
           const SizedBox(height: 16),
@@ -439,6 +508,18 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
           );
           return;
         }
+        if (sexoSeleccionado == null) {
+  setState(() {
+    isLoading = false;
+  });
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Por favor, seleccioná el sexo."),
+      backgroundColor: Colors.red,
+    ),
+  );
+  return;
+}
 
         if (fullname.isEmpty ||
             email.isEmpty ||
@@ -487,6 +568,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
               "rubro": selectedRubro,
               "taller": Capitalize().capitalize(taller),
               "telefono": telefono,
+              "sexo": sexoSeleccionado,
               "admin": true,
               "created_at": DateTime.now().toIso8601String(),
             },
@@ -503,7 +585,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
             'usuario': email,
             'fullname': Capitalize().capitalize(fullname),
             'user_uid': res.user?.id,
-            'sexo': "mujer",
+            "sexo": sexoSeleccionado,
             'clases_disponibles': 0,
             'trigger_alert': 0,
             'clases_canceladas': [],
@@ -568,10 +650,13 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
             ],
           ),
           const SizedBox(height: 16),
-        ],
+              ],
+            ),
+          ),
+        ),
       ),
     ),
-  ),
+  ],
 ),
 
     );
