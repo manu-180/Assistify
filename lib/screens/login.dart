@@ -243,7 +243,7 @@ class LoginState extends State<Login> {
     if (context.mounted) {
       RedirigirUsuarioAlTaller().redirigirUsuario(context);
     }
-  } on on AuthException catch (e) {
+  }  on AuthException catch (e) {
   if (context.mounted) {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
@@ -279,7 +279,7 @@ catch (e) {
       );
     }
   }
-}
+},
 
                               child:
                                   Text(localizations.translate('loginButton')),
