@@ -1,11 +1,19 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
+import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:taller_ceramica/supabase/utiles/actualizar_semanas.dart';
+import 'package:taller_ceramica/supabase/utiles/feriados_false.dart';
+import 'package:taller_ceramica/supabase/utiles/reset_clases.dart';
+import 'package:taller_ceramica/utils/actualizar_fechas_database.dart';
 import 'package:taller_ceramica/widgets/box_text.dart';
 import 'package:taller_ceramica/widgets/contactanos.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
@@ -43,6 +51,22 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
     setState(() {
       taller = tallerObtenido;
     });
+  }
+
+    Future<void> corregirDia() async {
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
+    final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+    final clases = await ObtenerTotalInfo(
+            supabase: supabase, clasesTable: taller, usuariosTable: "usuarios")
+        .obtenerClases();
+
+    for (final clase in clases) {
+      if (clase.dia == "miercoles") {
+        await supabase
+            .from(taller)
+            .update({'dia': "miércoles"}).eq('id', clase.id);
+      }
+    }
   }
 
   @override
@@ -95,10 +119,11 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                           ],
                         ),
                       )
-                    : ListView(
-                        children: [
-                          const SizedBox(height: 30),
-                          ExpansionTile(
+                   : ListView(
+  padding: const EdgeInsets.only(bottom: 100), // espacio para Contactanos
+  children: [
+    const SizedBox(height: 30),
+    ExpansionTile(
                             title: Text(
                               AppLocalizations.of(context)
                                   .translate('chooseColor'),
@@ -157,8 +182,8 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                     : const Icon(Icons.dark_mode_outlined),
                               ),
                             ],
-                          ),
-                          ExpansionTile(
+                          ), // Elige color
+    ExpansionTile(
                             title: Text(
                               AppLocalizations.of(context)
                                   .translate('updateData'),
@@ -179,9 +204,119 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                 },
                               ),
                             ],
-                          ),
-                        ],
-                      ),
+                          ), // Actualizar datos
+    const SizedBox(height: 20),
+    Center(
+      child: Center(
+  child: OutlinedButton.icon(
+    style: OutlinedButton.styleFrom(
+      foregroundColor: Colors.red[700], // color del texto e ícono
+      side: BorderSide(color: Colors.red[300]!), // borde
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+    ),
+    icon: const Icon(Icons.warning_amber_rounded),
+    label: const Text(
+      "Cambiar fechas al mes siguiente",
+      style: TextStyle(fontWeight: FontWeight.bold),
+    ),
+    onPressed: () async {
+      final confirmed = await showDialog<bool>(
+  context: context,
+  builder: (context) {
+    int countdown = 5;
+    bool isButtonEnabled = false;
+    late StateSetter dialogSetState;
+    late Timer countdownTimer;
+
+    return StatefulBuilder(
+      builder: (context, setState) {
+        dialogSetState = setState;
+
+        // Iniciar el timer solo una vez
+        if (countdown == 5) {
+          countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+            if (countdown == 1) {
+              timer.cancel();
+              if (mounted) {
+                dialogSetState(() {
+                  isButtonEnabled = true;
+                });
+              }
+            } else {
+              if (mounted) {
+                dialogSetState(() {
+                  countdown--;
+                });
+              }
+            }
+          });
+        }
+
+        return WillPopScope(
+          onWillPop: () async {
+            countdownTimer.cancel();
+            return true;
+          },
+          child: AlertDialog(
+            title: Text( user.userMetadata?['sexo'] == "Hombre"  ?  "¿Estás seguro?" : "¿Estás segura?" ),
+            content: const Text(
+              "Esta acción cerrará el mes actual y eliminará los datos del mes anterior. No se puede deshacer.",
+            ),
+            actions: [
+              TextButton(
+                child: const Text("Cancelar"),
+                onPressed: () {
+                  countdownTimer.cancel();
+                  Navigator.of(context).pop(false);
+                },
+              ),
+              FilledButton(
+                onPressed: isButtonEnabled
+                    ?  () async {
+        countdownTimer.cancel();
+        Navigator.of(context).pop(); // Cerrá el diálogo
+
+        corregirDia();
+
+        ResetClases().reset();
+        ActualizarFechasDatabase()
+            .actualizarClasesAlNuevoMes(user!.userMetadata?['taller'], 2025);
+        await Future.delayed(const Duration(seconds: 2));
+        await ActualizarSemanas().actualizarSemana();
+        await FeriadosFalse().feriadosFalse();
+      }
+                    : null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: isButtonEnabled
+                      ? color.primary
+                      : Colors.red, // gris con borde bordó
+                  foregroundColor: Colors.white,
+                  disabledBackgroundColor: const Color(0xFFBCAAA4),
+                  disabledForegroundColor: Colors.white70,
+                ),
+                child: Text("Confirmar${isButtonEnabled ? '' : ' ($countdown)'}"),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  },
+);
+
+
+    },
+  ),
+),
+
+    ),
+    const SizedBox(height: 20),
+  ],
+),
+
               ),
             ),
             Positioned(

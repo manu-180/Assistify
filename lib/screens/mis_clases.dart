@@ -239,6 +239,8 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                               'Para recuperar la clase debes cancelar con más de 24 hs de anticipación',
                         ),
                       ),
+                      
+                      user?.userMetadata?['taller'] != "Cerámica Ricardo Rojas" ?
 
                       FutureBuilder<int>(
                         future: Future.delayed(Duration.zero, () {
@@ -265,11 +267,12 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                                   const EdgeInsets.symmetric(horizontal: 20),
                               child: TituloSeleccion(texto: texto));
                         },
-                      ),
+                      )
                       // const SizedBox(height: 30),
+                      : SizedBox(),
 
-                      (clasesDelUsuario.isEmpty &&
-                              listaDeEsperaDelUsuario.isEmpty)
+                      // Show message if no classes and no waitlist, otherwise show the lists
+                      (clasesDelUsuario.isEmpty && listaDeEsperaDelUsuario.isEmpty)
                           ? Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,

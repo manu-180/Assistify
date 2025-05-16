@@ -81,9 +81,7 @@ class ActualizarFechasDatabase {
       await supabase.from(taller).insert(batchInsert);
       await ActualizarElMes().actualizarMes(mesActual);
 
-      debugPrint('Clases actualizadas correctamente para el nuevo mes.');
     } catch (e) {
-      debugPrint('Error al actualizar las clases: $e');
       throw Exception('No se pudieron actualizar las clases: $e');
     }
   }
