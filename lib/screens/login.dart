@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/supabase/utiles/redirijir_usuario_al_taller.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'dart:convert';
-
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:taller_ceramica/widgets/contactanos.dart';
 
 class Login extends StatefulWidget {
@@ -189,88 +189,98 @@ class LoginState extends State<Login> {
                             const SizedBox(width: 15),
                             FilledButton(
                               onPressed: () async {
-                                final email = emailController.text.trim();
-                                final password = passwordController.text.trim();
+  final email = emailController.text.trim();
+  final password = passwordController.text.trim();
 
-                                if (!emailRegex.hasMatch(email)) {
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(localizations
-                                          .translate('invalidEmail')),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                  return;
-                                }
+  final connectivityResult = await Connectivity().checkConnectivity();
+  if (connectivityResult == ConnectivityResult.none) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Se requiere conexión a internet para iniciar sesión.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    return;
+  }
 
-                                if (password.length < 6) {
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(localizations
-                                          .translate('passwordTooShort')),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                  return;
-                                }
+  if (!emailRegex.hasMatch(email)) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(localizations.translate('invalidEmail')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-                                try {
-                                  // Iniciar sesión
-                                  final response = await Supabase
-                                      .instance.client.auth
-                                      .signInWithPassword(
-                                    email: email,
-                                    password: password,
-                                  );
+  if (password.length < 6) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(localizations.translate('passwordTooShort')),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-                                  // Guardar sesión manualmente (SharedPreferences)
-                                  if (response.session != null) {
-                                    final prefs =
-                                        await SharedPreferences.getInstance();
-                                    final sessionData =
-                                        response.session!.toJson();
+  try {
+    final response = await Supabase.instance.client.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
 
-                                    await prefs.setString(
-                                        'session', jsonEncode(sessionData));
-                                  }
-                                  if (context.mounted) {
-                                    RedirigirUsuarioAlTaller()
-                                        .redirigirUsuario(context);
-                                  }
-                                  return;
-                                } on AuthException catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(localizations.translate(
-                                            'loginError',
-                                            params: {'error': e.message})),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                  return;
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(localizations
-                                            .translate('unexpectedError')),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                  return;
-                                }
-                              },
+    if (response.session != null) {
+      final prefs = await SharedPreferences.getInstance();
+      final sessionData = response.session!.toJson();
+      await prefs.setString('session', jsonEncode(sessionData));
+    }
+
+    if (context.mounted) {
+      RedirigirUsuarioAlTaller().redirigirUsuario(context);
+    }
+  } on on AuthException catch (e) {
+  if (context.mounted) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    String errorMessage;
+    final error = e.message.toLowerCase();
+
+    if (error.contains("user not found") || error.contains("invalid login credentials")) {
+      errorMessage = "Verificá tu correo electrónico o contraseña.";
+    } else if (error.contains("email not confirmed")) {
+      errorMessage = "Confirmá tu correo electrónico antes de iniciar sesión.";
+    } else if (error.contains("no user")) {
+      errorMessage = "No se encontró un usuario con ese correo. Pedile al administrador que registre tu cuenta.";
+    } else {
+      errorMessage = "Error al iniciar sesión. Intentá nuevamente.";
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
+catch (e) {
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(localizations.translate('unexpectedError')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
                               child:
                                   Text(localizations.translate('loginButton')),
                             ),

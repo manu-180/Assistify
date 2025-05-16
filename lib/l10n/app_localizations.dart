@@ -71,7 +71,7 @@ class AppLocalizations {
       "fullnameAlreadyExists":
           "The full name already exists. Please use a different name to avoid conflicts.",
       "registrationError": "Registration error: \$error",
-      "unexpectedError": "An unexpected error occurred: \$error.",
+      "unexpectedError": "Couldn't connect to the server. Please check your internet connection.",
       "registerButton": "Register",
       "successMessage":
           "Successful registration! Remember to log out before trying to log in again.",
@@ -427,7 +427,7 @@ class AppLocalizations {
       "fullnameAlreadyExists":
           "El nombre completo ya existe. Usa uno diferente para no generar conflictos.",
       "registrationError": "Error de registro: \$error",
-      "unexpectedError": "Ocurrió un error inesperado: \$error.",
+      "unexpectedError": "No se pudo conectar con el servidor. Verificá tu conexión a internet.",
       "registerButton": "Registrar",
       "successMessage":
           "¡Registro exitoso! Recuerda cerrar sesión antes de intentar iniciar sesión nuevamente.",
@@ -449,7 +449,7 @@ class AppLocalizations {
       "waitlistPosition": "Tu lugar en la lista de espera es: \$position",
       "workshopTitle": "Assistify",
       "homeScreenIntro":
-          "Alumnos: soliciten al administrador que registre su cuenta para iniciar.",
+          "Bienvenidos a Assistify!",
       "loginPrompt": "Inicia sesión :",
       "createWorkshopButton": "Crear Empresa",
       "loginError": "Error de inicio de sesión: \$error",
