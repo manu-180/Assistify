@@ -7,6 +7,7 @@ import 'package:taller_ceramica/supabase/utiles/redirijir_usuario_al_taller.dart
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:taller_ceramica/utils/enviar_wpp.dart';
 import 'package:taller_ceramica/widgets/contactanos.dart';
 
 class Login extends StatefulWidget {
@@ -241,6 +242,34 @@ try {
   }
 
   if (context.mounted) {
+    
+    final user = Supabase.instance.client.auth.currentUser;
+final metadata = user?.userMetadata ?? {};
+
+final tieneSexo = metadata['sexo'] != null;
+final tieneRubro = metadata['rubro'] != null;
+final tieneTaller = metadata['taller'] != null;
+final tieneTelefono = metadata['telefono'] != null;
+final tieneCreatedAt = metadata['created_at'] != null;
+
+if (!tieneSexo || !tieneRubro || !tieneTaller || !tieneTelefono || !tieneCreatedAt) {
+  //  EnviarWpp().sendWhatsAppMessage(
+  //                                         "HXa9fb3930150f932869bc13f223f26628",
+  //                                         'whatsapp:+549$telefono',
+  //                                         [fullname, "", "", "", ""]);
+  print("✏️ Actualizando metadatos incompletos");
+
+  await Supabase.instance.client.auth.updateUser(
+    UserAttributes(data: {
+      if (!tieneSexo) 'sexo': 'Mujer',
+      if (!tieneRubro) 'rubro': 'Clases de cerámica',
+      if (!tieneTaller) 'taller': 'Taller de cerámica Ricardo Rojas',
+      if (!tieneTelefono) 'telefono': null,
+      if (!tieneCreatedAt) 'created_at': DateTime.now().toUtc().toIso8601String(),
+    }),
+  );
+}
+
     RedirigirUsuarioAlTaller().redirigirUsuario(context);
   }
 }on AuthException catch (e) {

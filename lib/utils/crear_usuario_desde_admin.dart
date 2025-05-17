@@ -11,6 +11,7 @@ Future<String?> crearUsuarioAdmin({
   required String telefono,
   required String rubro,
   required String taller,
+  required String? sexo,
 }) async {
   final supabaseUrl = dotenv.env['SUPABASE_URL']!;
   final serviceRoleKey = dotenv.env['SERVICE_ROLE_KEY']!;
@@ -31,6 +32,7 @@ Future<String?> crearUsuarioAdmin({
         'fullname': Capitalize().capitalize(fullname),
         "rubro": rubro,
         "taller": Capitalize().capitalize(taller),
+        "sexo": sexo,
         "telefono": telefono,
         "admin": false,
         "created_at": DateTime.now().toIso8601String(),

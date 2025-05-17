@@ -206,6 +206,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                             ],
                           ), // Actualizar datos
     const SizedBox(height: 20),
+    user!.userMetadata?["admin"] == true ? 
     Center(
       child: Center(
   child: OutlinedButton.icon(
@@ -263,7 +264,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
           child: AlertDialog(
             title: Text( user.userMetadata?['sexo'] == "Hombre"  ?  "¿Estás seguro?" : "¿Estás segura?" ),
             content: const Text(
-              "Esta acción cerrará el mes actual y eliminará los datos del mes anterior. No se puede deshacer.",
+              "Esta acción cerrará el mes actual y eliminará todas las clases del mes anterior, dejando los horarios vacíos y listos para reasignar alumnos. \n\nLos creditos que los alumnos tengan disponibles para recuperar una clase se mantienen",
             ),
             actions: [
               TextButton(
@@ -283,7 +284,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
 
         ResetClases().reset();
         ActualizarFechasDatabase()
-            .actualizarClasesAlNuevoMes(user!.userMetadata?['taller'], 2025);
+            .actualizarClasesAlNuevoMes(user.userMetadata?['taller'], 2025);
         await Future.delayed(const Duration(seconds: 2));
         await ActualizarSemanas().actualizarSemana();
         await FeriadosFalse().feriadosFalse();
@@ -312,7 +313,9 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
   ),
 ),
 
-    ),
+    ):
+    const SizedBox(),
+
     const SizedBox(height: 20),
   ],
 ),
