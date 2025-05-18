@@ -104,40 +104,38 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     if (mounted) {
-  final mensaje = AppLocalizations.of(context).translate(
-  'classCancelled',
-  params: {
-    'dia': clase.dia,
-    'fecha': clase.fecha,
-    'hora': clase.hora,
-  },
-);
+      final mensaje = AppLocalizations.of(context).translate(
+        'classCancelled',
+        params: {
+          'dia': clase.dia,
+          'fecha': clase.fecha,
+          'hora': clase.hora,
+        },
+      );
 
-
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      duration: const Duration(seconds: 6),
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: SlideInUp(
-        duration: const Duration(milliseconds: 500),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            mensaje,
-            style: const TextStyle(color: Colors.white),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: const Duration(seconds: 6),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: SlideInUp(
+            duration: const Duration(milliseconds: 500),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                mensaje,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
-}
-
+      );
+    }
   }
 
   void cancelarClaseEnListaDeEspera(int claseId, String fullname) async {
@@ -153,39 +151,37 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
         .removerUsuarioDeListaDeEspera(claseId, fullname);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     if (mounted) {
- 
       final mensaje = AppLocalizations.of(context).translate(
-  'waitlistCancelled',
-  params: {
-    'dia': clase.dia,
-    'fecha': clase.fecha,
-    'hora': clase.hora,
-  },
-);
+        'waitlistCancelled',
+        params: {
+          'dia': clase.dia,
+          'fecha': clase.fecha,
+          'hora': clase.hora,
+        },
+      );
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: SlideInUp(
-        duration: const Duration(milliseconds: 500),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            mensaje,
-            style: const TextStyle(color: Colors.white),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: SlideInUp(
+            duration: const Duration(milliseconds: 500),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                mensaje,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
-}
-
+      );
+    }
   }
 
   Future<void> cargarMesActual() async {
@@ -297,41 +293,43 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                               'Para recuperar la clase debes cancelar con más de 24 hs de anticipación',
                         ),
                       ),
-                      
-                      user?.userMetadata?['taller'] != "Taller de cerámica Ricardo Rojas" ?
-                    
 
-                      FutureBuilder<int>(
-                        future: Future.delayed(Duration.zero, () {
-                          return ObtenerClasesDisponibles().clasesDisponibles(
-                            user?.userMetadata?['fullname'] ?? '',
-                          );
-                        }),
-                        key: ValueKey(_recargaCreditos),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) return const SizedBox();
-                          final cantidad = snapshot.data!;
-                          String texto = '';
+                      user?.userMetadata?['taller'] !=
+                              "Taller de cerámica Ricardo Rojas"
+                          ? FutureBuilder<int>(
+                              future: Future.delayed(Duration.zero, () {
+                                return ObtenerClasesDisponibles()
+                                    .clasesDisponibles(
+                                  user?.userMetadata?['fullname'] ?? '',
+                                );
+                              }),
+                              key: ValueKey(_recargaCreditos),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) return const SizedBox();
+                                final cantidad = snapshot.data!;
+                                String texto = '';
 
-                          if (cantidad > 1) {
-                            texto = '¡Tenés $cantidad créditos disponibles!';
-                          } else if (cantidad == 1) {
-                            texto = '¡Tenés 1 crédito disponible!';
-                          } else {
-                            texto = 'No tenés ningún crédito disponible';
-                          }
+                                if (cantidad > 1) {
+                                  texto =
+                                      '¡Tenés $cantidad créditos disponibles!';
+                                } else if (cantidad == 1) {
+                                  texto = '¡Tenés 1 crédito disponible!';
+                                } else {
+                                  texto = 'No tenés ningún crédito disponible';
+                                }
 
-                          return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              child: TituloSeleccion(texto: texto));
-                        },
-                      )
-                      // const SizedBox(height: 30),
-                      : SizedBox(),
+                                return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20),
+                                    child: TituloSeleccion(texto: texto));
+                              },
+                            )
+                          // const SizedBox(height: 30),
+                          : SizedBox(),
 
                       // Show message if no classes and no waitlist, otherwise show the lists
-                      (clasesDelUsuario.isEmpty && listaDeEsperaDelUsuario.isEmpty)
+                      (clasesDelUsuario.isEmpty &&
+                              listaDeEsperaDelUsuario.isEmpty)
                           ? Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,

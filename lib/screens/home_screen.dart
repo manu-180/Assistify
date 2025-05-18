@@ -286,96 +286,103 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
- Widget _homeGenerico(
-  Size size,
-  ColorScheme color,
-  AppLocalizations localizations,
-  User? user,
-  String firstName,
-  String fullName,
-  Color themeColor,
-  BuildContext context,
-  String anonimo,
-  String mujer,
-  String hombre,
-  String imagen1,
-  String imagen2,
-  String descripcion,
-  String clases,
-) {
-  final sexo = user?.userMetadata?['sexo'] ;
-  final isMujer = sexo == 'Mujer';
-  final isHombre = sexo == 'Hombre';
+  Widget _homeGenerico(
+    Size size,
+    ColorScheme color,
+    AppLocalizations localizations,
+    User? user,
+    String firstName,
+    String fullName,
+    Color themeColor,
+    BuildContext context,
+    String anonimo,
+    String mujer,
+    String hombre,
+    String imagen1,
+    String imagen2,
+    String descripcion,
+    String clases,
+  ) {
+    final sexo = user?.userMetadata?['sexo'];
+    final isMujer = sexo == 'Mujer';
+    final isHombre = sexo == 'Hombre';
 
-  print("Sexo: $sexo");
-  print("isMujer: $isMujer");
-  print("isHombre: $isHombre");
-  print("user: $user");
+    print("Sexo: $sexo");
+    print("isMujer: $isMujer");
+    print("isHombre: $isHombre");
+    print("user: $user");
 
-  return SingleChildScrollView(
-    padding: const EdgeInsets.all(16.0),
-    child: Center(
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 600),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 10),
-            Text(
-              isMujer
-                  ? localizations.translate('welcomeFemale').replaceAll('\$taller', taller ?? '')
-                  : localizations.translate('welcomeMale').replaceAll('\$taller', taller ?? ''),
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w600,
-                color: color.primary,
-                letterSpacing: -0.6,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 10),
+              Text(
+                isMujer
+                    ? localizations
+                        .translate('welcomeFemale')
+                        .replaceAll('\$taller', taller ?? '')
+                    : localizations
+                        .translate('welcomeMale')
+                        .replaceAll('\$taller', taller ?? ''),
+                style: TextStyle(
+                  fontSize: 33,
+                  fontWeight: FontWeight.w600,
+                  color: color.primary,
+                  letterSpacing: -0.6,
+                ),
               ),
-            ),
-            const SizedBox(height: 25),
-            TituloSeleccion(
-              texto: user == null
-                  ? localizations.translate(anonimo)
-                  : isMujer
-                      ? localizations.translate(mujer).replaceAll('\$firstName', firstName)
-                      : isHombre
-                          ? localizations.translate(hombre).replaceAll('\$firstName', firstName)
-                          : localizations.translate(anonimo),
-            ),
-            const SizedBox(height: 20),
-            _buildLoadingImage(
-              imagePath: imagen1,
-              height: 300,
-              width: size.width * 0.9,
-            ),
-            const SizedBox(height: 20),
-            Text(
-              localizations.translate('whatWeDo'),
-              style: TextStyle(
-                fontSize: 33,
-                fontWeight: FontWeight.w400,
-                color: color.primary,
-                letterSpacing: -0.6,
+              const SizedBox(height: 25),
+              TituloSeleccion(
+                texto: user == null
+                    ? localizations.translate(anonimo)
+                    : isMujer
+                        ? localizations
+                            .translate(mujer)
+                            .replaceAll('\$firstName', firstName)
+                        : isHombre
+                            ? localizations
+                                .translate(hombre)
+                                .replaceAll('\$firstName', firstName)
+                            : localizations.translate(anonimo),
               ),
-            ),
-            const SizedBox(height: 10),
-            TituloSeleccion(texto: localizations.translate(descripcion)),
-            const SizedBox(height: 20),
-            _buildLoadingImage(
-              imagePath: imagen2,
-              height: 300,
-              width: size.width * 0.9,
-            ),
-            const SizedBox(height: 20),
-            TituloSeleccion(texto: localizations.translate(clases)),
-            const SizedBox(height: 30),
-          ],
+              const SizedBox(height: 20),
+              _buildLoadingImage(
+                imagePath: imagen1,
+                height: 300,
+                width: size.width * 0.9,
+              ),
+              const SizedBox(height: 20),
+              Text(
+                localizations.translate('whatWeDo'),
+                style: TextStyle(
+                  fontSize: 33,
+                  fontWeight: FontWeight.w400,
+                  color: color.primary,
+                  letterSpacing: -0.6,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TituloSeleccion(texto: localizations.translate(descripcion)),
+              const SizedBox(height: 20),
+              _buildLoadingImage(
+                imagePath: imagen2,
+                height: 300,
+                width: size.width * 0.9,
+              ),
+              const SizedBox(height: 20),
+              TituloSeleccion(texto: localizations.translate(clases)),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildLoadingImage({
     required String imagePath,

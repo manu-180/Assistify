@@ -450,17 +450,16 @@ El alumno usará su correo y contraseña para iniciar sesión.
         child: FloatingActionButton(
           onPressed: () async {
             showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return CrearUsuarioDialog(
-                        onUsuarioCreado: () async {
-                          await cargarUsuarios(); // refresca la lista
-                        },
-                      );
-                    },
-                  );
-              
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return CrearUsuarioDialog(
+                  onUsuarioCreado: () async {
+                    await cargarUsuarios(); // refresca la lista
+                  },
+                );
+              },
+            );
           },
           child: Container(
             alignment: Alignment.center,

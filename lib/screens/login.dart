@@ -54,16 +54,15 @@ class LoginState extends State<Login> {
   }
 
   void mostrarSnackBar(String mensaje) {
-  if (!context.mounted) return;
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(mensaje),
-      backgroundColor: Colors.red,
-    ),
-  );
-}
-
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(mensaje),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
 
   Future<void> _checkSession() async {
     // Recuperar la sesión desde SharedPreferences
@@ -202,98 +201,130 @@ class LoginState extends State<Login> {
                             const SizedBox(width: 15),
                             FilledButton(
                               onPressed: () async {
-  print('🔹 Botón de login presionado');
-  final email = emailController.text.trim();
-  final password = passwordController.text.trim();
+                                print('🔹 Botón de login presionado');
+                                final email = emailController.text.trim();
+                                final password = passwordController.text.trim();
 
-  final connectivityResult = await Connectivity().checkConnectivity();
-print('🔍 Resultado de conexión: $connectivityResult');
+                                final connectivityResult =
+                                    await Connectivity().checkConnectivity();
+                                print(
+                                    '🔍 Resultado de conexión: $connectivityResult');
 
-if (connectivityResult == ConnectivityResult.none) {
-  print('⛔ Sin conexión a internet');
-  mostrarSnackBar('Verificá tu conexión a internet.');
-  return;
-}
+                                if (connectivityResult ==
+                                    ConnectivityResult.none) {
+                                  print('⛔ Sin conexión a internet');
+                                  mostrarSnackBar(
+                                      'Verificá tu conexión a internet.');
+                                  return;
+                                }
 
 // Validaciones de email y pass
-if (!emailRegex.hasMatch(email)) {
-  print('❌ Email inválido');
-  mostrarSnackBar(localizations.translate('invalidEmail'));
-  return;
-}
-if (password.length < 6) {
-  print('❌ Contraseña muy corta');
-  mostrarSnackBar(localizations.translate('passwordTooShort'));
-  return;
-}
+                                if (!emailRegex.hasMatch(email)) {
+                                  print('❌ Email inválido');
+                                  mostrarSnackBar(
+                                      localizations.translate('invalidEmail'));
+                                  return;
+                                }
+                                if (password.length < 6) {
+                                  print('❌ Contraseña muy corta');
+                                  mostrarSnackBar(localizations
+                                      .translate('passwordTooShort'));
+                                  return;
+                                }
 
 // Login
-try {
-  print('🔐 Intentando login con Supabase');
-  final response = await Supabase.instance.client.auth.signInWithPassword(
-    email: email,
-    password: password,
-  );
+                                try {
+                                  print('🔐 Intentando login con Supabase');
+                                  final response = await Supabase
+                                      .instance.client.auth
+                                      .signInWithPassword(
+                                    email: email,
+                                    password: password,
+                                  );
 
-  if (response.session != null) {
-    final prefs = await SharedPreferences.getInstance();
-    final sessionData = response.session!.toJson();
-    await prefs.setString('session', jsonEncode(sessionData));
-  }
+                                  if (response.session != null) {
+                                    final prefs =
+                                        await SharedPreferences.getInstance();
+                                    final sessionData =
+                                        response.session!.toJson();
+                                    await prefs.setString(
+                                        'session', jsonEncode(sessionData));
+                                  }
 
-  if (context.mounted) {
-    
-    final user = Supabase.instance.client.auth.currentUser;
-final metadata = user?.userMetadata ?? {};
+                                  if (context.mounted) {
+                                    final user = Supabase
+                                        .instance.client.auth.currentUser;
+                                    final metadata = user?.userMetadata ?? {};
 
-final tieneSexo = metadata['sexo'] != null;
-final tieneRubro = metadata['rubro'] != null;
-final tieneTaller = metadata['taller'] != null;
-final tieneTelefono = metadata['telefono'] != null;
-final tieneCreatedAt = metadata['created_at'] != null;
+                                    final tieneSexo = metadata['sexo'] != null;
+                                    final tieneRubro =
+                                        metadata['rubro'] != null;
+                                    final tieneTaller =
+                                        metadata['taller'] != null;
+                                    final tieneTelefono =
+                                        metadata['telefono'] != null;
+                                    final tieneCreatedAt =
+                                        metadata['created_at'] != null;
 
-if (!tieneSexo || !tieneRubro || !tieneTaller || !tieneTelefono || !tieneCreatedAt) {
-  //  EnviarWpp().sendWhatsAppMessage(
-  //                                         "HXa9fb3930150f932869bc13f223f26628",
-  //                                         'whatsapp:+549$telefono',
-  //                                         [fullname, "", "", "", ""]);
-  print("✏️ Actualizando metadatos incompletos");
+                                    if (!tieneSexo ||
+                                        !tieneRubro ||
+                                        !tieneTaller ||
+                                        !tieneTelefono ||
+                                        !tieneCreatedAt) {
+                                      //  EnviarWpp().sendWhatsAppMessage(
+                                      //                                         "HXa9fb3930150f932869bc13f223f26628",
+                                      //                                         'whatsapp:+549$telefono',
+                                      //                                         [fullname, "", "", "", ""]);
+                                      print(
+                                          "✏️ Actualizando metadatos incompletos");
 
-  await Supabase.instance.client.auth.updateUser(
-    UserAttributes(data: {
-      if (!tieneSexo) 'sexo': 'Mujer',
-      if (!tieneRubro) 'rubro': 'Clases de cerámica',
-      if (!tieneTaller) 'taller': 'Taller de cerámica Ricardo Rojas',
-      if (!tieneTelefono) 'telefono': null,
-      if (!tieneCreatedAt) 'created_at': DateTime.now().toUtc().toIso8601String(),
-    }),
-  );
-}
+                                      await Supabase.instance.client.auth
+                                          .updateUser(
+                                        UserAttributes(data: {
+                                          if (!tieneSexo) 'sexo': 'Mujer',
+                                          if (!tieneRubro)
+                                            'rubro': 'Clases de cerámica',
+                                          if (!tieneTaller)
+                                            'taller':
+                                                'Taller de cerámica Ricardo Rojas',
+                                          if (!tieneTelefono) 'telefono': null,
+                                          if (!tieneCreatedAt)
+                                            'created_at': DateTime.now()
+                                                .toUtc()
+                                                .toIso8601String(),
+                                        }),
+                                      );
+                                    }
 
-    RedirigirUsuarioAlTaller().redirigirUsuario(context);
-  }
-}on AuthException catch (e) {
-  print('🛑 AuthException: ${e.message}');
-  final error = e.message.toLowerCase();
+                                    RedirigirUsuarioAlTaller()
+                                        .redirigirUsuario(context);
+                                  }
+                                } on AuthException catch (e) {
+                                  print('🛑 AuthException: ${e.message}');
+                                  final error = e.message.toLowerCase();
 
-  if (error.contains("socketexception") || error.contains("failed host lookup")) {
-    mostrarSnackBar("Verificá tu conexión a internet.");
-  } else if (error.contains("user not found") || error.contains("invalid login credentials")) {
-    mostrarSnackBar("Verificá tu correo electrónico o contraseña.");
-  } else if (error.contains("email not confirmed")) {
-    mostrarSnackBar("Confirmá tu correo electrónico antes de iniciar sesión.");
-  } else if (error.contains("no user")) {
-    mostrarSnackBar("Pedile al administrador que registre tu cuenta.");
-  } else {
-    mostrarSnackBar("Error al iniciar sesión. Intentá nuevamente.");
-  }
-}
-
-
-}
-
-,
-
+                                  if (error.contains("socketexception") ||
+                                      error.contains("failed host lookup")) {
+                                    mostrarSnackBar(
+                                        "Verificá tu conexión a internet.");
+                                  } else if (error.contains("user not found") ||
+                                      error.contains(
+                                          "invalid login credentials")) {
+                                    mostrarSnackBar(
+                                        "Verificá tu correo electrónico o contraseña.");
+                                  } else if (error
+                                      .contains("email not confirmed")) {
+                                    mostrarSnackBar(
+                                        "Confirmá tu correo electrónico antes de iniciar sesión.");
+                                  } else if (error.contains("no user")) {
+                                    mostrarSnackBar(
+                                        "Pedile al administrador que registre tu cuenta.");
+                                  } else {
+                                    mostrarSnackBar(
+                                        "Error al iniciar sesión. Intentá nuevamente.");
+                                  }
+                                }
+                              },
                               child:
                                   Text(localizations.translate('loginButton')),
                             ),

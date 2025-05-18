@@ -106,6 +106,7 @@ class RemoverUsuario {
     ClaseModels clase,
     String user,
     void Function(ClaseModels claseActualizada)? callback,
+    void Function(List<ClaseModels> clasesAfectadas) onFinished,
   ) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
@@ -114,6 +115,8 @@ class RemoverUsuario {
       usuariosTable: 'usuarios',
       clasesTable: taller,
     ).obtenerClases();
+
+    final clasesAfectadas = <ClaseModels>[]; // ✅ acumulamos acá
 
     for (final item in data) {
       if (item.hora == clase.hora && item.dia == clase.dia) {
@@ -127,12 +130,17 @@ class RemoverUsuario {
 
           ModificarLugarDisponible().agregarLugarDisponible(item.id);
 
+          clasesAfectadas.add(item); // ✅ guardamos para el callback final
+
           if (callback != null) {
             callback(item);
           }
         }
       }
     }
+
+    // ✅ llamamos con las clases modificadas
+    onFinished(clasesAfectadas);
   }
 
   Future<void> removerUsuarioDeListaDeEspera(int idClase, String user) async {

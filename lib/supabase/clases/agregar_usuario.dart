@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_numero_admin.dart';
@@ -54,16 +55,20 @@ class AgregarUsuario {
   }
 
   Future<void> agregarUsuarioEnCuatroClases(
-      BuildContext context,
-      ClaseModels clase,
-      String user,
-      void Function(ClaseModels claseActualizada) callback) async {
+    BuildContext context,
+    ClaseModels clase,
+    String user,
+    void Function(ClaseModels claseActualizada) callback,
+    void Function(int total, List<ClaseModels> clasesAfectadas) onFinished,
+  ) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
     final data = await ObtenerTotalInfo(
-            supabase: supabase, usuariosTable: 'usuarios', clasesTable: taller)
-        .obtenerClases();
+      supabase: supabase,
+      usuariosTable: 'usuarios',
+      clasesTable: taller,
+    ).obtenerClases();
 
     int obtenerIndiceDia(String dia, String idioma) {
       final Map<String, List<String>> diasPorIdioma = {
@@ -234,6 +239,8 @@ class AgregarUsuario {
 
     int count = 0;
 
+    final clasesActualizadas = <ClaseModels>[];
+
     for (final item in data) {
       final partes = item.fecha.split('/');
       if (partes.length == 3) {
@@ -251,13 +258,19 @@ class AgregarUsuario {
 
             ModificarLugarDisponible().removerLugarDisponible(item.id);
 
-            callback(item);
+            clasesActualizadas.add(item);
 
             count++;
           }
         }
       }
     }
+    for (final claseActualizada in clasesActualizadas) {
+      callback(claseActualizada);
+    }
+
+    onFinished(clasesActualizadas.length, clasesActualizadas);
+    print("✔️ Callback ejecutado con total = ${clasesActualizadas.length}");
   }
 
   Future<void> agregarUsuarioAListaDeEspera(int id, String user) async {

@@ -80,7 +80,6 @@ class ActualizarFechasDatabase {
       final batchInsert = clasesNuevas.map((clase) => clase.toMap()).toList();
       await supabase.from(taller).insert(batchInsert);
       await ActualizarElMes().actualizarMes(mesActual);
-
     } catch (e) {
       throw Exception('No se pudieron actualizar las clases: $e');
     }

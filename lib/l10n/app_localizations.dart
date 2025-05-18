@@ -71,7 +71,8 @@ class AppLocalizations {
       "fullnameAlreadyExists":
           "The full name already exists. Please use a different name to avoid conflicts.",
       "registrationError": "Registration error: \$error",
-      "unexpectedError": "Couldn't connect to the server. Please check your internet connection.",
+      "unexpectedError":
+          "Couldn't connect to the server. Please check your internet connection.",
       "registerButton": "Register",
       "successMessage":
           "Successful registration! Remember to log out before trying to log in again.",
@@ -427,7 +428,8 @@ class AppLocalizations {
       "fullnameAlreadyExists":
           "El nombre completo ya existe. Usa uno diferente para no generar conflictos.",
       "registrationError": "Error de registro: \$error",
-      "unexpectedError": "No se pudo conectar con el servidor. Verificá tu conexión a internet.",
+      "unexpectedError":
+          "No se pudo conectar con el servidor. Verificá tu conexión a internet.",
       "registerButton": "Registrar",
       "successMessage":
           "¡Registro exitoso! Recuerda cerrar sesión antes de intentar iniciar sesión nuevamente.",
@@ -440,16 +442,17 @@ class AppLocalizations {
           "¿Deseas cancelar la clase el día \$day a las \$time? Ten en cuenta que si cancelas con menos de 24 horas de anticipación, no podrás recuperar la clase.",
       "cancelButton": "Cancelar",
       "acceptButton": "Aceptar",
-      "classCancelled": "Has cancelado exitosamente tu inscripción en la clase el dia \$dia \$fecha a las \$hora.",
-      "waitlistCancelled": "Has cancelado exitosamente tu lugar en lista de espera el dia \$dia \$fecha a las \$hora.",
+      "classCancelled":
+          "Has cancelado exitosamente tu inscripción en la clase el dia \$dia \$fecha a las \$hora.",
+      "waitlistCancelled":
+          "Has cancelado exitosamente tu lugar en lista de espera el dia \$dia \$fecha a las \$hora.",
       "loginToViewClasses": "Para ver tus clases debes iniciar sesión.",
       "viewCancelClassesInfo":
           "En esta sección podrás ver y cancelar tus clases. ¡Cuidado! Si cancelas con menos de 24 horas de anticipación, no podrás recuperar la clase.",
       "noClassesEnrolled": "No estás inscripto en ninguna clase.",
       "waitlistPosition": "Tu lugar en la lista de espera es: \$position",
       "workshopTitle": "Assistify",
-      "homeScreenIntro":
-          "Bienvenidos a Assistify!",
+      "homeScreenIntro": "Bienvenidos a Assistify!",
       "loginPrompt": "Inicia sesión :",
       "createWorkshopButton": "Crear Empresa",
       "loginError": "Error de inicio de sesión: \$error",

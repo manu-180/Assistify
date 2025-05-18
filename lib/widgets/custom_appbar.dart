@@ -151,10 +151,10 @@ class CustomAppBarState extends State<CustomAppBar> {
       //   'label': AppLocalizations.of(context).translate('testLabel'),
       // },
       if (user?.id == '55529ccc-07c0-4af4-958c-9267af58e39f')
-      {
-        'value': '/soporte',
-        'label': "soporte",
-      },
+        {
+          'value': '/soporte',
+          'label': "soporte",
+        },
     ];
 
     final userRoutes = [

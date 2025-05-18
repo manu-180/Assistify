@@ -201,8 +201,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     return diasConClases.toList();
   }
 
-
-   Future<void> mostrarDialogoModificarFeriado(
+  Future<void> mostrarDialogoModificarFeriado(
       ClaseModels clase, bool feriado) async {
     bool nuevoValor = !feriado;
 
@@ -255,15 +254,14 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                   }
                 });
                 final diaClave = '${clase.dia} - ${clase.fecha}';
-if (horariosPorDia.containsKey(diaClave)) {
-  final idx = horariosPorDia[diaClave]!
-      .indexWhere((c) => c.id == clase.id);
-  if (idx != -1) {
-    horariosPorDia[diaClave]![idx] =
-        clase.copyWith(feriado: nuevoValor);
-  }
-}
-
+                if (horariosPorDia.containsKey(diaClave)) {
+                  final idx = horariosPorDia[diaClave]!
+                      .indexWhere((c) => c.id == clase.id);
+                  if (idx != -1) {
+                    horariosPorDia[diaClave]![idx] =
+                        clase.copyWith(feriado: nuevoValor);
+                  }
+                }
               },
               child: const Text("Guardar"),
             ),
@@ -272,7 +270,6 @@ if (horariosPorDia.containsKey(diaClave)) {
       },
     );
   }
-
 
   @override
   void initState() {
@@ -355,40 +352,38 @@ if (horariosPorDia.containsKey(diaClave)) {
               child:
                   Text(AppLocalizations.of(context).translate('acceptButton')),
               onPressed: () async {
-  await AgregarUsuario(supabase).agregarUsuarioAListaDeEspera(
-      clase!.id, usuarioActivo!.userMetadata?['fullname']);
+                await AgregarUsuario(supabase).agregarUsuarioAListaDeEspera(
+                    clase!.id, usuarioActivo!.userMetadata?['fullname']);
 
-  if (context.mounted) {
-    Navigator.of(context).pop();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
 
-    final mensaje =
-        "Te inscribiste exitosamente a la lista de espera para el día ${clase!.dia} ${clase.fecha} a las ${clase.hora}.";
-ScaffoldMessenger.of(context).hideCurrentSnackBar();
-ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(
-    behavior: SnackBarBehavior.floating,
-    backgroundColor: Colors.transparent,
-    elevation: 0,
-    content: SlideInUp(
-      duration: const Duration(milliseconds: 500),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          mensaje,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-    ),
-  ),
-);
-
-  }
-},
-
+                  final mensaje =
+                      "Te inscribiste exitosamente a la lista de espera para el día ${clase!.dia} ${clase.fecha} a las ${clase.hora}.";
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      content: SlideInUp(
+                        duration: const Duration(milliseconds: 500),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            mensaje,
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }
+              },
             ),
           ],
         );
@@ -423,7 +418,6 @@ ScaffoldMessenger.of(context).showSnackBar(
   }
 
   void _mostrarDialogoSinClases(String taller) {
-
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
 
     showDialog(
@@ -432,28 +426,28 @@ ScaffoldMessenger.of(context).showSnackBar(
         title: const Text('Sin clases registradas'),
         content: const Text('Primero debes cargar tus clases.'),
         actions: [
-          usuarioActivo!.userMetadata?["admin"] ?
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar'),
-          ):
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancelar'),
-          ),
-          usuarioActivo .userMetadata?["admin"] ?
-          FilledButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              context.push('/gestionclases/$taller');
-            },
-            child: const Text('Ir a gestión'),
-          ):
-          SizedBox()
+          usuarioActivo!.userMetadata?["admin"]
+              ? TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancelar'),
+                )
+              : FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Cancelar'),
+                ),
+          usuarioActivo.userMetadata?["admin"]
+              ? FilledButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    context.push('/gestionclases/$taller');
+                  },
+                  child: const Text('Ir a gestión'),
+                )
+              : SizedBox()
         ],
       ),
     );
@@ -573,34 +567,33 @@ ScaffoldMessenger.of(context).showSnackBar(
 
     await cargarDatos();
     if (mounted) {
-  final mensaje =
-      "Te inscribiste exitosamente a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}.";
+      final mensaje =
+          "Te inscribiste exitosamente a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}.";
 
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: SlideInUp(
-        duration: const Duration(milliseconds: 500),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            mensaje,
-            style: const TextStyle(color: Colors.white),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          content: SlideInUp(
+            duration: const Duration(milliseconds: 500),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                mensaje,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  );
-}
-
+      );
+    }
   }
 
   String _obtenerTituloDialogo(String mensaje) {
@@ -752,46 +745,45 @@ ScaffoldMessenger.of(context).showSnackBar(
     // 👉 Si es feriado, mostramos una tarjeta especial
     if (clase.feriado) {
       return Padding(
-  padding: const EdgeInsets.only(bottom: 10),
-  child: GestureDetector(
-    onLongPress: esAdmin
-        ? () => mostrarDialogoModificarFeriado(clase, clase.feriado)
-        : null,
-    child: Card(
-      color: Colors.amber.shade100,
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          children: [
-            Icon(Icons.celebration,
-                size: screenWidth * 0.08, color: Colors.orange),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.only(bottom: 10),
+        child: GestureDetector(
+          onLongPress: esAdmin
+              ? () => mostrarDialogoModificarFeriado(clase, clase.feriado)
+              : null,
+          child: Card(
+            color: Colors.amber.shade100,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
                 children: [
-                  Text(
-                    "¡Es feriado!",
-                    style: TextStyle(
-                      fontSize: screenWidth * 0.04,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange,
+                  Icon(Icons.celebration,
+                      size: screenWidth * 0.08, color: Colors.orange),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "¡Es feriado!",
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepOrange,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
+          ),
         ),
-      ),
-    ),
-  ),
-);
-
+      );
     }
 
     // 🔁 Caso normal: clase habilitada o deshabilitada
@@ -805,41 +797,41 @@ ScaffoldMessenger.of(context).showSnackBar(
               onPressed: esAdmin
                   ? () async {
                       if (context.mounted) {
-  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
-  final mensaje = clase.mails.isEmpty
-      ? AppLocalizations.of(context).translate('noStudents')
-      : AppLocalizations.of(context).translate(
-          'studentsInClass',
-          params: {
-            'students': clase.mails.join(', '),
-          },
-        );
+                        final mensaje = clase.mails.isEmpty
+                            ? AppLocalizations.of(context)
+                                .translate('noStudents')
+                            : AppLocalizations.of(context).translate(
+                                'studentsInClass',
+                                params: {
+                                  'students': clase.mails.join(', '),
+                                },
+                              );
 
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      duration: const Duration(seconds: 7),
-      behavior: SnackBarBehavior.floating,
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      content: SlideInUp(
-        duration: const Duration(milliseconds: 500),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Theme.of(context).primaryColor,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Text(
-            mensaje,
-            style: const TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-    ),
-  );
-}
-
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            duration: const Duration(seconds: 7),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            content: SlideInUp(
+                              duration: const Duration(milliseconds: 500),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  mensaje,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
                     }
                   : ((Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||
@@ -876,11 +868,10 @@ ScaffoldMessenger.of(context).showSnackBar(
               ),
             ),
             onLongPress: () {
-              final usuarioActivo =
-                  Supabase.instance.client.auth.currentUser;
-              usuarioActivo!.userMetadata?['admin'] ?
-              mostrarDialogoModificarFeriado(clase, clase.feriado) :
-              mostrarAlertaListaEspera(context: context, clase: clase);
+              final usuarioActivo = Supabase.instance.client.auth.currentUser;
+              usuarioActivo!.userMetadata?['admin']
+                  ? mostrarDialogoModificarFeriado(clase, clase.feriado)
+                  : mostrarAlertaListaEspera(context: context, clase: clase);
             },
           ),
         ),

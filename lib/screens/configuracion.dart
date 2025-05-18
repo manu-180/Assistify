@@ -53,7 +53,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
     });
   }
 
-    Future<void> corregirDia() async {
+  Future<void> corregirDia() async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
     final clases = await ObtenerTotalInfo(
@@ -119,11 +119,12 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                           ],
                         ),
                       )
-                   : ListView(
-  padding: const EdgeInsets.only(bottom: 100), // espacio para Contactanos
-  children: [
-    const SizedBox(height: 30),
-    ExpansionTile(
+                    : ListView(
+                        padding: const EdgeInsets.only(
+                            bottom: 100), // espacio para Contactanos
+                        children: [
+                          const SizedBox(height: 30),
+                          ExpansionTile(
                             title: Text(
                               AppLocalizations.of(context)
                                   .translate('chooseColor'),
@@ -183,7 +184,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                               ),
                             ],
                           ), // Elige color
-    ExpansionTile(
+                          ExpansionTile(
                             title: Text(
                               AppLocalizations.of(context)
                                   .translate('updateData'),
@@ -205,120 +206,153 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                               ),
                             ],
                           ), // Actualizar datos
-    const SizedBox(height: 20),
-    user!.userMetadata?["admin"] == true ? 
-    Center(
-      child: Center(
-  child: OutlinedButton.icon(
-    style: OutlinedButton.styleFrom(
-      foregroundColor: Colors.red[700], // color del texto e ícono
-      side: BorderSide(color: Colors.red[300]!), // borde
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    icon: const Icon(Icons.warning_amber_rounded),
-    label: const Text(
-      "Cambiar fechas al mes siguiente",
-      style: TextStyle(fontWeight: FontWeight.bold),
-    ),
-    onPressed: () async {
-      final confirmed = await showDialog<bool>(
-  context: context,
-  builder: (context) {
-    int countdown = 5;
-    bool isButtonEnabled = false;
-    late StateSetter dialogSetState;
-    late Timer countdownTimer;
+                          const SizedBox(height: 20),
+                          user!.userMetadata?["admin"] == true
+                              ? Center(
+                                  child: Center(
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.red[
+                                            700], // color del texto e ícono
+                                        side: BorderSide(
+                                            color: Colors.red[300]!), // borde
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 14),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                          Icons.warning_amber_rounded),
+                                      label: const Text(
+                                        "Cambiar fechas al mes siguiente",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () async {
+                                        final confirmed =
+                                            await showDialog<bool>(
+                                          context: context,
+                                          builder: (context) {
+                                            int countdown = 5;
+                                            bool isButtonEnabled = false;
+                                            late StateSetter dialogSetState;
+                                            late Timer countdownTimer;
 
-    return StatefulBuilder(
-      builder: (context, setState) {
-        dialogSetState = setState;
+                                            return StatefulBuilder(
+                                              builder: (context, setState) {
+                                                dialogSetState = setState;
 
-        // Iniciar el timer solo una vez
-        if (countdown == 5) {
-          countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-            if (countdown == 1) {
-              timer.cancel();
-              if (mounted) {
-                dialogSetState(() {
-                  isButtonEnabled = true;
-                });
-              }
-            } else {
-              if (mounted) {
-                dialogSetState(() {
-                  countdown--;
-                });
-              }
-            }
-          });
-        }
+                                                // Iniciar el timer solo una vez
+                                                if (countdown == 5) {
+                                                  countdownTimer =
+                                                      Timer.periodic(
+                                                          const Duration(
+                                                              seconds: 1),
+                                                          (timer) {
+                                                    if (countdown == 1) {
+                                                      timer.cancel();
+                                                      if (mounted) {
+                                                        dialogSetState(() {
+                                                          isButtonEnabled =
+                                                              true;
+                                                        });
+                                                      }
+                                                    } else {
+                                                      if (mounted) {
+                                                        dialogSetState(() {
+                                                          countdown--;
+                                                        });
+                                                      }
+                                                    }
+                                                  });
+                                                }
 
-        return WillPopScope(
-          onWillPop: () async {
-            countdownTimer.cancel();
-            return true;
-          },
-          child: AlertDialog(
-            title: Text( user.userMetadata?['sexo'] == "Hombre"  ?  "¿Estás seguro?" : "¿Estás segura?" ),
-            content: const Text(
-              "Esta acción cerrará el mes actual y eliminará todas las clases del mes anterior, dejando los horarios vacíos y listos para reasignar alumnos. \n\nLos creditos que los alumnos tengan disponibles para recuperar una clase se mantienen",
-            ),
-            actions: [
-              TextButton(
-                child: const Text("Cancelar"),
-                onPressed: () {
-                  countdownTimer.cancel();
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              FilledButton(
-                onPressed: isButtonEnabled
-                    ?  () async {
-        countdownTimer.cancel();
-Navigator.of(context).pop();
+                                                return WillPopScope(
+                                                  onWillPop: () async {
+                                                    countdownTimer.cancel();
+                                                    return true;
+                                                  },
+                                                  child: AlertDialog(
+                                                    title: Text(
+                                                        user.userMetadata?[
+                                                                    'sexo'] ==
+                                                                "Hombre"
+                                                            ? "¿Estás seguro?"
+                                                            : "¿Estás segura?"),
+                                                    content: const Text(
+                                                      "Esta acción cerrará el mes actual y eliminará todas las clases del mes anterior, dejando los horarios vacíos y listos para reasignar alumnos. \n\nLos creditos que los alumnos tengan disponibles para recuperar una clase se mantienen",
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        child: const Text(
+                                                            "Cancelar"),
+                                                        onPressed: () {
+                                                          countdownTimer
+                                                              .cancel();
+                                                          Navigator.of(context)
+                                                              .pop(false);
+                                                        },
+                                                      ),
+                                                      FilledButton(
+                                                        onPressed:
+                                                            isButtonEnabled
+                                                                ? () async {
+                                                                    countdownTimer
+                                                                        .cancel();
+                                                                    Navigator.of(
+                                                                            context)
+                                                                        .pop();
 
-await corregirDia(); 
-await ResetClases().reset(); 
-await ActualizarFechasDatabase()
-    .actualizarClasesAlNuevoMes(user.userMetadata?['taller'], 2025); 
-await ActualizarSemanas().actualizarSemana(); 
-await FeriadosFalse().feriadosFalse(); 
+                                                                    await corregirDia();
+                                                                    await ResetClases()
+                                                                        .reset();
+                                                                    await ActualizarFechasDatabase().actualizarClasesAlNuevoMes(
+                                                                        user.userMetadata?[
+                                                                            'taller'],
+                                                                        2025);
+                                                                    await ActualizarSemanas()
+                                                                        .actualizarSemana();
+                                                                    await FeriadosFalse()
+                                                                        .feriadosFalse();
+                                                                  }
+                                                                : null,
+                                                        style: FilledButton
+                                                            .styleFrom(
+                                                          backgroundColor:
+                                                              isButtonEnabled
+                                                                  ? color
+                                                                      .primary
+                                                                  : Colors
+                                                                      .red, // gris con borde bordó
+                                                          foregroundColor:
+                                                              Colors.white,
+                                                          disabledBackgroundColor:
+                                                              const Color(
+                                                                  0xFFBCAAA4),
+                                                          disabledForegroundColor:
+                                                              Colors.white70,
+                                                        ),
+                                                        child: Text(
+                                                            "Confirmar${isButtonEnabled ? '' : ' ($countdown)'}"),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+                                              },
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                )
+                              : const SizedBox(),
 
-      }
-                    : null,
-                style: FilledButton.styleFrom(
-                  backgroundColor: isButtonEnabled
-                      ? color.primary
-                      : Colors.red, // gris con borde bordó
-                  foregroundColor: Colors.white,
-                  disabledBackgroundColor: const Color(0xFFBCAAA4),
-                  disabledForegroundColor: Colors.white70,
-                ),
-                child: Text("Confirmar${isButtonEnabled ? '' : ' ($countdown)'}"),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  },
-);
-
-
-    },
-  ),
-),
-
-    ):
-    const SizedBox(),
-
-    const SizedBox(height: 20),
-  ],
-),
-
+                          const SizedBox(height: 20),
+                        ],
+                      ),
               ),
             ),
             Positioned(
