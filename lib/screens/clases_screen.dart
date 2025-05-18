@@ -393,25 +393,37 @@ if (horariosPorDia.containsKey(diaClave)) {
   }
 
   void _mostrarDialogoSinClases(String taller) {
+
+    final usuarioActivo = Supabase.instance.client.auth.currentUser;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Sin clases registradas'),
         content: const Text('Primero debes cargar tus clases.'),
         actions: [
+          usuarioActivo!.userMetadata?["admin"] ?
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
             child: const Text('Cancelar'),
+          ):
+          FilledButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Cancelar'),
           ),
+          usuarioActivo .userMetadata?["admin"] ?
           FilledButton(
             onPressed: () {
               Navigator.of(context).pop();
               context.push('/gestionclases/$taller');
             },
             child: const Text('Ir a gestión'),
-          ),
+          ):
+          SizedBox()
         ],
       ),
     );

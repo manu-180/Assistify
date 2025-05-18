@@ -9,7 +9,6 @@ import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/models/usuario_models.dart';
-import 'package:taller_ceramica/supabase/utiles/al_menos_una_clase.dart';
 import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
@@ -450,8 +449,7 @@ El alumno usará su correo y contraseña para iniciar sesión.
         width: size.width * 0.38,
         child: FloatingActionButton(
           onPressed: () async {
-            await AlMenosUnaClase().tallerTieneDatos()
-                ? showDialog(
+            showDialog(
                     context: context,
                     barrierDismissible: false,
                     builder: (BuildContext context) {
@@ -461,9 +459,8 @@ El alumno usará su correo y contraseña para iniciar sesión.
                         },
                       );
                     },
-                  )
-                : mostrarAdvertenciaCrearUsuario(
-                    context, usuarioActivo!.userMetadata!['taller']);
+                  );
+              
           },
           child: Container(
             alignment: Alignment.center,
