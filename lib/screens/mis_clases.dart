@@ -103,11 +103,41 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
     });
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context).translate('classCancelled')),
+    if (mounted) {
+  final mensaje = AppLocalizations.of(context).translate(
+  'classCancelled',
+  params: {
+    'dia': clase.dia,
+    'fecha': clase.fecha,
+    'hora': clase.hora,
+  },
+);
+
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      duration: const Duration(seconds: 6),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: SlideInUp(
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            mensaje,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
       ),
-    );
+    ),
+  );
+}
+
   }
 
   void cancelarClaseEnListaDeEspera(int claseId, String fullname) async {
@@ -122,12 +152,40 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
     await RemoverUsuario(supabase)
         .removerUsuarioDeListaDeEspera(claseId, fullname);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text(AppLocalizations.of(context).translate('waitlistCancelled')),
+    if (mounted) {
+ 
+      final mensaje = AppLocalizations.of(context).translate(
+  'waitlistCancelled',
+  params: {
+    'dia': clase.dia,
+    'fecha': clase.fecha,
+    'hora': clase.hora,
+  },
+);
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: SlideInUp(
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            mensaje,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
       ),
-    );
+    ),
+  );
+}
+
   }
 
   Future<void> cargarMesActual() async {
@@ -240,7 +298,8 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                         ),
                       ),
                       
-                      user?.userMetadata?['taller'] != "Cerámica Ricardo Rojas" ?
+                      user?.userMetadata?['taller'] != "Taller de cerámica Ricardo Rojas" ?
+                    
 
                       FutureBuilder<int>(
                         future: Future.delayed(Duration.zero, () {

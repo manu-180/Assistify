@@ -363,6 +363,7 @@ if (horariosPorDia.containsKey(diaClave)) {
 
     final mensaje =
         "Te inscribiste exitosamente a la lista de espera para el día ${clase!.dia} ${clase.fecha} a las ${clase.hora}.";
+ScaffoldMessenger.of(context).hideCurrentSnackBar();
 ScaffoldMessenger.of(context).showSnackBar(
   SnackBar(
     behavior: SnackBarBehavior.floating,
@@ -574,6 +575,8 @@ ScaffoldMessenger.of(context).showSnackBar(
     if (mounted) {
   final mensaje =
       "Te inscribiste exitosamente a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}.";
+
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
@@ -802,25 +805,41 @@ ScaffoldMessenger.of(context).showSnackBar(
               onPressed: esAdmin
                   ? () async {
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              clase.mails.isEmpty
-                                  ? AppLocalizations.of(context)
-                                      .translate('noStudents')
-                                  : AppLocalizations.of(context).translate(
-                                      'studentsInClass',
-                                      params: {
-                                        'students': clase.mails.join(', ')
-                                      },
-                                    ),
-                            ),
-                            duration: const Duration(seconds: 5),
-                            behavior: SnackBarBehavior.fixed,
-                          ),
-                        );
-                      }
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+  final mensaje = clase.mails.isEmpty
+      ? AppLocalizations.of(context).translate('noStudents')
+      : AppLocalizations.of(context).translate(
+          'studentsInClass',
+          params: {
+            'students': clase.mails.join(', '),
+          },
+        );
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      duration: const Duration(seconds: 7),
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: SlideInUp(
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            mensaje,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
                     }
                   : ((Calcular24hs().esMenorA0Horas(
                               clase.fecha, clase.hora, mesActual) ||

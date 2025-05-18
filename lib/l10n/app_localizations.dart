@@ -440,8 +440,8 @@ class AppLocalizations {
           "¿Deseas cancelar la clase el día \$day a las \$time? Ten en cuenta que si cancelas con menos de 24 horas de anticipación, no podrás recuperar la clase.",
       "cancelButton": "Cancelar",
       "acceptButton": "Aceptar",
-      "classCancelled": "Has cancelado tu inscripción en la clase.",
-      "waitlistCancelled": "Has cancelado tu lugar en la lista de espera.",
+      "classCancelled": "Has cancelado exitosamente tu inscripción en la clase el dia \$dia \$fecha a las \$hora.",
+      "waitlistCancelled": "Has cancelado exitosamente tu lugar en lista de espera el dia \$dia \$fecha a las \$hora.",
       "loginToViewClasses": "Para ver tus clases debes iniciar sesión.",
       "viewCancelClassesInfo":
           "En esta sección podrás ver y cancelar tus clases. ¡Cuidado! Si cancelas con menos de 24 horas de anticipación, no podrás recuperar la clase.",
