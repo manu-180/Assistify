@@ -280,13 +280,12 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
         countdownTimer.cancel();
 Navigator.of(context).pop();
 
-await corregirDia(); // ← 1: Corregí días mal escritos
-await ResetClases().reset(); // ← 2: Vaciar mails y espera
+await corregirDia(); 
+await ResetClases().reset(); 
 await ActualizarFechasDatabase()
-    .actualizarClasesAlNuevoMes(user.userMetadata?['taller'], 2025); // ← 3: Actualizar fechas (ya con clases vacías)
-
-await ActualizarSemanas().actualizarSemana(); // ← 4: Asignar semana y resetear lugares
-await FeriadosFalse().feriadosFalse(); // ← 5: Marcar todos como no feriado
+    .actualizarClasesAlNuevoMes(user.userMetadata?['taller'], 2025); 
+await ActualizarSemanas().actualizarSemana(); 
+await FeriadosFalse().feriadosFalse(); 
 
       }
                     : null,

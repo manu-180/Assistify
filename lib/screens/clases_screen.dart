@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/subscription/subscription_verifier.dart';
+import 'package:taller_ceramica/supabase/modificar_datos/modificar_feriado.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
@@ -42,6 +43,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
   List<ClaseModels> diasUnicos = [];
   Map<String, List<ClaseModels>> horariosPorDia = {};
   final Map<String, List<ClaseModels>> _cachePorSemana = {};
+  List<ClaseModels> clasesDisponibles = [];
+  List<ClaseModels> clasesFiltradas = [];
 
   String? avisoDeClasesDisponibles;
   String? avisoAnterior;
@@ -197,6 +200,79 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
 
     return diasConClases.toList();
   }
+
+
+   Future<void> mostrarDialogoModificarFeriado(
+      ClaseModels clase, bool feriado) async {
+    bool nuevoValor = !feriado;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Modificar feriado"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("¿Querés marcar esta clase como feriado?"),
+              const SizedBox(height: 10),
+              SwitchListTile(
+                value: nuevoValor,
+                onChanged: (val) {
+                  nuevoValor = val;
+                  Navigator.of(context).pop();
+                },
+                title: Text(nuevoValor ? "Feriado" : "Clase normal"),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancelar"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                await ModificarFeriado.cambiarFeriado(
+                  idClase: clase.id,
+                  nuevoValor: nuevoValor,
+                );
+
+                setState(() {
+                  final idx =
+                      clasesFiltradas.indexWhere((c) => c.id == clase.id);
+                  if (idx != -1) {
+                    clasesFiltradas[idx] = clase.copyWith(feriado: nuevoValor);
+                  }
+
+                  final idxAll =
+                      clasesDisponibles.indexWhere((c) => c.id == clase.id);
+                  if (idxAll != -1) {
+                    clasesDisponibles[idxAll] =
+                        clase.copyWith(feriado: nuevoValor);
+                  }
+                });
+                final diaClave = '${clase.dia} - ${clase.fecha}';
+if (horariosPorDia.containsKey(diaClave)) {
+  final idx = horariosPorDia[diaClave]!
+      .indexWhere((c) => c.id == clase.id);
+  if (idx != -1) {
+    horariosPorDia[diaClave]![idx] =
+        clase.copyWith(feriado: nuevoValor);
+  }
+}
+
+              },
+              child: const Text("Guardar"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   void initState() {
@@ -605,40 +681,46 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     // 👉 Si es feriado, mostramos una tarjeta especial
     if (clase.feriado) {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: Card(
-          color: Colors.amber.shade100,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
-                Icon(Icons.celebration,
-                    size: screenWidth * 0.08, color: Colors.orange),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "¡Es feriado!",
-                        style: TextStyle(
-                          fontSize: screenWidth * 0.04,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.deepOrange,
-                        ),
-                      ),
-                    ],
+  padding: const EdgeInsets.only(bottom: 10),
+  child: GestureDetector(
+    onLongPress: esAdmin
+        ? () => mostrarDialogoModificarFeriado(clase, clase.feriado)
+        : null,
+    child: Card(
+      color: Colors.amber.shade100,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Icon(Icons.celebration,
+                size: screenWidth * 0.08, color: Colors.orange),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "¡Es feriado!",
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.04,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepOrange,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+          ],
         ),
-      );
+      ),
+    ),
+  ),
+);
+
     }
 
     // 🔁 Caso normal: clase habilitada o deshabilitada
@@ -707,6 +789,10 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
               ),
             ),
             onLongPress: () {
+              final usuarioActivo =
+                  Supabase.instance.client.auth.currentUser;
+              usuarioActivo!.userMetadata?['admin'] ?
+              mostrarDialogoModificarFeriado(clase, clase.feriado) :
               mostrarAlertaListaEspera(context: context, clase: clase);
             },
           ),
