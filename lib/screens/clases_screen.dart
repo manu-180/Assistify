@@ -354,11 +354,40 @@ if (horariosPorDia.containsKey(diaClave)) {
             FilledButton(
               child:
                   Text(AppLocalizations.of(context).translate('acceptButton')),
-              onPressed: () {
-                AgregarUsuario(supabase).agregarUsuarioAListaDeEspera(
-                    clase!.id, usuarioActivo!.userMetadata?['fullname']);
-                Navigator.of(context).pop();
-              },
+              onPressed: () async {
+  await AgregarUsuario(supabase).agregarUsuarioAListaDeEspera(
+      clase!.id, usuarioActivo!.userMetadata?['fullname']);
+
+  if (context.mounted) {
+    Navigator.of(context).pop();
+
+    final mensaje =
+        "Te inscribiste exitosamente a la lista de espera para el día ${clase!.dia} ${clase.fecha} a las ${clase.hora}.";
+ScaffoldMessenger.of(context).showSnackBar(
+  SnackBar(
+    behavior: SnackBarBehavior.floating,
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    content: SlideInUp(
+      duration: const Duration(milliseconds: 500),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Theme.of(context).primaryColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          mensaje,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    ),
+  ),
+);
+
+  }
+},
+
             ),
           ],
         );
@@ -542,6 +571,33 @@ if (horariosPorDia.containsKey(diaClave)) {
     _cachePorSemana.remove(semanaSeleccionada);
 
     await cargarDatos();
+    if (mounted) {
+  final mensaje =
+      "Te inscribiste exitosamente a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}.";
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      content: SlideInUp(
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Theme.of(context).primaryColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            mensaje,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
   }
 
   String _obtenerTituloDialogo(String mensaje) {
