@@ -11,8 +11,12 @@ class ResetClases {
         .obtenerClases();
 
     for (final clase in clases) {
-      await supabase.from(taller).update({"mails": []}).eq("id", clase.id);
-      await supabase.from(taller).update({"espera": []}).eq("id", clase.id);
-    }
+  print('🔎 Procesando clase con ID: ${clase.id}');
+  await supabase.from(taller).update({
+    "mails": [],
+    "espera": [],
+  }).eq("id", clase.id);
+}
+
   }
 }
