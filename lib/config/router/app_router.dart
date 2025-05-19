@@ -7,6 +7,7 @@ import 'package:taller_ceramica/screens/home_screen.dart';
 import 'package:taller_ceramica/screens/mis_clases.dart';
 import 'package:taller_ceramica/screens/gestion_clases_screen.dart';
 import 'package:taller_ceramica/screens/gestion_horarios_screen.dart';
+import 'package:taller_ceramica/screens/onboarding_screen.dart';
 import 'package:taller_ceramica/screens/prueba.dart';
 import 'package:taller_ceramica/screens/clases_screen.dart';
 import 'package:taller_ceramica/screens/subscription_screen.dart';
@@ -112,5 +113,11 @@ final appRouter = GoRouter(
       name: 'soporte',
       builder: (context, state) => const ConversationListScreen(),
     ),
+    GoRoute(
+      path: '/onboarding',
+      name: 'onboarding',
+      builder: (context, state) => const OnboardingScreen(),
+    ),
+    
   ],
 );

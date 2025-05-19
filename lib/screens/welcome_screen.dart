@@ -140,7 +140,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           children: [
                             OutlinedButton(
                               onPressed: () {
-                                context.push("/creartaller");
+                                context.push("/onboarding");
                               },
                               style: OutlinedButton.styleFrom(
                                 minimumSize: Size(size.width * 0.8, 50),

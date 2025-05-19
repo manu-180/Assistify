@@ -439,6 +439,32 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                         },
                       ),
                       const SizedBox(height: 24),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 5),
+                        child: Row(
+                          children: [
+                            const Text("Al continuar, aceptás nuestra "),
+                            InkWell(
+                              onTap: () async {
+                                const url = 'https://politicas-six.vercel.app/';
+                                if (await canLaunchUrl(Uri.parse(url))) {
+                                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              child: const Text(
+                                "Política de Privacidad",
+                                style: TextStyle(
+                                  decoration: TextDecoration.underline,
+                                  color: Color.fromARGB(255, 61, 132, 191),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+,
+                      const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
