@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
@@ -11,6 +13,7 @@ import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
 import 'package:taller_ceramica/supabase/utiles/generar_id.dart';
+import 'package:taller_ceramica/utils/contar_dias_en_mes_actual.dart';
 import 'package:taller_ceramica/utils/utils_barril.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:intl/intl.dart';
@@ -127,31 +130,25 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
       }
     });
   }
+Future<bool?> mostrarDialogoConfirmacion(
+    BuildContext context, String mensaje,
+    {required ClaseModels clase}) {
+  final localizations = AppLocalizations.of(context);
+  final esEliminar = mensaje ==
+      localizations.translate('deleteClassConfirmation');
 
-  // Diálogo de confirmación
-  Future<bool?> mostrarDialogoConfirmacion(
-      BuildContext context, String mensaje) {
-    final localizations = AppLocalizations.of(context);
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(localizations.translate('confirmationDialogTitle')),
-          content: Text(mensaje),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(localizations.translate('noButton')),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text(localizations.translate('yesButton')),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  return showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return _DialogoEliminarClaseConSwitch(
+        mensaje: mensaje,
+        clase: clase,
+        esEliminar: esEliminar,
+      );
+    },
+  );
+}
+
 
   String obtenerDia(DateTime fecha) {
     final localizations = AppLocalizations.of(context);
@@ -543,9 +540,25 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                           final esFeriado = clase.feriado;
 
                           return GestureDetector(
-                            onLongPress: () {
-                              mostrarDialogoModificarFeriado(clase, esFeriado);
-                            },
+                            onTap: () {
+  mostrarDialogoModificarFeriado(clase, esFeriado);
+},
+
+                            onLongPress: () async {
+  bool? confirmacion = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('deleteClassConfirmation'),
+    clase: clase,
+  );
+
+  if (confirmacion == true && mounted) {
+    setState(() {
+      clasesFiltradas.removeAt(index);
+    });
+  }
+},
+
+
                             child: esFeriado
                                 ? Padding(
                                     padding: const EdgeInsets.all(8.0),
@@ -595,10 +608,24 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                     child: Card(
                                       color: colors.surface,
                                       child: InkWell(
-                                        onLongPress: () {
+                                        onTap: () {
                                           mostrarDialogoModificarFeriado(
                                               clase, esFeriado);
                                         },
+                                        onLongPress: () async {
+  bool? confirmacion = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('deleteClassConfirmation'),
+    clase: clase,
+  );
+
+  if (confirmacion == true && mounted) {
+    setState(() {
+      clasesFiltradas.removeAt(index);
+    });
+  }
+},
+
                                         child: ListTile(
                                           title: Text(
                                             AppLocalizations.of(context)
@@ -627,6 +654,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                                     AppLocalizations.of(context)
                                                         .translate(
                                                             'addPlaceConfirmation'),
+                                                            clase: clase
                                                   );
                                                   if (respuesta == true) {
                                                     agregarLugar(clase.id);
@@ -645,6 +673,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                                     AppLocalizations.of(context)
                                                         .translate(
                                                             'removePlaceConfirmation'),
+                                                            clase: clase
                                                   );
                                                   if (respuesta == true &&
                                                       clase.lugaresDisponibles >
@@ -656,30 +685,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                                   }
                                                 },
                                               ),
-                                              IconButton(
-                                                icon: const Icon(
-                                                  Icons.delete,
-                                                  color: Colors.red,
-                                                ),
-                                                onPressed: () async {
-                                                  bool? respuesta =
-                                                      await mostrarDialogoConfirmacion(
-                                                    context,
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'deleteClassConfirmation'),
-                                                  );
-                                                  if (respuesta == true) {
-                                                    setState(() {
-                                                      clasesFiltradas
-                                                          .removeAt(index);
-                                                      EliminarClase()
-                                                          .eliminarClase(
-                                                              clase.id);
-                                                    });
-                                                  }
-                                                },
-                                              ),
+                                             
                                             ],
                                           ),
                                         ),
@@ -748,6 +754,182 @@ Así se indica que ese día no habrá clases.
           ),
         ),
       ),
+    );
+  }
+}
+
+
+class _DialogoConfirmacionConContador extends StatefulWidget {
+  final String mensaje;
+  final bool esEliminar;
+
+  const _DialogoConfirmacionConContador({
+    required this.mensaje,
+    required this.esEliminar,
+  });
+
+  @override
+  State<_DialogoConfirmacionConContador> createState() =>
+      _DialogoConfirmacionConContadorState();
+}
+
+class _DialogoConfirmacionConContadorState
+    extends State<_DialogoConfirmacionConContador> {
+  int segundosRestantes = 2;
+  late final AppLocalizations localizations;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.esEliminar) {
+      Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
+        setState(() {
+          segundosRestantes--;
+        });
+        if (segundosRestantes == 0) timer.cancel();
+      });
+    }
+  }
+
+  @override
+Widget build(BuildContext context) {
+  final localizations = AppLocalizations.of(context);
+
+  return AlertDialog(
+    title: Text(localizations.translate('confirmationDialogTitle')),
+    content: Text(widget.mensaje),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(false),
+        child: Text(localizations.translate('noButton')),
+      ),
+      ElevatedButton(
+        onPressed: widget.esEliminar && segundosRestantes > 0
+            ? null
+            : () => Navigator.of(context).pop(true),
+   
+        child: Text(
+          widget.esEliminar && segundosRestantes > 0
+              ? 'Eliminar ($segundosRestantes)'
+              : 'Eliminar',
+        ),
+      ),
+    ],
+  );
+}
+
+}
+
+class _DialogoEliminarClaseConSwitch extends StatefulWidget {
+  final String mensaje;
+  final bool esEliminar;
+  final ClaseModels clase;
+
+  const _DialogoEliminarClaseConSwitch({
+    required this.mensaje,
+    required this.esEliminar,
+    required this.clase,
+  });
+
+  @override
+  State<_DialogoEliminarClaseConSwitch> createState() =>
+      _DialogoEliminarClaseConSwitchState();
+}
+class _DialogoEliminarClaseConSwitchState
+    extends State<_DialogoEliminarClaseConSwitch> {
+  int segundosRestantes = 3;
+  bool eliminarMultiples = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.esEliminar) {
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (!mounted) return;
+        setState(() {
+          segundosRestantes--;
+        });
+        if (segundosRestantes == 0) timer.cancel();
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return FutureBuilder<int>(
+      future: contarDiasEnMesActual(widget.clase.dia.toLowerCase()),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const AlertDialog(
+            content: SizedBox(
+              height: 60,
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        final repeticiones = snapshot.data ?? 0;
+        final eliminarText = eliminarMultiples
+            ? "Eliminar $repeticiones clases"
+            : "Eliminar esta clase";
+
+        return AlertDialog(
+          title: Text(localizations.translate('confirmationDialogTitle')),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.mensaje),
+              const SizedBox(height: 12),
+              SwitchListTile(
+                value: eliminarMultiples,
+                onChanged: (val) {
+                  setState(() {
+                    eliminarMultiples = val;
+                  });
+                },
+                title: Text(
+                  "¿Eliminar ${widget.clase.dia} x$repeticiones?",
+                  style: const TextStyle(fontSize: 14.5),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(localizations.translate('noButton')),
+            ),
+            ElevatedButton(
+              onPressed: widget.esEliminar && segundosRestantes > 0
+                  ? null
+                  : () async {
+                      Navigator.of(context).pop(true);
+                      if (eliminarMultiples) {
+                        await EliminarClase().eliminarMuchasClases(
+                          dia: widget.clase.dia,
+                          hora: widget.clase.hora,
+                        );
+                      } else {
+                        await EliminarClase().eliminarClase(widget.clase.id);
+                      }
+                    },
+              child: Text(segundosRestantes > 0
+                  ? '$eliminarText ($segundosRestantes)'
+                  : eliminarText),
+            ),
+          ],
+        );
+      },
     );
   }
 }
