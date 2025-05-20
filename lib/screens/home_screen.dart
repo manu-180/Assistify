@@ -351,11 +351,11 @@ class HomeScreen extends StatelessWidget {
                             : localizations.translate(anonimo),
               ),
               const SizedBox(height: 20),
-              _buildLoadingImage(
-                imagePath: imagen1,
-                height: 300,
-                width: size.width * 0.9,
-              ),
+              // _buildLoadingImage(
+              //   imagePath: imagen1,
+              //   height: 300,
+              //   width: size.width * 0.9,
+              // ),
               const SizedBox(height: 20),
               Text(
                 localizations.translate('whatWeDo'),
@@ -369,11 +369,11 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 10),
               TituloSeleccion(texto: localizations.translate(descripcion)),
               const SizedBox(height: 20),
-              _buildLoadingImage(
-                imagePath: imagen2,
-                height: 300,
-                width: size.width * 0.9,
-              ),
+              // _buildLoadingImage(
+              //   imagePath: imagen2,
+              //   height: 300,
+              //   width: size.width * 0.9,
+              // ),
               const SizedBox(height: 20),
               TituloSeleccion(texto: localizations.translate(clases)),
               const SizedBox(height: 30),

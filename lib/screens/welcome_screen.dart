@@ -94,27 +94,27 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Padding(
-                  padding: EdgeInsets.only(top: size.height * 0.02),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: SizedBox(
-                      height: size.height * 0.5,
-                      width: size.width * 0.8,
-                      child: _allInitialized
-                          ? AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 800),
-                              switchInCurve: Curves.easeIn,
-                              switchOutCurve: Curves.easeOut,
-                              child: VideoPlayer(
-                                _controllers[_currentPage],
-                                key: UniqueKey(),
-                              ),
-                            )
-                          : const Center(child: CircularProgressIndicator()),
-                    ),
-                  ),
-                ),
+                // Padding(
+                //   padding: EdgeInsets.only(top: size.height * 0.02),
+                //   child: ClipRRect(
+                //     borderRadius: BorderRadius.circular(32),
+                //     child: SizedBox(
+                //       height: size.height * 0.5,
+                //       width: size.width * 0.8,
+                //       child: _allInitialized
+                //           ? AnimatedSwitcher(
+                //               duration: const Duration(milliseconds: 800),
+                //               switchInCurve: Curves.easeIn,
+                //               switchOutCurve: Curves.easeOut,
+                //               child: VideoPlayer(
+                //                 _controllers[_currentPage],
+                //                 key: UniqueKey(),
+                //               ),
+                //             )
+                //           : const Center(child: CircularProgressIndicator()),
+                //     ),
+                //   ),
+                // ),
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
