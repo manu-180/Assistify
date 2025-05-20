@@ -28,6 +28,6 @@ flutter build web
 mkdir docs    
 cp -r build/web/* docs/
 git add .
-git commit -m "actualizando pagina webbb" 
+git commit -m "actualizando pagina webbb para los iphnoes" 
 git push
 

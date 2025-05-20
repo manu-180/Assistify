@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:taller_ceramica/utils/enviar_wpp.dart';
 import 'package:taller_ceramica/widgets/contactanos.dart';
+import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -117,18 +118,13 @@ class LoginState extends State<Login> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.fromLTRB(
-                    size.width * 0.04, size.width * 0.08, size.width * 0.04, 0),
-                child: Text(
-                  localizations.translate('homeScreenIntro'),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w900,
-                    color: color.primary,
-                    letterSpacing: -0.4,
-                  ),
+                padding: EdgeInsets.only(top: size.height * 0.08),
+                child:  TituloAnimadoAssistify(
+                  texto: '¡Bienvenidos a Assistify!',
+                  size: size.width * 0.078,
                 ),
               ),
+             
               SizedBox(height: size.height * 0.02),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
@@ -140,16 +136,10 @@ class LoginState extends State<Login> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text(
-                            localizations.translate('loginPrompt'),
-                            style: TextStyle(
-                              fontSize: 19,
-                              fontWeight: FontWeight.bold,
-                              color: color.primary,
-                              letterSpacing: -0.4,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
+                          TituloAnimadoAssistify(texto: localizations.translate('loginPrompt'),
+                          initialDelay: const Duration(milliseconds: 50 * 26),
+                          size: size.width * 0.055,),
+                       
                         ],
                       ),
                       SizedBox(height: size.height * 0.02),
@@ -343,4 +333,99 @@ class LoginState extends State<Login> {
   }
 }
 
-// listologuin
+class TituloAnimadoAssistify extends StatefulWidget {
+  final String texto;
+  final TextStyle? estilo;
+  final Duration initialDelay;
+  final double size;
+
+  const TituloAnimadoAssistify({
+    super.key,
+    required this.texto,
+    this.estilo,
+    this.initialDelay = Duration.zero,
+    required this.size,
+
+  });
+
+  @override
+  State<TituloAnimadoAssistify> createState() => _TituloAnimadoAssistifyState();
+}
+
+class _TituloAnimadoAssistifyState extends State<TituloAnimadoAssistify>
+    with TickerProviderStateMixin {
+  late final List<AnimationController> _controllers;
+  late final List<Animation<Offset>> _offsetAnimations;
+  late final List<Animation<double>> _opacityAnimations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controllers = List.generate(widget.texto.length, (i) {
+      final controller = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 400),
+      );
+      Future.delayed(widget.initialDelay + Duration(milliseconds: i * 50), () {
+  if (mounted) controller.forward();
+});
+
+      return controller;
+    });
+
+    _offsetAnimations = _controllers.map((controller) {
+      return Tween<Offset>(
+        begin: const Offset(0, 0.5),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
+    }).toList();
+
+    _opacityAnimations = _controllers.map((controller) {
+      return Tween<double>(
+        begin: 0,
+        end: 1,
+      ).animate(CurvedAnimation(parent: controller, curve: Curves.easeIn));
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
+    final color = Theme.of(context).colorScheme;
+
+    return Wrap(
+      children: List.generate(widget.texto.length, (i) {
+        final char = widget.texto[i];
+        return AnimatedBuilder(
+          animation: _controllers[i],
+          builder: (_, __) {
+            return Opacity(
+              opacity: _opacityAnimations[i].value,
+              child: Transform.translate(
+                offset: _offsetAnimations[i].value * 20,
+                child: Text(
+                  char,
+                  style: widget.estilo ??
+                       TextStyle(
+                        fontSize: widget.size,
+                        fontFamily: 'Oxanium',
+                        fontWeight: FontWeight.w900,
+                        color: color.primary,
+                      ),
+                ),
+              ),
+            );
+          },
+        );
+      }),
+    );
+  }}
