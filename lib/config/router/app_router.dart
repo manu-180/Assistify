@@ -118,6 +118,5 @@ final appRouter = GoRouter(
       name: 'onboarding',
       builder: (context, state) => const OnboardingScreen(),
     ),
-    
   ],
 );

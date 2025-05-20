@@ -448,7 +448,8 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                               onTap: () async {
                                 const url = 'https://politicas-six.vercel.app/';
                                 if (await canLaunchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+                                  await launchUrl(Uri.parse(url),
+                                      mode: LaunchMode.externalApplication);
                                 }
                               },
                               child: const Text(
@@ -462,8 +463,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                             ),
                           ],
                         ),
-                      )
-,
+                      ),
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

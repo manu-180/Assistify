@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
@@ -35,6 +36,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
   String? fechaSeleccionada;
   List<ClaseModels> clasesDisponibles = [];
   List<ClaseModels> clasesFiltradas = [];
+  late BuildContext scaffoldContext;
 
   bool isLoading = true;
   bool isProcessing = false;
@@ -130,25 +132,38 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
       }
     });
   }
-Future<bool?> mostrarDialogoConfirmacion(
-    BuildContext context, String mensaje,
-    {required ClaseModels clase}) {
-  final localizations = AppLocalizations.of(context);
-  final esEliminar = mensaje ==
-      localizations.translate('deleteClassConfirmation');
 
-  return showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return _DialogoEliminarClaseConSwitch(
-        mensaje: mensaje,
-        clase: clase,
-        esEliminar: esEliminar,
-      );
-    },
-  );
-}
+  Future<Map<String, dynamic>?> mostrarDialogoConfirmacion(
+    BuildContext context,
+    String mensaje, {
+    required ClaseModels clase,
+    required List<ClaseModels> clasesDisponibles,
+    required List<ClaseModels> clasesFiltradas,
+    required String? fechaSeleccionada,
+    required void Function(List<ClaseModels> nuevasDisponibles,
+            List<ClaseModels> nuevasFiltradas)
+        onActualizar,
+  }) {
+    final localizations = AppLocalizations.of(context);
+    final esEliminar =
+        mensaje == localizations.translate('deleteClassConfirmation');
 
+    return showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (BuildContext context) {
+        return _DialogoEliminarClaseConSwitch(
+          mensaje: mensaje,
+          clase: clase,
+          esEliminar: esEliminar,
+          clasesDisponibles: clasesDisponibles,
+          clasesFiltradas: clasesFiltradas,
+          fechaSeleccionada: fechaSeleccionada,
+          onActualizar: onActualizar,
+          scaffoldContext: scaffoldContext,
+        );
+      },
+    );
+  }
 
   String obtenerDia(DateTime fecha) {
     final localizations = AppLocalizations.of(context);
@@ -493,271 +508,333 @@ Future<bool?> mostrarDialogoConfirmacion(
     final color = Theme.of(context).primaryColor;
     final colors = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar:
-          ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
-      body: Stack(
-        children: [
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 600),
-              child: Column(
-                children: [
-                  const SizedBox(height: 50),
-                  MostrarDiaSegunFecha(
-                    text: fechaSeleccionada ?? '-',
-                    colors: colors,
-                    color: color,
-                    cambiarFecha: cambiarFecha,
-                  ),
-                  const SizedBox(height: 20),
-                  DropdownButton<String>(
-                    value: fechaSeleccionada,
-                    hint: Text(
-                      AppLocalizations.of(context).translate('selectDateHint'),
-                    ),
-                    onChanged: (value) {
-                      if (value != null) {
-                        seleccionarFecha(value);
-                      }
-                    },
-                    items: fechasDisponibles.map((fecha) {
-                      return DropdownMenuItem(
-                        value: fecha,
-                        child: Text(fecha),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 20),
-                  if (!isLoading &&
-                      fechaSeleccionada != null &&
-                      clasesFiltradas.isNotEmpty)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: clasesFiltradas.length,
-                        itemBuilder: (context, index) {
-                          final clase = clasesFiltradas[index];
-                          final esFeriado = clase.feriado;
-
-                          return GestureDetector(
-                            onTap: () {
-  mostrarDialogoModificarFeriado(clase, esFeriado);
-},
-
-                            onLongPress: () async {
-  bool? confirmacion = await mostrarDialogoConfirmacion(
-    context,
-    AppLocalizations.of(context).translate('deleteClassConfirmation'),
-    clase: clase,
-  );
-
-  if (confirmacion == true && mounted) {
-    setState(() {
-      clasesFiltradas.removeAt(index);
-    });
-  }
-},
-
-
-                            child: esFeriado
-                                ? Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      color: Colors.amber.shade100,
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(16),
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Row(
-                                          children: [
-                                            const Icon(Icons.celebration,
-                                                size: 40, color: Colors.orange),
-                                            const SizedBox(width: 16),
-                                            const Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    "¡Es feriado!",
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color: Colors.deepOrange,
-                                                    ),
-                                                  ),
-                                                  SizedBox(height: 4),
-                                                  Text(
-                                                    "No hay clases este día. ¡Disfrutá tu descanso!",
-                                                    style:
-                                                        TextStyle(fontSize: 16),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Card(
-                                      color: colors.surface,
-                                      child: InkWell(
-                                        onTap: () {
-                                          mostrarDialogoModificarFeriado(
-                                              clase, esFeriado);
-                                        },
-                                        onLongPress: () async {
-  bool? confirmacion = await mostrarDialogoConfirmacion(
-    context,
-    AppLocalizations.of(context).translate('deleteClassConfirmation'),
-    clase: clase,
-  );
-
-  if (confirmacion == true && mounted) {
-    setState(() {
-      clasesFiltradas.removeAt(index);
-    });
-  }
-},
-
-                                        child: ListTile(
-                                          title: Text(
-                                            AppLocalizations.of(context)
-                                                .translate(
-                                              'classInfo',
-                                              params: {
-                                                'time': clase.hora,
-                                                'availablePlaces': clase
-                                                    .lugaresDisponibles
-                                                    .toString(),
-                                              },
-                                            ),
-                                          ),
-                                          subtitle: clase.mails.isEmpty
-                                              ? Text("Sin alumnos")
-                                              : Text(clase.mails.join(", ")),
-                                          trailing: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              IconButton(
-                                                icon: const Icon(Icons.add),
-                                                onPressed: () async {
-                                                  bool? respuesta =
-                                                      await mostrarDialogoConfirmacion(
-                                                    context,
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'addPlaceConfirmation'),
-                                                            clase: clase
-                                                  );
-                                                  if (respuesta == true) {
-                                                    agregarLugar(clase.id);
-                                                    ModificarLugarDisponible()
-                                                        .agregarLugarDisponible(
-                                                            clase.id);
-                                                  }
-                                                },
-                                              ),
-                                              IconButton(
-                                                icon: const Icon(Icons.remove),
-                                                onPressed: () async {
-                                                  bool? respuesta =
-                                                      await mostrarDialogoConfirmacion(
-                                                    context,
-                                                    AppLocalizations.of(context)
-                                                        .translate(
-                                                            'removePlaceConfirmation'),
-                                                            clase: clase
-                                                  );
-                                                  if (respuesta == true &&
-                                                      clase.lugaresDisponibles >
-                                                          0) {
-                                                    quitarLugar(clase.id);
-                                                    ModificarLugarDisponible()
-                                                        .removerLugarDisponible(
-                                                            clase.id);
-                                                  }
-                                                },
-                                              ),
-                                             
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                          );
-                        },
+    return Builder(
+      builder: (context) {
+        scaffoldContext = context;
+        return Scaffold(
+          appBar:
+              ResponsiveAppBar(isTablet: MediaQuery.of(context).size.width > 600),
+          body: Stack(
+            children: [
+              Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 50),
+                      MostrarDiaSegunFecha(
+                        text: fechaSeleccionada ?? '-',
+                        colors: colors,
+                        color: color,
+                        cambiarFecha: cambiarFecha,
                       ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 90, // Lo subo un poco para no tapar el FloatingActionButton
-            right: 20,
-            child: InformationButon(text: '''
-1️⃣ Primero seleccioná una fecha en el calendario.
-Así el sistema sabe qué día de la semana (por ejemplo "martes") va a usar para crear las clases.
+                      const SizedBox(height: 20),
+                      DropdownButton<String>(
+                        value: fechaSeleccionada,
+                        hint: Text(
+                          AppLocalizations.of(context).translate('selectDateHint'),
+                        ),
+                        onChanged: (value) {
+                          if (value != null) {
+                            seleccionarFecha(value);
+                          }
+                        },
+                        items: fechasDisponibles.map((fecha) {
+                          return DropdownMenuItem(
+                            value: fecha,
+                            child: Text(fecha),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      if (!isLoading &&
+                          fechaSeleccionada != null &&
+                          clasesFiltradas.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: clasesFiltradas.length,
+                            itemBuilder: (context, index) {
+                              final clase = clasesFiltradas[index];
+                              final esFeriado = clase.feriado;
+        
+                              return GestureDetector(
+                                onTap: () {
+                                  mostrarDialogoModificarFeriado(clase, esFeriado);
+                                },
+                               onLongPress: () async {
+  final resultado = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('deleteClassConfirmation'),
+    clase: clase,
+    clasesDisponibles: clasesDisponibles,
+    clasesFiltradas: clasesFiltradas,
+    fechaSeleccionada: fechaSeleccionada,
+    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+      setState(() {
+        clasesDisponibles = nuevasDisponibles;
+        clasesFiltradas = nuevasFiltradas;
+      });
+    },
+  );
 
-2️⃣ Para crear una nueva clase, presioná el botón "Crear nueva clase".
-Vas a tener que ingresar la hora y la cantidad de lugares disponibles.
-Se generará automáticamente una clase cada semana en el día seleccionado.
+  if (resultado != null &&
+      resultado is Map<String, dynamic> &&
+      resultado['confirmado'] == true &&
+      resultado['eliminadas'] is List<ClaseModels>) {
+    final mensaje = resultado['mensaje'] ?? 'Clases eliminadas';
+    final eliminadas = resultado['eliminadas'] as List<ClaseModels>;
 
-3️⃣ Desde cada clase podés:
+    final detalles = eliminadas
+        .map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}')
+        .join('\n');
 
-➕ Aumentar los lugares disponibles.
-
-➖ Reducir los lugares disponibles.
-
-🗑️ Eliminar la clase.
-
-4️⃣ Si mantenés presionada una clase, podés marcar esa clase como "feriado".
-Así se indica que ese día no habrá clases.
-'''),
-          ),
-        ],
-      ),
-      floatingActionButton: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.5,
-        child: FloatingActionButton(
-          backgroundColor: colors.secondaryContainer,
-          onPressed: () {
-            if (fechaSeleccionada == null) {
-              ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    AppLocalizations.of(context)
-                        .translate('selectDateBeforeAdding'),
-                  ),
-                ),
-              );
-              return;
-            }
-            mostrarDialogoAgregarClase(
-              DiaConFecha().obtenerDiaDeLaSemana(
-                fechaSeleccionada!,
-                AppLocalizations.of(context),
-              ),
-            );
-          },
-          child: Text(
-            AppLocalizations.of(context).translate('createNewClassButton'),
-          ),
-        ),
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$mensaje\n\n$detalles'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
       ),
     );
   }
 }
+,
 
+                                child: esFeriado
+                                    ? Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          color: Colors.amber.shade100,
+                                          elevation: 4,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(16),
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Row(
+                                              children: [
+                                                const Icon(Icons.celebration,
+                                                    size: 40, color: Colors.orange),
+                                                const SizedBox(width: 16),
+                                                const Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text(
+                                                        "¡Es feriado!",
+                                                        style: TextStyle(
+                                                          fontSize: 18,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          color: Colors.deepOrange,
+                                                        ),
+                                                      ),
+                                                      SizedBox(height: 4),
+                                                      Text(
+                                                        "No hay clases este día. ¡Disfrutá tu descanso!",
+                                                        style:
+                                                            TextStyle(fontSize: 16),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Card(
+                                          color: colors.surface,
+                                          child: InkWell(
+                                            onTap: () {
+                                              mostrarDialogoModificarFeriado(
+                                                  clase, esFeriado);
+                                            },
+                                           onLongPress: () async {
+  final resultado = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('deleteClassConfirmation'),
+    clase: clase,
+    clasesDisponibles: clasesDisponibles,
+    clasesFiltradas: clasesFiltradas,
+    fechaSeleccionada: fechaSeleccionada,
+    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+      setState(() {
+        clasesDisponibles = nuevasDisponibles;
+        clasesFiltradas = nuevasFiltradas;
+      });
+    },
+  );
+
+  if (resultado != null &&
+      resultado is Map<String, dynamic> &&
+      resultado['confirmado'] == true &&
+      resultado['eliminadas'] is List<ClaseModels>) {
+    final mensaje = resultado['mensaje'] ?? 'Clases eliminadas';
+    final eliminadas = resultado['eliminadas'] as List<ClaseModels>;
+
+    final detalles = eliminadas
+        .map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}')
+        .join('\n');
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$mensaje\n\n$detalles'),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+},
+
+                                            child: ListTile(
+                                                title: Text(
+                                                  AppLocalizations.of(context)
+                                                      .translate(
+                                                    'classInfo',
+                                                    params: {
+                                                      'time': clase.hora,
+                                                      'availablePlaces': clase
+                                                          .lugaresDisponibles
+                                                          .toString(),
+                                                    },
+                                                  ),
+                                                ),
+                                                subtitle: clase.mails.isEmpty
+                                                    ? Text("Sin alumnos")
+                                                    : Text(clase.mails.join(", ")),
+                                                trailing: Row(
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    IconButton(
+      icon: const Icon(Icons.add),
+      onPressed: () async {
+        final resultado = await mostrarDialogoConfirmacion(
+          context,
+          AppLocalizations.of(context).translate('addPlaceConfirmation'),
+          clase: clase,
+          clasesDisponibles: clasesDisponibles,
+          clasesFiltradas: clasesFiltradas,
+          fechaSeleccionada: fechaSeleccionada,
+          onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+            setState(() {
+              clasesDisponibles = nuevasDisponibles;
+              clasesFiltradas = nuevasFiltradas;
+            });
+          },
+        );
+
+        if (resultado is Map<String, dynamic> && resultado['confirmado'] == true) {
+          agregarLugar(clase.id);
+          ModificarLugarDisponible().agregarLugarDisponible(clase.id);
+        }
+      },
+    ),
+    IconButton(
+      icon: const Icon(Icons.remove),
+      onPressed: () async {
+        final resultado = await mostrarDialogoConfirmacion(
+          context,
+          AppLocalizations.of(context).translate('removePlaceConfirmation'),
+          clase: clase,
+          clasesDisponibles: clasesDisponibles,
+          clasesFiltradas: clasesFiltradas,
+          fechaSeleccionada: fechaSeleccionada,
+          onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+            setState(() {
+              clasesDisponibles = nuevasDisponibles;
+              clasesFiltradas = nuevasFiltradas;
+            });
+          },
+        );
+
+        if (resultado is Map<String, dynamic> &&
+            resultado['confirmado'] == true &&
+            clase.lugaresDisponibles > 0) {
+          quitarLugar(clase.id);
+          ModificarLugarDisponible().removerLugarDisponible(clase.id);
+        }
+      },
+    ),
+  ],
+),
+),
+                                          ),
+                                        ),
+                                      ),
+                              );
+                            },
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 90, // Lo subo un poco para no tapar el FloatingActionButton
+                right: 20,
+                child: InformationButon(text: '''
+        1️⃣ Primero seleccioná una fecha en el calendario.
+        Así el sistema sabe qué día de la semana (por ejemplo "martes") va a usar para crear las clases.
+        
+        2️⃣ Para crear una nueva clase, presioná el botón "Crear nueva clase".
+        Vas a tener que ingresar la hora y la cantidad de lugares disponibles.
+        Se generará automáticamente una clase cada semana en el día seleccionado.
+        
+        3️⃣ Desde cada clase podés:
+        
+        ➕ Aumentar los lugares disponibles.
+        
+        ➖ Reducir los lugares disponibles.
+        
+        🗑️ Eliminar la clase.
+        
+        4️⃣ Si mantenés presionada una clase, podés marcar esa clase como "feriado".
+        Así se indica que ese día no habrá clases.
+        '''),
+              ),
+            ],
+          ),
+          floatingActionButton: SizedBox(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: FloatingActionButton(
+              backgroundColor: colors.secondaryContainer,
+              onPressed: () {
+                if (fechaSeleccionada == null) {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        AppLocalizations.of(context)
+                            .translate('selectDateBeforeAdding'),
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                mostrarDialogoAgregarClase(
+                  DiaConFecha().obtenerDiaDeLaSemana(
+                    fechaSeleccionada!,
+                    AppLocalizations.of(context),
+                  ),
+                );
+              },
+              child: Text(
+                AppLocalizations.of(context).translate('createNewClassButton'),
+              ),
+            ),
+          ),
+        );
+      }
+    );
+  }
+}
 
 class _DialogoConfirmacionConContador extends StatefulWidget {
   final String mensaje;
@@ -793,52 +870,63 @@ class _DialogoConfirmacionConContadorState
   }
 
   @override
-Widget build(BuildContext context) {
-  final localizations = AppLocalizations.of(context);
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
 
-  return AlertDialog(
-    title: Text(localizations.translate('confirmationDialogTitle')),
-    content: Text(widget.mensaje),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.of(context).pop(false),
-        child: Text(localizations.translate('noButton')),
-      ),
-      ElevatedButton(
-        onPressed: widget.esEliminar && segundosRestantes > 0
-            ? null
-            : () => Navigator.of(context).pop(true),
-   
-        child: Text(
-          widget.esEliminar && segundosRestantes > 0
-              ? 'Eliminar ($segundosRestantes)'
-              : 'Eliminar',
+    return AlertDialog(
+      title: Text(localizations.translate('confirmationDialogTitle')),
+      content: Text(widget.mensaje),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(localizations.translate('noButton')),
         ),
-      ),
-    ],
-  );
-}
-
+        ElevatedButton(
+          onPressed: widget.esEliminar && segundosRestantes > 0
+              ? null
+              : () => Navigator.of(context).pop(true),
+          child: Text(
+            widget.esEliminar && segundosRestantes > 0
+                ? 'Eliminar ($segundosRestantes)'
+                : 'Eliminar',
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 class _DialogoEliminarClaseConSwitch extends StatefulWidget {
   final String mensaje;
   final bool esEliminar;
   final ClaseModels clase;
+  final List<ClaseModels> clasesDisponibles;
+  final List<ClaseModels> clasesFiltradas;
+  final String? fechaSeleccionada;
+  final BuildContext scaffoldContext;
+  final void Function(List<ClaseModels> nuevasDisponibles,
+      List<ClaseModels> nuevasFiltradas) onActualizar;
+      
 
   const _DialogoEliminarClaseConSwitch({
     required this.mensaje,
     required this.esEliminar,
     required this.clase,
+    required this.clasesDisponibles,
+    required this.clasesFiltradas,
+    required this.fechaSeleccionada,
+    required this.onActualizar,
+    required this.scaffoldContext,
   });
 
   @override
   State<_DialogoEliminarClaseConSwitch> createState() =>
       _DialogoEliminarClaseConSwitchState();
 }
+
 class _DialogoEliminarClaseConSwitchState
     extends State<_DialogoEliminarClaseConSwitch> {
-  int segundosRestantes = 3;
+  int segundosRestantes = 2;
   bool eliminarMultiples = false;
   Timer? _timer;
 
@@ -861,6 +949,34 @@ class _DialogoEliminarClaseConSwitchState
     _timer?.cancel();
     super.dispose();
   }
+
+  void mostrarSnackBarEliminacion({
+  required String titulo,
+  required List<ClaseModels> clases,
+  required Color colorFondo,
+}) {
+  final detalles =
+      clases.map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}').join('\n');
+  final mensaje = '$titulo:\n\n$detalles';
+
+  ScaffoldMessenger.of(widget.scaffoldContext).hideCurrentSnackBar();
+  print('Mostrando snackbar...'); // VERIFICACIÓN VISUAL
+
+ScaffoldMessenger.of(widget.scaffoldContext).showSnackBar(
+  SnackBar(
+    content: Text(
+      'Clase eliminada correctamente.',
+      style: TextStyle(color: Colors.white),
+    ),
+    backgroundColor: Colors.black,
+    behavior: SnackBarBehavior.floating, // o remove esto si querés el estilo clásico
+    duration: Duration(seconds: 3),
+  ),
+);
+
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -910,22 +1026,68 @@ class _DialogoEliminarClaseConSwitchState
               child: Text(localizations.translate('noButton')),
             ),
             ElevatedButton(
-              onPressed: widget.esEliminar && segundosRestantes > 0
-                  ? null
-                  : () async {
-                      Navigator.of(context).pop(true);
-                      if (eliminarMultiples) {
-                        await EliminarClase().eliminarMuchasClases(
-                          dia: widget.clase.dia,
-                          hora: widget.clase.hora,
-                        );
-                      } else {
-                        await EliminarClase().eliminarClase(widget.clase.id);
-                      }
-                    },
-              child: Text(segundosRestantes > 0
-                  ? '$eliminarText ($segundosRestantes)'
-                  : eliminarText),
+             onPressed: widget.esEliminar && segundosRestantes > 0
+    ? null
+    : () async {
+        final dia = widget.clase.dia;
+        final hora = widget.clase.hora;
+        final id = widget.clase.id;
+
+        if (eliminarMultiples) {
+          await EliminarClase().eliminarMuchasClases(dia: dia, hora: hora);
+          final mesActual = await ObtenerMes().obtenerMes();
+
+          final eliminadas = widget.clasesDisponibles
+              .where((c) =>
+                  c.dia == dia && c.hora == hora && c.mes == mesActual)
+              .toList();
+
+          widget.clasesDisponibles.removeWhere((c) =>
+              c.dia == dia && c.hora == hora && c.mes == mesActual);
+
+          final clasesFiltradasActualizadas = widget.fechaSeleccionada != null
+              ? widget.clasesDisponibles
+                  .where((c) => c.fecha == widget.fechaSeleccionada)
+                  .toList()
+              : <ClaseModels>[];
+
+          widget.onActualizar(
+              widget.clasesDisponibles, clasesFiltradasActualizadas);
+
+          if (!mounted) return;
+
+          Navigator.of(context).pop({
+            'confirmado': true,
+            'eliminadas': eliminadas,
+            'mensaje': 'Se eliminaron ${eliminadas.length} clases',
+          });
+        } else {
+          await EliminarClase().eliminarClase(id);
+
+          final nuevasDisponibles = widget.clasesDisponibles
+              .where((c) => c.id != id)
+              .toList();
+          final nuevasFiltradas = widget.clasesFiltradas
+              .where((c) => c.id != id)
+              .toList();
+
+          widget.onActualizar(nuevasDisponibles, nuevasFiltradas);
+
+          if (!mounted) return;
+
+          Navigator.of(context).pop({
+            'confirmado': true,
+            'eliminadas': [widget.clase],
+            'mensaje': 'Se eliminó la clase:',
+          });
+        }
+      },
+
+              child: Text(
+                segundosRestantes > 0
+                    ? '$eliminarText ($segundosRestantes)'
+                    : eliminarText,
+              ),
             ),
           ],
         );

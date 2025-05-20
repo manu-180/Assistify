@@ -271,7 +271,6 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                         const Icon(Icons.lock_outline,
                             size: 80, color: Colors.grey),
                         const SizedBox(height: 20),
-
                         Text(
                           localizations.translate('loginToViewClasses'),
                           style: TextStyle(

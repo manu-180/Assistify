@@ -185,14 +185,13 @@ class CustomAppBarState extends State<CustomAppBar> {
               context.push("/home/${taller ?? ''}");
             },
             child: Padding(
-  padding: const EdgeInsets.only(left: 0),
-  child: Image.asset(
-    'assets/icon/assistifyLogo.png', // ← asegurate que el path sea correcto
-    height: size.width * 0.42,
-    fit: BoxFit.contain,
-  ),
-),
-
+              padding: const EdgeInsets.only(left: 0),
+              child: Image.asset(
+                'assets/icon/assistifyLogo.png', // ← asegurate que el path sea correcto
+                height: size.width * 0.42,
+                fit: BoxFit.contain,
+              ),
+            ),
           ),
           PopupMenuButton<String>(
             onSelected: (value) => context.push(value),

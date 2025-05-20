@@ -119,12 +119,11 @@ class LoginState extends State<Login> {
             children: [
               Padding(
                 padding: EdgeInsets.only(top: size.height * 0.08),
-                child:  TituloAnimadoAssistify(
+                child: TituloAnimadoAssistify(
                   texto: '¡Bienvenidos a Assistify!',
                   size: size.width * 0.078,
                 ),
               ),
-             
               SizedBox(height: size.height * 0.02),
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 600),
@@ -136,10 +135,11 @@ class LoginState extends State<Login> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          TituloAnimadoAssistify(texto: localizations.translate('loginPrompt'),
-                          initialDelay: const Duration(milliseconds: 50 * 26),
-                          size: size.width * 0.055,),
-                       
+                          TituloAnimadoAssistify(
+                            texto: localizations.translate('loginPrompt'),
+                            initialDelay: const Duration(milliseconds: 50 * 26),
+                            size: size.width * 0.055,
+                          ),
                         ],
                       ),
                       SizedBox(height: size.height * 0.02),
@@ -345,7 +345,6 @@ class TituloAnimadoAssistify extends StatefulWidget {
     this.estilo,
     this.initialDelay = Duration.zero,
     required this.size,
-
   });
 
   @override
@@ -368,8 +367,8 @@ class _TituloAnimadoAssistifyState extends State<TituloAnimadoAssistify>
         duration: const Duration(milliseconds: 400),
       );
       Future.delayed(widget.initialDelay + Duration(milliseconds: i * 50), () {
-  if (mounted) controller.forward();
-});
+        if (mounted) controller.forward();
+      });
 
       return controller;
     });
@@ -399,7 +398,6 @@ class _TituloAnimadoAssistifyState extends State<TituloAnimadoAssistify>
 
   @override
   Widget build(BuildContext context) {
-
     final color = Theme.of(context).colorScheme;
 
     return Wrap(
@@ -415,7 +413,7 @@ class _TituloAnimadoAssistifyState extends State<TituloAnimadoAssistify>
                 child: Text(
                   char,
                   style: widget.estilo ??
-                       TextStyle(
+                      TextStyle(
                         fontSize: widget.size,
                         fontFamily: 'Oxanium',
                         fontWeight: FontWeight.w900,
@@ -428,4 +426,5 @@ class _TituloAnimadoAssistifyState extends State<TituloAnimadoAssistify>
         );
       }),
     );
-  }}
+  }
+}
