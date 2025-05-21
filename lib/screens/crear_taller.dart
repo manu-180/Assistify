@@ -218,25 +218,36 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                           errorText: tallerError.isEmpty ? null : tallerError,
                         ),
                         keyboardType: TextInputType.text,
-                        onChanged: (value) async {
-                          final nombre = value.trim();
+                        
 
-                          if (nombre.isEmpty) {
-                            setState(() {
-                              tallerError = AppLocalizations.of(context)
-                                  .translate('emptyWorkshopNameError');
-                            });
-                            return;
-                          }
+onChanged: (value) async {
+  final simbolosInvalidos = RegExp(r'[^\w\sáéíóúÁÉÍÓÚñÑ]');
+  final nombre = value.trim();
 
-                          final existe = await tallerYaExiste(nombre);
+  if (nombre.isEmpty) {
+    setState(() {
+      tallerError = AppLocalizations.of(context)
+          .translate('emptyWorkshopNameError');
+    });
+    return;
+  }
 
-                          setState(() {
-                            tallerError = existe
-                                ? "Ya existe ese nombre de empresa."
-                                : '';
-                          });
-                        },
+  if (simbolosInvalidos.hasMatch(nombre)) {
+    setState(() {
+      tallerError = "No se aceptan símbolos. Contactá a soporte si es necesario.";
+    });
+    return;
+  }
+
+  final existe = await tallerYaExiste(nombre);
+
+  setState(() {
+    tallerError = existe
+        ? "Ya existe ese nombre de empresa."
+        : '';
+  });
+},
+
                       ),
                       const SizedBox(height: 16),
                       TextField(

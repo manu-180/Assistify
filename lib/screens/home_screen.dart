@@ -258,6 +258,23 @@ class HomeScreen extends StatelessWidget {
                   "assets/images/Gymnastics.png",
                   'workshopDescriptionGymnastics',
                   "workshopClassesGymnastics");
+            }else if (rubro == "Clases de marketing digital") {
+              return _homeGenerico(
+                  size,
+                  color,
+                  localizations,
+                  user,
+                  firstName,
+                  fullName,
+                  themeColor,
+                  context,
+                  "helloAnonymousGymnastics",
+                  'helloFemaleGymnastics',
+                  'helloMaleGymnastics',
+                  "assets/images/Gymnastics.png",
+                  "assets/images/Gymnastics.png",
+                  'workshopDescriptionGymnastics',
+                  "workshopClassesGymnastics");
             } else if (rubro == "Clases de boxeo") {
               return _homeGenerico(
                   size,

@@ -261,10 +261,7 @@ class LoginState extends State<Login> {
                                         !tieneTaller ||
                                         !tieneTelefono ||
                                         !tieneCreatedAt) {
-                                      //  EnviarWpp().sendWhatsAppMessage(
-                                      //                                         "HXa9fb3930150f932869bc13f223f26628",
-                                      //                                         'whatsapp:+549$telefono',
-                                      //                                         [fullname, "", "", "", ""]);
+                     
                                       print(
                                           "✏️ Actualizando metadatos incompletos");
 
