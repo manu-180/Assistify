@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
   import 'package:taller_ceramica/subscription/subscription_verifier.dart';
   import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
   import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:taller_ceramica/supabase/supabase_barril.dart';
   import 'package:taller_ceramica/supabase/utiles/actualizar_semanas.dart';
   import 'package:taller_ceramica/supabase/utiles/feriados_false.dart';
   import 'package:taller_ceramica/supabase/utiles/reset_clases.dart';
@@ -436,12 +437,13 @@ Future<void> eliminarCuentaYUsuario({
                       onPressed: () async {
   final confirmed = await mostrarDialogoConfirmacionEliminarCuenta(context, user, color);
   if (confirmed == true) {
-    await eliminarCuentaYUsuario(
-      context: context,
-      userId: user.id,
-      supabaseUrl: 'https://gcjyhrlcftbkeaiqlzlm.supabase.co',
-      serviceRoleKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjanlocmxjZnRia2VhaXFsemxtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcxNTcyNDc3MCwiZXhwIjoyMDMxMzAwNzcwfQ.HC-tuFM2oMqJt2jjbuRHJ3fdLbXIMnn4OtBGBPcufwA',
-    );
+    await EliminarUsuario().eliminarUsuarioAutenticado(user.id);
+    await EliminarUsuario().eliminarDeBaseDatos(user.id);
+    if (context.mounted) 
+    {
+context.go("/");
+    }
+    
   }
 },
 

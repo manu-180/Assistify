@@ -1,9 +1,28 @@
+import 'dart:convert';
+
+import 'package:http/http.dart' as http;
 import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/main.dart';
 
 class EliminarUsuario {
-  Future<void> eliminarDeBaseDatos(int userId) async {
+
+  Future<void> eliminarUsuarioAutenticado(String uid) async {
+  final response = await http.post(
+    Uri.parse('https://backend-suscripciones.onrender.com/eliminar-auth'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'uid': uid}),
+  );
+
+  if (response.statusCode == 200) {
+    print('✅ Usuario autenticado eliminado correctamente');
+  } else {
+    print('❌ Error al eliminar usuario autenticado: ${response.body}');
+  }
+}
+
+
+  Future<void> eliminarDeBaseDatos(String uid) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     final taller = await ObtenerTaller().retornarTaller(usuarioActivo!.id);
     final dataClases = await ObtenerTotalInfo(
@@ -15,10 +34,10 @@ class EliminarUsuario {
 
     var user = "";
 
-    await supabase.from('usuarios').delete().eq('id', userId);
+    await supabase.from('usuarios').delete().eq('user_uid', uid);
 
     for (var usuario in dataUsuarios) {
-      if (usuario.id == userId) {
+      if (usuario.userUid == uid) {
         user = usuario.fullname;
       }
     }

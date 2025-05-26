@@ -13,7 +13,6 @@ import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 
-import '../utils/utils_barril.dart';
 
 class UsuariosScreen extends StatefulWidget {
   const UsuariosScreen({super.key, String? taller});
@@ -71,9 +70,10 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     }
   }
 
-  Future<void> eliminarUsuario(int userId, String userUid) async {
-    await EliminarUsuario().eliminarDeBaseDatos(userId);
-    await EliminarDeBD().deleteCurrentUser(userUid);
+  Future<void> eliminarUsuario( String userUid) async {
+    await EliminarUsuario().eliminarDeBaseDatos(userUid);
+     await EliminarUsuario().eliminarUsuarioAutenticado(userUid);
+    await EliminarUsuario().eliminarDeBaseDatos(userUid);
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -405,7 +405,10 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                             ),
                                             onPressed: () {
                                               Navigator.of(context).pop();
-                                              // Aquí deberías llamar a eliminarUsuario
+                                              eliminarUsuario(
+                                             
+                                                usuario.userUid,
+                                              );
                                             },
                                             child: const Text("Eliminar"),
                                           ),

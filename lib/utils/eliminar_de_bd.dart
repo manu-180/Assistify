@@ -1,16 +1,21 @@
-import 'package:supabase/supabase.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
 
-class EliminarDeBD {
-  Future<void> deleteCurrentUser(userUid) async {
-    await dotenv.load(fileName: ".env");
+import 'package:http/http.dart' as http;
 
-    final supabase = SupabaseClient(
-      dotenv.env['SUPABASE_URL'] ?? '',
-      dotenv.env['SERVICE_ROLE_KEY'] ?? '',
-    );
+class EliminarDeSupabase {
+Future<void> eliminarUsuario(String uid) async {
+  final response = await http.post(
+    Uri.parse('https://backend-suscripciones.onrender.com/eliminar'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'uid': uid}),
+  );
 
-    await supabase.auth.admin.deleteUser(userUid);
+  if (response.statusCode == 200) {
+    print('✅ Usuario eliminado correctamente');
+  } else {
+    print('❌ Error al eliminar usuario: ${response.body}');
   }
 }
+}
+
+
