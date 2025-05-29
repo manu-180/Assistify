@@ -98,18 +98,17 @@ class LoginState extends State<Login> {
         ),
         toolbarHeight: kToolbarHeight * 1.1,
         title: GestureDetector(
+          onTap: () {
+            context.push("/subscription");
+          },
           child: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text(
-              AppLocalizations.of(context).translate('appTitle'),
-              style: TextStyle(
-                  color: color.onPrimary,
-                  fontSize: size.width * 0.065,
-                  fontFamily: 'Oxanium',
-                  fontWeight: FontWeight.w800),
+            padding: const EdgeInsets.only(left: 0),
+            child: Image.asset(
+              'assets/icon/assistifyLogo.png', // ← asegurate que el path sea correcto
+              height: size.width * 0.42,
+              fit: BoxFit.contain,
             ),
           ),
-          onTap: () => context.go('/'),
         ),
         backgroundColor: color.primary,
       ),
@@ -261,7 +260,6 @@ class LoginState extends State<Login> {
                                         !tieneTaller ||
                                         !tieneTelefono ||
                                         !tieneCreatedAt) {
-                     
                                       print(
                                           "✏️ Actualizando metadatos incompletos");
 

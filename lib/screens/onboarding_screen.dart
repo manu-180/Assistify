@@ -60,93 +60,119 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          Column(
-            children: [
-              Expanded(
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: _slides.length,
-                  onPageChanged: (index) =>
-                      setState(() => _currentIndex = index),
-                  itemBuilder: (_, index) {
-                    final slide = _slides[index];
-                    return Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(16),
-                            child: Image.asset(
-                              slide.image,
-                              height: size.height * 0.5,
-                              fit: BoxFit.cover,
+          GestureDetector(
+            onTap: () {
+              if (_currentIndex < _slides.length - 1) {
+                _pageController.nextPage(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            },
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: _slides.length,
+                    onPageChanged: (index) =>
+                        setState(() => _currentIndex = index),
+                    itemBuilder: (_, index) {
+                      final slide = _slides[index];
+                      return Padding(
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: Image.asset(
+                                slide.image,
+                                height: size.height * 0.5,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 32),
-                          Text(slide.title,
-                              style: TextStyle(
+                            const SizedBox(height: 32),
+                            Text(
+                              slide.title,
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
-                              textAlign: TextAlign.center),
-                          const SizedBox(height: 16),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(slide.description,
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 16),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                slide.description,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w400,
                                   color: Colors.grey[800],
                                 ),
-                                textAlign: TextAlign.start),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                                textAlign: TextAlign.start,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  _slides.length,
-                  (index) => Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: _currentIndex == index ? Colors.blue : Colors.grey,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _slides.length,
+                    (index) => Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 12),
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            _currentIndex == index ? Colors.blue : Colors.grey,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (_currentIndex == _slides.length - 1)
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                  child: ElevatedButton(
-                    onPressed: () => context.push('/creartaller'),
-                    child: const Text("Comenzar"),
+                if (_currentIndex == _slides.length - 1)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 16),
+                    child: ElevatedButton(
+                      onPressed: () => context.push('/creartaller'),
+                      child: const Text("Comenzar"),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
           Positioned(
             top: 40,
             right: 16,
             child: Visibility(
               visible: _currentIndex < _slides.length - 1,
-              child: TextButton.icon(
-                onPressed: () => context.push('/creartaller'),
-                icon: const Icon(Icons.arrow_forward_ios, size: 16),
-                label: const Text('Saltar'),
-                style: TextButton.styleFrom(
-                  foregroundColor: color.primary,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              child: Positioned(
+                top: 40,
+                right: 16,
+                child: Visibility(
+                  visible: _currentIndex < _slides.length - 1,
+                  child: IntrinsicWidth(
+                    // <-- solución
+                    child: TextButton.icon(
+                      onPressed: () => context.push('/creartaller'),
+                      icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                      label: const Text('Saltar'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: color.primary,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

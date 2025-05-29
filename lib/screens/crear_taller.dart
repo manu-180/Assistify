@@ -63,6 +63,8 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
   String? selectedRubro;
   bool isLoading = false;
   String fullnameError = '';
+  bool aceptoPolitica = false;
+  bool aceptaPoliticas = false;
 
   Future<void> crearTablaTaller(String taller) async {
     final int mesActual = DateTime.now().month;
@@ -116,19 +118,17 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
         iconTheme: const IconThemeData(color: Colors.white),
         toolbarHeight: kToolbarHeight * 1.1,
         title: GestureDetector(
-          child: Row(
-            children: [
-              Text(
-                AppLocalizations.of(context).translate('appTitle'),
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(width: 7),
-              FaIcon(FontAwesomeIcons.fileLines,
-                  color: Colors.white, size: size.width * 0.055),
-            ],
+          onTap: () {
+            context.push("/");
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 0),
+            child: Image.asset(
+              'assets/icon/assistifyLogo.png', // ← asegurate que el path sea correcto
+              height: size.width * 0.42,
+              fit: BoxFit.contain,
+            ),
           ),
-          onTap: () => context.go('/'),
         ),
         backgroundColor: color.primary,
       ),
@@ -218,36 +218,35 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                           errorText: tallerError.isEmpty ? null : tallerError,
                         ),
                         keyboardType: TextInputType.text,
-                        
+                        onChanged: (value) async {
+                          final simbolosInvalidos =
+                              RegExp(r'[^\w\sáéíóúÁÉÍÓÚñÑ]');
+                          final nombre = value.trim();
 
-onChanged: (value) async {
-  final simbolosInvalidos = RegExp(r'[^\w\sáéíóúÁÉÍÓÚñÑ]');
-  final nombre = value.trim();
+                          if (nombre.isEmpty) {
+                            setState(() {
+                              tallerError = AppLocalizations.of(context)
+                                  .translate('emptyWorkshopNameError');
+                            });
+                            return;
+                          }
 
-  if (nombre.isEmpty) {
-    setState(() {
-      tallerError = AppLocalizations.of(context)
-          .translate('emptyWorkshopNameError');
-    });
-    return;
-  }
+                          if (simbolosInvalidos.hasMatch(nombre)) {
+                            setState(() {
+                              tallerError =
+                                  "No se aceptan símbolos. Contactá a soporte si es necesario.";
+                            });
+                            return;
+                          }
 
-  if (simbolosInvalidos.hasMatch(nombre)) {
-    setState(() {
-      tallerError = "No se aceptan símbolos. Contactá a soporte si es necesario.";
-    });
-    return;
-  }
+                          final existe = await tallerYaExiste(nombre);
 
-  final existe = await tallerYaExiste(nombre);
-
-  setState(() {
-    tallerError = existe
-        ? "Ya existe ese nombre de empresa."
-        : '';
-  });
-},
-
+                          setState(() {
+                            tallerError = existe
+                                ? "Ya existe ese nombre de empresa."
+                                : '';
+                          });
+                        },
                       ),
                       const SizedBox(height: 16),
                       TextField(
@@ -262,7 +261,7 @@ onChanged: (value) async {
                         onChanged: (value) async {
                           final emailActual = value.trim();
                           final emailRegex = RegExp(
-                            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@"
+                            r"^[\wñÑáéíóúÁÉÍÓÚ.!#$%&'*+/=?^_`{|}~-]+@"
                             r"[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?"
                             r"(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$",
                           );
@@ -322,8 +321,10 @@ onChanged: (value) async {
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children:
-                            ['Hombre', 'Mujer'].asMap().entries.map((entry) {
+                        children: ['Hombre', 'Mujer', 'Indefinido']
+                            .asMap()
+                            .entries
+                            .map((entry) {
                           final index = entry.key;
                           final opcion = entry.value;
                           final esSeleccionado = sexoSeleccionado == opcion;
@@ -336,10 +337,8 @@ onChanged: (value) async {
                                 });
                               },
                               child: Container(
-                                margin: EdgeInsets.only(
-                                  left: index == 1 ? 8 : 0,
-                                  right: index == 0 ? 8 : 0,
-                                ),
+                                margin:
+                                    EdgeInsets.only(left: index > 0 ? 8 : 0),
                                 decoration: BoxDecoration(
                                   color: esSeleccionado
                                       ? color.primary.withOpacity(0.1)
@@ -347,29 +346,29 @@ onChanged: (value) async {
                                   border: Border.all(
                                     color: esSeleccionado
                                         ? color.primary
-                                        : Colors.grey.shade400,
+                                        : Colors.black54,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 14),
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 18),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Icon(
-                                        esSeleccionado
-                                            ? Icons.radio_button_checked
-                                            : Icons.radio_button_off,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 6),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      esSeleccionado
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_off,
+                                      size: 18,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
                                         opcion,
                                         style: TextStyle(
+                                          fontSize: 13,
                                           fontWeight: esSeleccionado
                                               ? FontWeight.bold
                                               : FontWeight.normal,
@@ -377,13 +376,11 @@ onChanged: (value) async {
                                               ? Theme.of(context)
                                                   .colorScheme
                                                   .primary
-                                              : Theme.of(context)
-                                                  .colorScheme
-                                                  .onBackground,
+                                              : Colors.black87,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -450,30 +447,52 @@ onChanged: (value) async {
                         },
                       ),
                       const SizedBox(height: 24),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 5),
-                        child: Row(
-                          children: [
-                            const Text("Al continuar, aceptás nuestra "),
-                            InkWell(
-                              onTap: () async {
-                                const url = 'https://politicas-six.vercel.app/';
-                                if (await canLaunchUrl(Uri.parse(url))) {
-                                  await launchUrl(Uri.parse(url),
-                                      mode: LaunchMode.externalApplication);
-                                }
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: aceptaPoliticas,
+                            onChanged: (value) {
+                              setState(() {
+                                aceptaPoliticas = value ?? false;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  aceptaPoliticas = !aceptaPoliticas;
+                                });
                               },
-                              child: const Text(
-                                "Política de Privacidad",
-                                style: TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  color: Color.fromARGB(255, 61, 132, 191),
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              child: Wrap(
+                                children: [
+                                  const Text("Al continuar, aceptás nuestra "),
+                                  InkWell(
+                                    onTap: () async {
+                                      const url =
+                                          'https://politicas-six.vercel.app/';
+                                      if (await canLaunchUrl(Uri.parse(url))) {
+                                        await launchUrl(Uri.parse(url),
+                                            mode:
+                                                LaunchMode.externalApplication);
+                                      }
+                                    },
+                                    child: const Text(
+                                      "Política de Privacidad",
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color:
+                                            Color.fromARGB(255, 61, 132, 191),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 24),
                       Row(
@@ -590,20 +609,6 @@ onChanged: (value) async {
                                       );
                                       return;
                                     }
-                                    if (sexoSeleccionado == null) {
-                                      setState(() {
-                                        isLoading = false;
-                                      });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "Por favor, seleccioná el sexo."),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                      return;
-                                    }
 
                                     if (fullname.isEmpty ||
                                         email.isEmpty ||
@@ -648,6 +653,28 @@ onChanged: (value) async {
                                                     'passwordMismatchError');
                                         isLoading = false;
                                       });
+                                      return;
+                                    }
+
+                                    if (email.contains('ñ') ||
+                                        email.contains('Ñ')) {
+                                      setState(() {
+                                        mailError =
+                                            "Los correos electrónicos no pueden contener la letra 'ñ'.";
+                                        isLoading = false;
+                                      });
+                                      return;
+                                    }
+                                    if (!aceptaPoliticas) {
+                                      setState(() => isLoading = false);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Debés aceptar la Política de Privacidad para continuar."),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
                                       return;
                                     }
 
@@ -727,14 +754,15 @@ onChanged: (value) async {
                                       if (error.contains(
                                           "user already registered")) {
                                         mensajeError =
-                                            "El correo electrónico ya está registrado.";
+                                            "Este correo ya está registrado.";
+                                      } else if (error
+                                              .contains("invalid format") ||
+                                          error.contains("validation_failed")) {
+                                        mensajeError =
+                                            "El correo electrónico ingresado no es válido. Verificá que esté bien escrito.";
                                       } else {
                                         mensajeError =
-                                            AppLocalizations.of(context)
-                                                .translate(
-                                          'workshopCreationError',
-                                          params: {'error': e.toString()},
-                                        );
+                                            "Hubo un error al crear la cuenta. Intentá nuevamente.";
                                       }
 
                                       if (context.mounted) {

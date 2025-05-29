@@ -30,8 +30,8 @@ class SubscriptionManager {
     final restoredPurchases = await restorePurchases();
 
     final bool isSubscribed = restoredPurchases.any((purchase) =>
-        (purchase.productID == 'monthlysubscription' ||
-            purchase.productID == 'annualsubscription' ||
+        (purchase.productID == 'assistifymonthly' ||
+            purchase.productID == 'assistifyannual' ||
             purchase.productID == 'cero' ||
             purchase.productID == 'prueba') &&
         (purchase.status == PurchaseStatus.purchased ||
@@ -55,8 +55,8 @@ class SubscriptionManager {
     bool isSubscribed = false;
 
     for (final purchase in restoredPurchases) {
-      if ((purchase.productID == 'monthlysubscription' ||
-              purchase.productID == 'annualsubscription' ||
+      if ((purchase.productID == 'assistifymonthly' ||
+              purchase.productID == 'assistifyannual' ||
               purchase.productID == 'cero' ||
               purchase.productID == 'prueba') &&
           (purchase.status == PurchaseStatus.purchased ||
@@ -99,8 +99,8 @@ class SubscriptionManager {
   /// Verifica manualmente si el usuario está suscripto
   bool isUserSubscribed() {
     for (var purchase in _purchases) {
-      if ((purchase.productID == "monthlysubscription" ||
-              purchase.productID == "annualsubscription") &&
+      if ((purchase.productID == "assistifymonthly" ||
+              purchase.productID == "assistifyannual") &&
           purchase.status == PurchaseStatus.purchased) {
         return true;
       }
@@ -110,10 +110,7 @@ class SubscriptionManager {
 
   /// Consulta los detalles de productos configurados
   Future<void> fetchProductDetails() async {
-    const Set<String> productIds = {
-      "monthlysubscription",
-      "annualsubscription"
-    };
+    const Set<String> productIds = {"assistifymonthly", "assistifyannual"};
 
     // Verifica la conexión a Internet antes de proceder
     if (!await Internet().hayConexionInternet()) {
