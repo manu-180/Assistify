@@ -28,12 +28,27 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   List<ProductDetails> _products = [];
   Map<String, bool> hovering = {};
   StreamSubscription<List<PurchaseDetails>>? _subscription;
-  
+  final Map<String, Map<String, String>> planesCustom = {
+  'assistify_monthly': {
+    'titulo': 'Plan Mensual',
+    'beneficio': '1 MES GRATIS',
+    'descripcion':
+        'Suscripción mensual con acceso completo a todas las funcionalidades.',
+  },
+  'assistify_annual': {
+    'titulo': 'Plan Anual',
+    'beneficio': '2 MESES GRATIS',
+    'descripcion':
+        'Suscripción anual con acceso completo y ahorro especial.',
+  },
+};
+
+
   String? extraerBeneficio(String description) {
-  final exp = RegExp(r'(\d+)\s+mes(?:es)?\s+gratis', caseSensitive: false);
-  final match = exp.firstMatch(description);
-  return match != null ? match.group(0) : null;
-}
+    final exp = RegExp(r'(\d+)\s+mes(?:es)?\s+gratis', caseSensitive: false);
+    final match = exp.firstMatch(description);
+    return match != null ? match.group(0) : null;
+  }
 
   @override
   void initState() {
@@ -202,7 +217,7 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
             child: Image.asset(
-              'assets/icon/assistifyLogo.png', 
+              'assets/icon/assistifyLogo.png',
               height: size.width * 0.42,
               fit: BoxFit.contain,
             ),
@@ -224,91 +239,92 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        children: _products.map((product) {
-                          return GestureDetector(
-                            onTap: () => _subscribe(product),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: Container(
-                                height: size.height * 0.33,
-                                width: size.width * 0.8,
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: theme.colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 10,
-                                      offset: Offset(0, 5),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: Text(
-    cleanTitle(product.title),
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      color: theme.colorScheme.onPrimary,
-      fontWeight: FontWeight.bold,
-      fontSize: fontSizeTitle,
-    ),
-  ),
-),
+                       children: _products.map((product) {
+  final custom = planesCustom[product.id];
 
-const SizedBox(height: 10),
+  return GestureDetector(
+    onTap: () => _subscribe(product),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Container(
+        width: size.width * 0.8,
+        margin: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 📦 Título
+            Text(
+              custom?['titulo'] ?? product.title,
+              style: TextStyle(
+                fontSize: size.width * 0.055,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 16),
 
-if (extraerBeneficio(product.description) != null)
-  Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: Text(
-      extraerBeneficio(product.description)!,
-      style: TextStyle(
-        color: Colors.greenAccent,
-        fontWeight: FontWeight.bold,
-        fontSize: fontSizeDescription,
+            // 🔥 Beneficio
+            if (custom?['beneficio'] != null)
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    vertical: 6, horizontal: 12),
+                decoration: BoxDecoration(
+                  color: color.primary.withAlpha(130),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  custom!['beneficio']!,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            const SizedBox(height: 8),
+
+            // 📝 Descripción
+            Text(
+              custom?['descripcion'] ?? product.description,
+              style: TextStyle(
+                fontSize: size.width * 0.04,
+                color: Colors.black54,
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // 💰 Precio
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                product.price,
+                style: TextStyle(
+                  fontSize: size.width * 0.05,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      textAlign: TextAlign.center,
     ),
-  ),
-
-Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-  child: Text(
-    product.description,
-    textAlign: TextAlign.center,
-    style: TextStyle(
-      color: theme.colorScheme.onPrimary,
-      fontSize: fontSizeDescription,
-    ),
-  ),
-),
-
-const SizedBox(height: 20),
-
-Text(
-  product.price,
-  style: TextStyle(
-    color: theme.colorScheme.onPrimary,
-    fontWeight: FontWeight.bold,
-    fontSize: fontSizePrice,
-  ),
-),
-
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+  );
+}).toList(),
+                      )
                     ),
                   ),
                 )
@@ -319,5 +335,3 @@ Text(
     );
   }
 }
-
-//prueba
