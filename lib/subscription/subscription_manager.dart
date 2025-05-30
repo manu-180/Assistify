@@ -31,9 +31,7 @@ class SubscriptionManager {
 
     final bool isSubscribed = restoredPurchases.any((purchase) =>
         (purchase.productID == 'assistifymonthly' ||
-            purchase.productID == 'assistifyannual' ||
-            purchase.productID == 'cero' ||
-            purchase.productID == 'prueba') &&
+            purchase.productID == 'assistifyannual' ) &&
         (purchase.status == PurchaseStatus.purchased ||
             purchase.status == PurchaseStatus.restored));
 
