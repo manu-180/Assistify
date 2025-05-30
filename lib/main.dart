@@ -9,7 +9,6 @@ import 'package:taller_ceramica/config/theme/app_theme.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/providers/theme_provider.dart';
 import 'package:taller_ceramica/subscription/subscription_manager.dart';
-import 'package:in_app_purchase_android/in_app_purchase_android.dart'; // 👈 Importación añadida
 
 // AssistifyPRUEBA MAIN
 Future<void> main() async {
@@ -23,9 +22,6 @@ Future<void> main() async {
   );
 
   await initializeDateFormatting('es_ES', null);
-
-  // 👇 Registro explícito de la plataforma de compras para Android
-  InAppPurchaseAndroidPlatform.registerPlatform();
 
   // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
