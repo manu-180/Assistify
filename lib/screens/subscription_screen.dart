@@ -28,6 +28,9 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   List<ProductDetails> _products = [];
   Map<String, bool> hovering = {};
   StreamSubscription<List<PurchaseDetails>>? _subscription;
+  bool _isProcessingPurchase = false;
+  Timer? _purchaseTimeoutTimer;
+
   final Map<String, Map<String, String>> planesCustom = {
   'assistify_monthly': {
     'titulo': 'Plan Mensual',
@@ -106,21 +109,44 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
     }
   }
 
-  void _subscribe(ProductDetails productDetails) {
-    try {
-      final PurchaseParam purchaseParam =
-          PurchaseParam(productDetails: productDetails);
-      debugPrint('Attempting to purchase: ${productDetails.id}');
-      _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
-    } catch (e) {
-      debugPrint('Error initiating purchase: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('purchaseError', params: {'error': e.toString()}))),
-      );
-    }
+ void _subscribe(ProductDetails productDetails) async {
+  if (_isProcessingPurchase) {
+    debugPrint('⚠️ Ya hay una compra en proceso.');
+    return;
   }
+
+  _isProcessingPurchase = true;
+
+  try {
+    final PurchaseParam purchaseParam =
+        PurchaseParam(productDetails: productDetails);
+    debugPrint('Attempting to purchase: ${productDetails.id}');
+    _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+
+    // 🕒 Liberar el flag si no pasa nada después de 15 segundos
+    _purchaseTimeoutTimer?.cancel(); // por si hay otro pendiente
+
+_purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
+  if (_isProcessingPurchase) {
+    debugPrint('🕒 Timeout: No se completó la compra, liberando bloqueo.');
+    _isProcessingPurchase = false;
+  }
+});
+
+  } catch (e) {
+    debugPrint('❌ Error initiating purchase: $e');
+    _isProcessingPurchase = false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(AppLocalizations.of(context).translate(
+          'purchaseError',
+          params: {'error': e.toString()},
+        )),
+      ),
+    );
+  }
+}
+
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -192,6 +218,7 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
         );
       }
     }
+    _isProcessingPurchase = false;
   }
 
   @override
@@ -329,6 +356,7 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
                   ),
                 )
           : Center(
+            
               child: Text(
                   AppLocalizations.of(context).translate('storeNotAvailable')),
             ),
