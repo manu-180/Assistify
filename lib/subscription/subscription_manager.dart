@@ -3,13 +3,17 @@ import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/internet.dart';
-import 'package:taller_ceramica/utils/verificar_suscripcion_con_backend.dart'; // Importa la clase para verificar conexión
+import 'package:taller_ceramica/utils/verificar_suscripcion_con_backend.dart';
 
 class SubscriptionManager {
+  static final SubscriptionManager _instance = SubscriptionManager._internal();
+  factory SubscriptionManager() => _instance;
+
   final InAppPurchase _inAppPurchase = InAppPurchase.instance;
   final List<PurchaseDetails> _purchases = [];
+  bool _isListening = false;
 
-  SubscriptionManager() {
+  SubscriptionManager._internal() {
     _startPeriodicValidation();
   }
 
@@ -20,9 +24,7 @@ class SubscriptionManager {
   }
 
   Future<void> verificarEstadoSuscripcion() async {
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
+    if (!await Internet().hayConexionInternet()) return;
 
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
     if (usuarioActivo == null) return;
@@ -30,8 +32,8 @@ class SubscriptionManager {
     final restoredPurchases = await restorePurchases();
 
     final bool isSubscribed = restoredPurchases.any((purchase) =>
-        (purchase.productID == 'assistifymonthly' ||
-            purchase.productID == 'assistifyannual') &&
+        (purchase.productID == 'assistify_monthly' ||
+            purchase.productID == 'assistify_annual') &&
         (purchase.status == PurchaseStatus.purchased ||
             purchase.status == PurchaseStatus.restored));
 
@@ -41,9 +43,7 @@ class SubscriptionManager {
   }
 
   Future<void> checkAndUpdateSubscription() async {
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
+    if (!await Internet().hayConexionInternet()) return;
 
     final currentUser = Supabase.instance.client.auth.currentUser;
     if (currentUser == null) return;
@@ -53,8 +53,8 @@ class SubscriptionManager {
     bool isSubscribed = false;
 
     for (final purchase in restoredPurchases) {
-      if ((purchase.productID == 'assistifymonthly' ||
-              purchase.productID == 'assistifyannual' ||
+      if ((purchase.productID == 'assistify_monthly' ||
+              purchase.productID == 'assistify_annual' ||
               purchase.productID == 'cero' ||
               purchase.productID == 'prueba') &&
           (purchase.status == PurchaseStatus.purchased ||
@@ -68,7 +68,7 @@ class SubscriptionManager {
 
         if (backendActiva) {
           isSubscribed = true;
-          break; // Ya con una activa nos alcanza
+          break;
         }
       }
     }
@@ -78,8 +78,10 @@ class SubscriptionManager {
         .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
   }
 
-  /// Escucha las actualizaciones de compras
-  void listenToPurchaseUpdates() {
+  void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
+    if (_isListening) return;
+    _isListening = true;
+
     _inAppPurchase.purchaseStream.listen(
       (List<PurchaseDetails> purchaseDetailsList) {
         for (var purchase in purchaseDetailsList) {
@@ -90,15 +92,21 @@ class SubscriptionManager {
             }
           }
         }
+
+        if (onPurchase != null) {
+          onPurchase(purchaseDetailsList);
+        }
+      },
+      onError: (error) {
+        print("Error en el stream de compras: $error");
       },
     );
   }
 
-  /// Verifica manualmente si el usuario está suscripto
   bool isUserSubscribed() {
     for (var purchase in _purchases) {
-      if ((purchase.productID == "assistifymonthly" ||
-              purchase.productID == "assistifyannual") &&
+      if ((purchase.productID == "assistify_monthly" ||
+              purchase.productID == "assistify_annual") &&
           purchase.status == PurchaseStatus.purchased) {
         return true;
       }
@@ -106,14 +114,10 @@ class SubscriptionManager {
     return false;
   }
 
-  /// Consulta los detalles de productos configurados
   Future<void> fetchProductDetails() async {
-    const Set<String> productIds = {"assistifymonthly", "assistifyannual"};
+    const Set<String> productIds = {"assistify_monthly", "assistify_annual"};
 
-    // Verifica la conexión a Internet antes de proceder
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
+    if (!await Internet().hayConexionInternet()) return;
 
     try {
       final ProductDetailsResponse response =
@@ -128,19 +132,15 @@ class SubscriptionManager {
   }
 
   Future<List<PurchaseDetails>> restorePurchases() async {
-    if (!await Internet().hayConexionInternet()) {
-      throw Exception('No hay conexión a Internet.');
-    }
+    if (!await Internet().hayConexionInternet()) return [];
 
     final Completer<List<PurchaseDetails>> completer = Completer();
-
     final List<PurchaseDetails> restored = [];
 
     final Stream<List<PurchaseDetails>> purchaseUpdates =
         _inAppPurchase.purchaseStream;
 
-    final subscription =
-        purchaseUpdates.listen((List<PurchaseDetails> purchases) {
+    final subscription = purchaseUpdates.listen((List<PurchaseDetails> purchases) {
       for (var purchase in purchases) {
         if (purchase.status == PurchaseStatus.restored ||
             purchase.status == PurchaseStatus.purchased) {
@@ -148,7 +148,6 @@ class SubscriptionManager {
         }
       }
 
-      // Cuando llegan las restauraciones, devolvemos la lista
       if (!completer.isCompleted) {
         completer.complete(restored);
       }
@@ -156,7 +155,6 @@ class SubscriptionManager {
 
     await _inAppPurchase.restorePurchases();
 
-    // Esperamos máximo 8 segundos por respuesta
     return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
       subscription.cancel();
       return restored;

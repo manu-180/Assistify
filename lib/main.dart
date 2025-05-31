@@ -25,7 +25,13 @@ Future<void> main() async {
 
   // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
-  subscriptionManager.listenToPurchaseUpdates();
+  subscriptionManager.listenToPurchaseUpdates(
+  onPurchase: (purchases) {
+    // Si necesitás manejar lógica global cuando se compra
+    print("Se recibieron compras nuevas: $purchases");
+  },
+);
+
 
   // 🟢 PostFrame: ejecutamos todo lo demás después del arranque visual
   runApp(

@@ -30,6 +30,7 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   bool _isProcessingPurchase = false;
   Timer? _purchaseTimeoutTimer;
+  
 
   final Map<String, Map<String, String>> planesCustom = {
   'assistify_monthly': {
@@ -56,29 +57,26 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   @override
   void initState() {
     super.initState();
+    final manager = SubscriptionManager();
+manager.listenToPurchaseUpdates(onPurchase: _handlePurchaseUpdates);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      SubscriptionManager().checkAndUpdateSubscription();
-    });
+WidgetsBinding.instance.addPostFrameCallback((_) {
+  manager.checkAndUpdateSubscription();
+});
+
 
     _initializeStore();
 
-    final Stream<List<PurchaseDetails>> purchaseUpdated =
-        _inAppPurchase.purchaseStream;
-    _subscription = purchaseUpdated.listen((purchases) {
-      _handlePurchaseUpdates(purchases);
-    }, onDone: () {
-      _subscription?.cancel();
-    }, onError: (error) {
-      debugPrint('Error en las compras: $error');
-    });
+    
   }
 
   @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
+void dispose() {
+  _subscription?.cancel();
+  _purchaseTimeoutTimer?.cancel(); // ← esto es clave
+  super.dispose();
+}
+
 
   // Función para limpiar el título
   String cleanTitle(String title) {
@@ -96,6 +94,8 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
           "assistify_annual",
         }.toSet(),
       );
+
+      if (!mounted) return;
 
       setState(() {
         _isAvailable = isAvailable;
@@ -115,7 +115,11 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
     return;
   }
 
-  _isProcessingPurchase = true;
+  if (mounted) {
+    setState(() {
+      _isProcessingPurchase = true;
+    });
+  }
 
   try {
     final PurchaseParam purchaseParam =
@@ -123,19 +127,23 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
     debugPrint('Attempting to purchase: ${productDetails.id}');
     _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
 
-    // 🕒 Liberar el flag si no pasa nada después de 15 segundos
-    _purchaseTimeoutTimer?.cancel(); // por si hay otro pendiente
-
-_purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
-  if (_isProcessingPurchase) {
-    debugPrint('🕒 Timeout: No se completó la compra, liberando bloqueo.');
-    _isProcessingPurchase = false;
-  }
-});
-
+    // 🕒 Timeout para liberar el flag si no hay respuesta
+    _purchaseTimeoutTimer?.cancel();
+    _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
+      if (mounted && _isProcessingPurchase) {
+        debugPrint('🕒 Timeout: No se completó la compra, liberando bloqueo.');
+        setState(() {
+          _isProcessingPurchase = false;
+        });
+      }
+    });
   } catch (e) {
     debugPrint('❌ Error initiating purchase: $e');
-    _isProcessingPurchase = false;
+    if (mounted) {
+      setState(() {
+        _isProcessingPurchase = false;
+      });
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context).translate(
@@ -146,7 +154,6 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
     );
   }
 }
-
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -160,7 +167,6 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
             await _inAppPurchase.completePurchase(purchase);
             debugPrint('🟢 Purchase completada y acknowledge enviada');
           }
-
           await Future.delayed(const Duration(seconds: 2));
 
           final purchaseToken =
@@ -188,12 +194,19 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context).translate('purchaseSuccess'),
-              ),
-            ),
-          );
+  SnackBar(
+    content: Text(
+      AppLocalizations.of(context).translate('purchaseSuccess'),
+    ),
+  ),
+);
+
+// ✅ Redirigir al home del taller
+context.go("/home/$taller");
+return;
+
+          
+          
         } catch (e) {
           debugPrint('❌ Error en acknowledgment o backend: $e');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -218,7 +231,12 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
         );
       }
     }
+    if (mounted) {
+  setState(() {
     _isProcessingPurchase = false;
+  });
+}
+
   }
 
   @override
@@ -226,9 +244,8 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     final color = theme.colorScheme;
-    final double fontSizeTitle = size.width * 0.065;
-    final double fontSizeDescription = size.width * 0.04;
-    final double fontSizePrice = size.width * 0.07;
+    final usarioActivo = Supabase.instance.client.auth.currentUser;
+    final taller = usarioActivo!.appMetadata['taller'];
 
     return Scaffold(
       appBar: AppBar(
@@ -239,7 +256,7 @@ _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
         toolbarHeight: kToolbarHeight * 1.1,
         title: GestureDetector(
           onTap: () {
-            context.push("/subscription");
+            context.push("/home/${taller ?? ''}");
           },
           child: Padding(
             padding: const EdgeInsets.only(left: 0),
