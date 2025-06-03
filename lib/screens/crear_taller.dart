@@ -448,52 +448,70 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                       ),
                       const SizedBox(height: 24),
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Checkbox(
-                            value: aceptaPoliticas,
-                            onChanged: (value) {
-                              setState(() {
-                                aceptaPoliticas = value ?? false;
-                              });
-                            },
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  aceptaPoliticas = !aceptaPoliticas;
-                                });
-                              },
-                              child: Wrap(
-                                children: [
-                                  const Text("Al continuar, aceptás nuestra "),
-                                  InkWell(
-                                    onTap: () async {
-                                      const url =
-                                          'https://politicas-six.vercel.app/';
-                                      if (await canLaunchUrl(Uri.parse(url))) {
-                                        await launchUrl(Uri.parse(url),
-                                            mode:
-                                                LaunchMode.externalApplication);
-                                      }
-                                    },
-                                    child: const Text(
-                                      "Política de Privacidad",
-                                      style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color:
-                                            Color.fromARGB(255, 61, 132, 191),
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Checkbox(
+      value: aceptaPoliticas,
+      onChanged: (value) {
+        setState(() {
+          aceptaPoliticas = value ?? false;
+        });
+      },
+    ),
+    Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            aceptaPoliticas = !aceptaPoliticas;
+          });
+        },
+        child: Wrap(
+          children: [
+            const Text("Al continuar, aceptás nuestra "),
+            InkWell(
+              onTap: () async {
+                const url = 'https://politicas-six.vercel.app/';
+                if (await canLaunchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url),
+                      mode: LaunchMode.externalApplication);
+                }
+              },
+              child: const Text(
+                "Política de Privacidad",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Color.fromARGB(255, 61, 132, 191),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Text(" y los "),
+            InkWell(
+              onTap: () async {
+                const url =
+                    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+                if (await canLaunchUrl(Uri.parse(url))) {
+                  await launchUrl(Uri.parse(url),
+                      mode: LaunchMode.externalApplication);
+                }
+              },
+              child: const Text(
+                "Términos de uso",
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                  color: Color.fromARGB(255, 61, 132, 191),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Text("."),
+          ],
+        ),
+      ),
+    ),
+  ],
+),
+
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

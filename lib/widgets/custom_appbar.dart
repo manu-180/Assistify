@@ -146,6 +146,12 @@ class CustomAppBarState extends State<CustomAppBar> {
         'value': '/configuracion/${taller ?? ''}',
         'label': AppLocalizations.of(context).translate('settingsLabel'),
       },
+
+      if (user?.userMetadata!["admin"] ) 
+      {
+        'value': '/subscription',
+        'label': "Suscribite",
+      },
       // if (user?.id == '668da4f9-3487-42c5-8f28-fe2da23806d4')
       // {
       //   'value': '/prueba',

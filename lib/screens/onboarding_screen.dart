@@ -78,47 +78,91 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     onPageChanged: (index) =>
                         setState(() => _currentIndex = index),
                     itemBuilder: (_, index) {
-                      final slide = _slides[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(16),
-                              child: Image.asset(
-                                slide.image,
-                                height: size.height * 0.5,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            const SizedBox(height: 32),
-                            Text(
-                              slide.title,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            const SizedBox(height: 16),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10),
-                              child: Text(
-                                slide.description,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.grey[800],
-                                ),
-                                textAlign: TextAlign.start,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+  final slide = _slides[index];
+  final size = MediaQuery.of(context).size;
+  final isWide = size.width > 600;
+
+  return Padding(
+    padding: const EdgeInsets.all(24.0),
+    child: isWide
+        ? Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    slide.image,
+                    height: size.height ,
+      
+                  ),
+                ),
+              ),
+              const SizedBox(width: 24),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      slide.title,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      slide.description,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  slide.image,
+                  height: MediaQuery.of(context).size.height * 0.5,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Text(
+                slide.title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(
+                  slide.description,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Colors.grey[800],
+                  ),
+                  textAlign: TextAlign.start,
+                ),
+              ),
+            ],
+          ),
+  );
+}
+
                   ),
                 ),
                 Row(

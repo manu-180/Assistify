@@ -244,8 +244,6 @@ return;
     final theme = Theme.of(context);
     final size = MediaQuery.of(context).size;
     final color = theme.colorScheme;
-    final usarioActivo = Supabase.instance.client.auth.currentUser;
-    final taller = usarioActivo!.appMetadata['taller'];
 
     return Scaffold(
       appBar: AppBar(
@@ -374,8 +372,7 @@ return;
                 )
           : Center(
             
-              child: Text(
-                  AppLocalizations.of(context).translate('storeNotAvailable')),
+              child: CircularProgressIndicator(),
             ),
     );
   }
