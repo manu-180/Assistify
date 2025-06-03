@@ -82,19 +82,21 @@ class MyApp extends ConsumerWidget {
         Locale('sv'),
         Locale('pl'),
       ],
-      localeResolutionCallback: (locale, supportedLocales) {
-        if (locale == null) {
-          return const Locale('en');
-        }
+      // localeResolutionCallback: (locale, supportedLocales) {
+      //   if (locale == null) {
+      //     return const Locale('en');
+      //   }
 
-        for (var supportedLocale in supportedLocales) {
-          if (supportedLocale.languageCode == locale.languageCode) {
-            return supportedLocale;
-          }
-        }
+      //   for (var supportedLocale in supportedLocales) {
+      //     if (supportedLocale.languageCode == locale.languageCode) {
+      //       return supportedLocale;
+      //     }
+      //   }
 
-        return const Locale('en');
-      },
+      //   return const Locale('en');
+      // },  PARA DESPUES 
+      locale: const Locale('es'),
+
     );
   }
 }

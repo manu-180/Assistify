@@ -251,20 +251,26 @@ class CustomAppBarState extends State<CustomAppBar> {
                     width: size.width * 0.35,
                     height: size.height * 0.044,
                     child: ElevatedButton(
-                      onPressed: () async {
-                        await Supabase.instance.client.auth.signOut();
-                        final prefs = await SharedPreferences.getInstance();
-                        await prefs.remove('session');
+  onPressed: () async {
+    await Supabase.instance.client.auth.signOut();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('session');
 
-                        if (context.mounted) {
-                          context.push('/');
-                        }
-                      },
-                      child: Text(
-                        AppLocalizations.of(context).translate('logoutLabel'),
-                        style: TextStyle(fontSize: size.width * 0.032),
-                      ),
-                    ),
+    if (context.mounted) {
+      context.push('/');
+    }
+  },
+  style: ElevatedButton.styleFrom(
+    padding: EdgeInsets.zero, // 🔽 Quita el padding interno
+    minimumSize: Size.zero,   // 🔽 Permite que se achique lo más posible
+    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 🔽 Evita expansión automática por accesibilidad
+  ),
+  child: Text(
+    AppLocalizations.of(context).translate('logoutLabel'),
+    style: TextStyle(fontSize: size.width * 0.035),
+  ),
+),
+
                   ),
                 ],
               ),
