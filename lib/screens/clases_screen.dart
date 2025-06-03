@@ -626,6 +626,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     final color = Theme.of(context).primaryColor;
     final colors = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
 
     double paddingSize = size.width * 0.05;
 
@@ -636,6 +637,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
             size.width * 0.03, size.height * 0.06, size.width * 0.03, 0),
         child: Column(
           children: [
+            isWide ?
+            SizedBox():
             Padding(
               padding: EdgeInsets.fromLTRB(0, 0, 0, size.height * 0.06),
               child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
@@ -663,7 +666,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: isLoading
+                    child: isLoading && !isWide
                         ? Column(
                             children: List.generate(
                                 5,
@@ -740,7 +743,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     final partesFecha = clase.fecha.split('/');
     final diaMes = '${partesFecha[0]}/${partesFecha[1]}';
     final diaYHora = '${clase.dia} $diaMes - ${clase.hora}';
-    final screenWidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
 
     // 👉 Si es feriado, mostramos una tarjeta especial
     if (clase.feriado) {
@@ -761,7 +765,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
               child: Row(
                 children: [
                   Icon(Icons.celebration,
-                      size: screenWidth * 0.08, color: Colors.orange),
+                      size: size.width * 0.08, color: Colors.orange),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -770,7 +774,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         Text(
                           "¡Es feriado!",
                           style: TextStyle(
-                            fontSize: screenWidth * 0.04,
+                            fontSize: size.width * 0.04,
                             fontWeight: FontWeight.bold,
                             color: Colors.deepOrange,
                           ),
@@ -790,8 +794,8 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
     return Column(
       children: [
         SizedBox(
-          width: screenWidth * 0.7,
-          height: screenWidth * 0.12,
+          width: size.width * 0.7,
+          height: isWide? size.height * 0.17: size.height * 0.053,
           child: GestureDetector(
             child: ElevatedButton(
               onPressed: esAdmin
@@ -852,7 +856,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                 ),
                 shape: WidgetStateProperty.all(
                   RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(screenWidth * 0.03)),
+                      borderRadius: BorderRadius.circular(size.width * 0.03)),
                 ),
                 padding: WidgetStateProperty.all(EdgeInsets.zero),
               ),
@@ -862,7 +866,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                   Text(
                     diaYHora,
                     style: TextStyle(
-                        fontSize: screenWidth * 0.032, color: Colors.white),
+                        fontSize: size.width * 0.032, color: Colors.white),
                   ),
                 ],
               ),
@@ -952,7 +956,8 @@ class SemanaNavigation extends StatefulWidget {
 class _SemanaNavigationState extends State<SemanaNavigation> {
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
     final color = Theme.of(context).colorScheme;
 
     final semanas = ['semana1', 'semana2', 'semana3', 'semana4', 'semana5'];
@@ -965,7 +970,7 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
           onPressed: widget.cambiarSemanaAtras,
           icon: Icon(
             Icons.arrow_back_ios_new,
-            size: screenWidth * 0.07,
+            size: isWide ? size.width * 0.03 : size.width * 0.07,
             color: color.primary,
           ),
           padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
@@ -977,8 +982,8 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
 
             return Container(
               margin: EdgeInsets.symmetric(horizontal: 2),
-              width: screenWidth * 0.032,
-              height: screenWidth * 0.02,
+              width: size.width * 0.032,
+              height: isWide ? size.height * 0.03 : size.height * 0.01,
               decoration: BoxDecoration(
                 color: isActive ? color.primary : Colors.transparent,
                 border: Border.all(
@@ -994,7 +999,7 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
           onPressed: widget.cambiarSemanaAdelante,
           icon: Icon(
             Icons.arrow_forward_ios,
-            size: screenWidth * 0.07,
+            size:  isWide ? size.width * 0.03 : size.width * 0.07,
             color: color.primary,
           ),
           padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
@@ -1027,9 +1032,8 @@ class _DiaSelection extends StatefulWidget {
 class _DiaSelectionState extends State<_DiaSelection> {
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-
+    final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
     final filteredFechas = widget.fechasDisponibles.where((dateString) {
       final partes = dateString.split('/');
       final fecha = DateTime(
@@ -1055,20 +1059,20 @@ class _DiaSelectionState extends State<_DiaSelection> {
         return Column(
           children: [
             SizedBox(
-              width: screenWidth * 0.99,
-              height: screenHeight * 0.053,
+              width: isWide?size.width * 0.35 :size.width * 0.99,
+              height: isWide?size.height * 0.15 : size.height * 0.053,
               child: ElevatedButton(
                 onPressed: () => widget.seleccionarDia(diaMesAnio),
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size.zero,
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenWidth * 0.03),
+                    borderRadius: BorderRadius.circular(size.width * 0.03),
                   ),
                 ),
                 child: Text(
                   '${clase.dia} - $diaMes',
-                  style: TextStyle(fontSize: screenWidth * 0.032),
+                  style: TextStyle(fontSize: size.width * 0.032),
                 ),
               ),
             ),
