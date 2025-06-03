@@ -101,6 +101,7 @@ class _ContactanosState extends State<Contactanos>
     final user = Supabase.instance.client.auth.currentUser;
     final fullname = user?.userMetadata?['fullname'] ?? 'usuario';
     final email = user?.email ?? 'sin_email';
+    final isWide = MediaQuery.of(context).size.width > 600;
 
     final TextEditingController mensajeController = TextEditingController();
 
@@ -125,7 +126,7 @@ class _ContactanosState extends State<Contactanos>
             const SizedBox(height: 16),
             TextField(
               controller: mensajeController,
-              maxLines: 5,
+              maxLines: isWide ? 2: 5,
               decoration: const InputDecoration(
                 hintText: "Escribí tu mensaje acá...",
                 border: OutlineInputBorder(),
@@ -158,6 +159,7 @@ class _ContactanosState extends State<Contactanos>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600; 
     final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Stack(
@@ -208,42 +210,42 @@ class _ContactanosState extends State<Contactanos>
                     ),
                   ),
                 const SizedBox(height: 10),
-                if (_isExpanded)
-                  TweenAnimationBuilder(
-                    duration: const Duration(milliseconds: 350),
-                    tween: Tween<double>(begin: 12, end: 0),
-                    curve: Curves.easeOut,
-                    builder: (context, value, child) => Transform.translate(
-                      offset: Offset(0, value),
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            context.push("/chatscreen");
-                          });
-                        },
-                        child: Container(
-                          width: size.width * 0.143,
-                          height: size.height * 0.068,
-                          decoration: BoxDecoration(
-                            color: Colors.blueAccent,
-                            borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withAlpha(10),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          child: const Icon(
-                            Icons.android,
-                            color: Colors.white,
-                            size: 33,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                // if (_isExpanded)
+                //   TweenAnimationBuilder(
+                //     duration: const Duration(milliseconds: 350),
+                //     tween: Tween<double>(begin: 12, end: 0),
+                //     curve: Curves.easeOut,
+                //     builder: (context, value, child) => Transform.translate(
+                //       offset: Offset(0, value),
+                //       child: GestureDetector(
+                //         onTap: () {
+                //           setState(() {
+                //             context.push("/chatscreen");
+                //           });
+                //         },
+                //         child: Container(
+                //           width: isWide ?  size.width * 0.065 : size.width * 0.143,
+                //           height: isWide ?  size.height * 0.135 : size.height * 0.068,
+                //           decoration: BoxDecoration(
+                //             color: Colors.blueAccent,
+                //             borderRadius: BorderRadius.circular(18),
+                //             boxShadow: [
+                //               BoxShadow(
+                //                 color: Colors.black.withAlpha(10),
+                //                 blurRadius: 8,
+                //                 spreadRadius: 2,
+                //               ),
+                //             ],
+                //           ),
+                //           child: const Icon(
+                //             Icons.android,
+                //             color: Colors.white,
+                //             size: 33,
+                //           ),
+                //         ),
+                //       ),
+                //     ),
+                //   ),
                 const SizedBox(height: 10),
                 Visibility(
                   visible: !isKeyboardOpen, // Oculta si el teclado está abierto

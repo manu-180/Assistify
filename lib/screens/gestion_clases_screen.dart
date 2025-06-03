@@ -507,6 +507,8 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
     final colors = Theme.of(context).colorScheme;
+    final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
 
     return Builder(builder: (context) {
       scaffoldContext = context;
@@ -872,7 +874,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
           ],
         ),
         floatingActionButton: SizedBox(
-          width: MediaQuery.of(context).size.width * 0.5,
+          width: isWide?  size.width * 0.23:size.width * 0.5,
           child: FloatingActionButton(
             backgroundColor: colors.secondaryContainer,
             onPressed: () {

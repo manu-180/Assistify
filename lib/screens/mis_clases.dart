@@ -256,6 +256,8 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
     final user = ref.watch(authProvider);
     final color = Theme.of(context).colorScheme;
     final localizations = AppLocalizations.of(context);
+    final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
 
     return Scaffold(
         appBar:
@@ -295,7 +297,7 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                       ),
 
                       user?.userMetadata?['taller'] !=
-                              "Taller de cerámica Ricardo Rojas"
+                              "Taller de cerámica Ricardo Rojas" && !isWide
                           ? FutureBuilder<int>(
                               future: Future.delayed(Duration.zero, () {
                                 return ObtenerClasesDisponibles()
