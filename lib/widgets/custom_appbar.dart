@@ -89,6 +89,7 @@ class CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     final color = Theme.of(context).colorScheme;
     final size = MediaQuery.of(context).size;
+    final isWide = size.width > 600;
 
     if (isLoading && !showLoader) {
       return AppBar(
@@ -188,7 +189,7 @@ class CustomAppBarState extends State<CustomAppBar> {
               padding: const EdgeInsets.only(left: 0),
               child: Image.asset(
                 'assets/icon/assistifyLogo.png', // ← asegurate que el path sea correcto
-                height: size.width * 0.42,
+                height: isWide ? size.width * 0.27 : size.width * 0.42,
                 fit: BoxFit.contain,
               ),
             ),
@@ -207,6 +208,7 @@ class CustomAppBarState extends State<CustomAppBar> {
               child: Icon(
                 Icons.keyboard_arrow_down_outlined,
                 color: color.surface,
+                size: isWide ? size.width * 0.04 : size.width * 0.07,
               ),
             ),
             onOpened: () {
@@ -219,7 +221,7 @@ class CustomAppBarState extends State<CustomAppBar> {
                 _isMenuOpen = false;
               });
             },
-            offset: Offset(-size.width * 0.05, size.height * 0.07),
+            offset: Offset(isWide ? -size.width * 0.05 :  -size.width * 0.05, isWide ? size.height * 0.3 :  size.height * 0.07),
           ),
         ],
       ),
@@ -248,8 +250,8 @@ class CustomAppBarState extends State<CustomAppBar> {
                 children: [
                   SizedBox(width: size.width * 0.02),
                   SizedBox(
-                    width: size.width * 0.35,
-                    height: size.height * 0.044,
+                    width: isWide ? size.width * 0.2 :size.width * 0.35,
+                    height: isWide ? size.height * 0.1 : size.height * 0.044,
                     child: ElevatedButton(
   onPressed: () async {
     await Supabase.instance.client.auth.signOut();
@@ -264,11 +266,13 @@ class CustomAppBarState extends State<CustomAppBar> {
     padding: EdgeInsets.zero, // 🔽 Quita el padding interno
     minimumSize: Size.zero,   // 🔽 Permite que se achique lo más posible
     tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 🔽 Evita expansión automática por accesibilidad
+    
   ),
   child: Text(
     AppLocalizations.of(context).translate('logoutLabel'),
-    style: TextStyle(fontSize: size.width * 0.035),
+    style: TextStyle(fontSize: isWide?  size.width * 0.015 : size.width * 0.035),
   ),
+  
 ),
 
                   ),
