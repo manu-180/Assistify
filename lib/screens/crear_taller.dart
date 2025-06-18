@@ -321,72 +321,80 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                       ),
                       const SizedBox(height: 16),
                       Row(
-                        children: ['Hombre', 'Mujer', 'Indefinido']
-                            .asMap()
-                            .entries
-                            .map((entry) {
-                          final index = entry.key;
-                          final opcion = entry.value;
-                          final esSeleccionado = sexoSeleccionado == opcion;
+  children: ['Hombre', 'Mujer', 'Indefinido']
+      .asMap()
+      .entries
+      .map((entry) {
+    final index = entry.key;
+    final opcion = entry.value;
+    final esSeleccionado = sexoSeleccionado == opcion;
 
-                          return Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  sexoSeleccionado = opcion;
-                                });
-                              },
-                              child: Container(
-                                margin:
-                                    EdgeInsets.only(left: index > 0 ? 8 : 0),
-                                decoration: BoxDecoration(
-                                  color: esSeleccionado
-                                      ? color.primary.withOpacity(0.1)
-                                      : color.background,
-                                  border: Border.all(
-                                    color: esSeleccionado
-                                        ? color.primary
-                                        : Colors.black54,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10, horizontal: 6),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Icon(
-                                      esSeleccionado
-                                          ? Icons.radio_button_checked
-                                          : Icons.radio_button_off,
-                                      size: 18,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Flexible(
-                                      child: Text(
-                                        opcion,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: esSeleccionado
-                                              ? FontWeight.bold
-                                              : FontWeight.normal,
-                                          color: esSeleccionado
-                                              ? Theme.of(context)
-                                                  .colorScheme
-                                                  .primary
-                                              : Colors.black87,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            sexoSeleccionado = opcion;
+          });
+        },
+        child: Container(
+          margin: EdgeInsets.only(left: index > 0 ? 8 : 0),
+          decoration: BoxDecoration(
+            color: esSeleccionado
+                ? color.primary.withOpacity(0.1)
+                : color.background,
+            border: Border.all(
+              color:
+                  esSeleccionado ? color.primary : Colors.black54,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          padding: const EdgeInsets.symmetric(
+              vertical: 10, horizontal: 6),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Icon(
+                esSeleccionado
+                    ? Icons.radio_button_checked
+                    : Icons.radio_button_off,
+                size: 18,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  opcion,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: esSeleccionado
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    color: esSeleccionado
+                        ? Theme.of(context).colorScheme.primary
+                        : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }).toList(),
+),
+const SizedBox(height: 4),
+Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    "Sexo (opcional)",
+    style: TextStyle(
+      fontSize: 12,
+      color: Colors.black54,
+      fontStyle: FontStyle.italic,
+    ),
+  ),
+),
+
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         decoration: InputDecoration(
