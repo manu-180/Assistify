@@ -637,23 +637,23 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
             size.width * 0.03, size.height * 0.06, size.width * 0.03, 0),
         child: Column(
           children: [
-            isWide ?
-            SizedBox():
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, size.height * 0.06),
-              child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
-                  ? _AvisoDeClasesDisponibles(
-                      colors: colors,
-                      color: color,
-                      text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
-                    )
-                  : ShimmerLoading(
-                      brillo: colors.primary.withAlpha(40),
-                      color: colors.primary.withAlpha(120),
-                      height: size.width * 0.19,
-                      width: size.width * 0.9,
-                    ),
-            ),
+            isWide
+                ? SizedBox()
+                : Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, size.height * 0.06),
+                    child: (avisoDeClasesDisponibles ?? avisoAnterior) != null
+                        ? _AvisoDeClasesDisponibles(
+                            colors: colors,
+                            color: color,
+                            text: (avisoDeClasesDisponibles ?? avisoAnterior)!,
+                          )
+                        : ShimmerLoading(
+                            brillo: colors.primary.withAlpha(40),
+                            color: colors.primary.withAlpha(120),
+                            height: size.width * 0.19,
+                            width: size.width * 0.9,
+                          ),
+                  ),
             SemanaNavigation(
               semanaSeleccionada: semanaSeleccionada,
               cambiarSemanaAdelante: cambiarSemanaAdelante,
@@ -795,7 +795,7 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
       children: [
         SizedBox(
           width: size.width * 0.7,
-          height: isWide? size.height * 0.17: size.height * 0.053,
+          height: isWide ? size.height * 0.17 : size.height * 0.053,
           child: GestureDetector(
             child: ElevatedButton(
               onPressed: esAdmin
@@ -999,7 +999,7 @@ class _SemanaNavigationState extends State<SemanaNavigation> {
           onPressed: widget.cambiarSemanaAdelante,
           icon: Icon(
             Icons.arrow_forward_ios,
-            size:  isWide ? size.width * 0.03 : size.width * 0.07,
+            size: isWide ? size.width * 0.03 : size.width * 0.07,
             color: color.primary,
           ),
           padding: EdgeInsets.zero, // <- Esto elimina el espacio del ícono
@@ -1059,8 +1059,8 @@ class _DiaSelectionState extends State<_DiaSelection> {
         return Column(
           children: [
             SizedBox(
-              width: isWide?size.width * 0.35 :size.width * 0.99,
-              height: isWide?size.height * 0.15 : size.height * 0.053,
+              width: isWide ? size.width * 0.35 : size.width * 0.99,
+              height: isWide ? size.height * 0.15 : size.height * 0.053,
               child: ElevatedButton(
                 onPressed: () => widget.seleccionarDia(diaMesAnio),
                 style: ElevatedButton.styleFrom(

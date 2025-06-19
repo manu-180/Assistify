@@ -26,12 +26,11 @@ Future<void> main() async {
   // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
   subscriptionManager.listenToPurchaseUpdates(
-  onPurchase: (purchases) {
-    // Si necesitás manejar lógica global cuando se compra
-    print("Se recibieron compras nuevas: $purchases");
-  },
-);
-
+    onPurchase: (purchases) {
+      // Si necesitás manejar lógica global cuando se compra
+      print("Se recibieron compras nuevas: $purchases");
+    },
+  );
 
   // 🟢 PostFrame: ejecutamos todo lo demás después del arranque visual
   runApp(
@@ -94,9 +93,8 @@ class MyApp extends ConsumerWidget {
       //   }
 
       //   return const Locale('en');
-      // },  PARA DESPUES 
+      // },  PARA DESPUES
       locale: const Locale('es'),
-
     );
   }
 }

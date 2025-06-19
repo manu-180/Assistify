@@ -140,7 +140,8 @@ class SubscriptionManager {
     final Stream<List<PurchaseDetails>> purchaseUpdates =
         _inAppPurchase.purchaseStream;
 
-    final subscription = purchaseUpdates.listen((List<PurchaseDetails> purchases) {
+    final subscription =
+        purchaseUpdates.listen((List<PurchaseDetails> purchases) {
       for (var purchase in purchases) {
         if (purchase.status == PurchaseStatus.restored ||
             purchase.status == PurchaseStatus.purchased) {

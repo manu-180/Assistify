@@ -297,7 +297,8 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                       ),
 
                       user?.userMetadata?['taller'] !=
-                              "Taller de cerámica Ricardo Rojas" && !isWide
+                                  "Taller de cerámica Ricardo Rojas" &&
+                              !isWide
                           ? FutureBuilder<int>(
                               future: Future.delayed(Duration.zero, () {
                                 return ObtenerClasesDisponibles()

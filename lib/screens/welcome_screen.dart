@@ -81,59 +81,61 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   List<Widget> _buildTextAndButtons(Size size) {
-  return [
-    const Text(
-      '¿Sos empresa?',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-        fontFamily: "oxanium",
-      ),
-      textAlign: TextAlign.center,
-    ),
-    Column(
-      children: [
-        OutlinedButton(
-          onPressed: () => context.push("/onboarding"),
-          style: OutlinedButton.styleFrom(
-            minimumSize: Size(size.width * 0.8, 50),
-            side: const BorderSide(color: Colors.white),
-          ),
-          child: const Text('Crea tu cuenta', style: TextStyle(color: Colors.white)),
+    return [
+      const Text(
+        '¿Sos empresa?',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontFamily: "oxanium",
         ),
-        SizedBox(height: size.width * 0.04),
-        OutlinedButton(
-          onPressed: () => context.push("/login"),
-          style: OutlinedButton.styleFrom(
-            minimumSize: Size(size.width * 0.8, 50),
-            side: const BorderSide(color: Colors.white),
+        textAlign: TextAlign.center,
+      ),
+      Column(
+        children: [
+          OutlinedButton(
+            onPressed: () => context.push("/onboarding"),
+            style: OutlinedButton.styleFrom(
+              minimumSize: Size(size.width * 0.8, 50),
+              side: const BorderSide(color: Colors.white),
+            ),
+            child: const Text('Crea tu cuenta',
+                style: TextStyle(color: Colors.white)),
           ),
-          child: const Text('Inicia sesión', style: TextStyle(color: Colors.white)),
+          SizedBox(height: size.width * 0.04),
+          OutlinedButton(
+            onPressed: () => context.push("/login"),
+            style: OutlinedButton.styleFrom(
+              minimumSize: Size(size.width * 0.8, 50),
+              side: const BorderSide(color: Colors.white),
+            ),
+            child: const Text('Inicia sesión',
+                style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+      const Text(
+        '¿Sos alumno?',
+        style: TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+          fontFamily: "oxanium",
         ),
-      ],
-    ),
-    const Text(
-      '¿Sos alumno?',
-      style: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-        fontFamily: "oxanium",
+        textAlign: TextAlign.center,
       ),
-      textAlign: TextAlign.center,
-    ),
-    OutlinedButton(
-      onPressed: () => context.push("/login"),
-      style: OutlinedButton.styleFrom(
-        minimumSize: Size(size.width * 0.8, 50),
-        side: const BorderSide(color: Colors.white),
+      OutlinedButton(
+        onPressed: () => context.push("/login"),
+        style: OutlinedButton.styleFrom(
+          minimumSize: Size(size.width * 0.8, 50),
+          side: const BorderSide(color: Colors.white),
+        ),
+        child:
+            const Text('Inicia sesión', style: TextStyle(color: Colors.white)),
       ),
-      child: const Text('Inicia sesión', style: TextStyle(color: Colors.white)),
-    ),
-  ];
-}
-
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,86 +150,87 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             height: size.height,
             width: size.width,
             child: isWide
-    ? Row(
-        children: [
-          // VIDEO A LA IZQUIERDA
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(32),
-                child: _allInitialized
-                    ? AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 800),
-                        switchInCurve: Curves.easeIn,
-                        switchOutCurve: Curves.easeOut,
-                        child: VideoPlayer(
-                          _controllers[_currentPage],
-                          key: UniqueKey(),
+                ? Row(
+                    children: [
+                      // VIDEO A LA IZQUIERDA
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(32),
+                            child: _allInitialized
+                                ? AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 800),
+                                    switchInCurve: Curves.easeIn,
+                                    switchOutCurve: Curves.easeOut,
+                                    child: VideoPlayer(
+                                      _controllers[_currentPage],
+                                      key: UniqueKey(),
+                                    ),
+                                  )
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                          ),
                         ),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
-              ),
-            ),
-          ),
+                      ),
 
-          // CONTENIDO A LA DERECHA
-          Expanded(
-            flex: 1,
-            child: Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: _buildTextAndButtons(size),
-              ),
-            ),
-          ),
-        ],
-      )
-    : Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.only(top: size.height * 0.02),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: SizedBox(
-                height: size.height * 0.5,
-                width: size.width * 0.8,
-                child: _allInitialized
-                    ? AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 800),
-                        switchInCurve: Curves.easeIn,
-                        switchOutCurve: Curves.easeOut,
-                        child: VideoPlayer(
-                          _controllers[_currentPage],
-                          key: UniqueKey(),
+                      // CONTENIDO A LA DERECHA
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: _buildTextAndButtons(size),
+                          ),
                         ),
-                      )
-                    : const Center(child: CircularProgressIndicator()),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(
-                size.height * 0.03,
-                0,
-                size.height * 0.03,
-                size.height * 0.03,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: _buildTextAndButtons(size),
-              ),
-            ),
-          ),
-        ],
-      ),
-
+                      ),
+                    ],
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(top: size.height * 0.02),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(32),
+                          child: SizedBox(
+                            height: size.height * 0.5,
+                            width: size.width * 0.8,
+                            child: _allInitialized
+                                ? AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 800),
+                                    switchInCurve: Curves.easeIn,
+                                    switchOutCurve: Curves.easeOut,
+                                    child: VideoPlayer(
+                                      _controllers[_currentPage],
+                                      key: UniqueKey(),
+                                    ),
+                                  )
+                                : const Center(
+                                    child: CircularProgressIndicator()),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(
+                            size.height * 0.03,
+                            0,
+                            size.height * 0.03,
+                            size.height * 0.03,
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: _buildTextAndButtons(size),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ),
       ),

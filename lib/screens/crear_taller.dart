@@ -7,6 +7,7 @@ import 'package:taller_ceramica/l10n/app_localizations.dart';
 import 'package:taller_ceramica/main.dart';
 import 'package:taller_ceramica/supabase/supabase_barril.dart';
 import 'package:taller_ceramica/utils/utils_barril.dart';
+import 'package:taller_ceramica/widgets/snackbar_animado.dart';
 import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -321,80 +322,84 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                       ),
                       const SizedBox(height: 16),
                       Row(
-  children: ['Hombre', 'Mujer', 'Indefinido']
-      .asMap()
-      .entries
-      .map((entry) {
-    final index = entry.key;
-    final opcion = entry.value;
-    final esSeleccionado = sexoSeleccionado == opcion;
+                        children: ['Hombre', 'Mujer', 'Indefinido']
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final index = entry.key;
+                          final opcion = entry.value;
+                          final esSeleccionado = sexoSeleccionado == opcion;
 
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            sexoSeleccionado = opcion;
-          });
-        },
-        child: Container(
-          margin: EdgeInsets.only(left: index > 0 ? 8 : 0),
-          decoration: BoxDecoration(
-            color: esSeleccionado
-                ? color.primary.withOpacity(0.1)
-                : color.background,
-            border: Border.all(
-              color:
-                  esSeleccionado ? color.primary : Colors.black54,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          padding: const EdgeInsets.symmetric(
-              vertical: 10, horizontal: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Icon(
-                esSeleccionado
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_off,
-                size: 18,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  opcion,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: esSeleccionado
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    color: esSeleccionado
-                        ? Theme.of(context).colorScheme.primary
-                        : Colors.black87,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }).toList(),
-),
-const SizedBox(height: 4),
-Align(
-  alignment: Alignment.centerLeft,
-  child: Text(
-    "Sexo (opcional)",
-    style: TextStyle(
-      fontSize: 12,
-      color: Colors.black54,
-      fontStyle: FontStyle.italic,
-    ),
-  ),
-),
-
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  sexoSeleccionado = opcion;
+                                });
+                              },
+                              child: Container(
+                                margin:
+                                    EdgeInsets.only(left: index > 0 ? 8 : 0),
+                                decoration: BoxDecoration(
+                                  color: esSeleccionado
+                                      ? color.primary.withOpacity(0.1)
+                                      : color.background,
+                                  border: Border.all(
+                                    color: esSeleccionado
+                                        ? color.primary
+                                        : Colors.black54,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 6),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      esSeleccionado
+                                          ? Icons.radio_button_checked
+                                          : Icons.radio_button_off,
+                                      size: 18,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: Text(
+                                        opcion,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: esSeleccionado
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                          color: esSeleccionado
+                                              ? Theme.of(context)
+                                                  .colorScheme
+                                                  .primary
+                                              : Colors.black87,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "Sexo (opcional)",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.black54,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
                         decoration: InputDecoration(
@@ -456,70 +461,74 @@ Align(
                       ),
                       const SizedBox(height: 24),
                       Row(
-  crossAxisAlignment: CrossAxisAlignment.center,
-  children: [
-    Checkbox(
-      value: aceptaPoliticas,
-      onChanged: (value) {
-        setState(() {
-          aceptaPoliticas = value ?? false;
-        });
-      },
-    ),
-    Expanded(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            aceptaPoliticas = !aceptaPoliticas;
-          });
-        },
-        child: Wrap(
-          children: [
-            const Text("Al continuar, aceptás nuestra "),
-            InkWell(
-              onTap: () async {
-                const url = 'https://politicas-six.vercel.app/';
-                if (await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url),
-                      mode: LaunchMode.externalApplication);
-                }
-              },
-              child: const Text(
-                "Política de Privacidad",
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Color.fromARGB(255, 61, 132, 191),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const Text(" y los "),
-            InkWell(
-              onTap: () async {
-                const url =
-                    'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
-                if (await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url),
-                      mode: LaunchMode.externalApplication);
-                }
-              },
-              child: const Text(
-                "Términos de uso",
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                  color: Color.fromARGB(255, 61, 132, 191),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            const Text("."),
-          ],
-        ),
-      ),
-    ),
-  ],
-),
-
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Checkbox(
+                            value: aceptaPoliticas,
+                            onChanged: (value) {
+                              setState(() {
+                                aceptaPoliticas = value ?? false;
+                              });
+                            },
+                          ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  aceptaPoliticas = !aceptaPoliticas;
+                                });
+                              },
+                              child: Wrap(
+                                children: [
+                                  const Text("Al continuar, aceptás nuestra "),
+                                  InkWell(
+                                    onTap: () async {
+                                      const url =
+                                          'https://politicas-six.vercel.app/';
+                                      if (await canLaunchUrl(Uri.parse(url))) {
+                                        await launchUrl(Uri.parse(url),
+                                            mode:
+                                                LaunchMode.externalApplication);
+                                      }
+                                    },
+                                    child: const Text(
+                                      "Política de Privacidad",
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color:
+                                            Color.fromARGB(255, 61, 132, 191),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const Text(" y los "),
+                                  InkWell(
+                                    onTap: () async {
+                                      const url =
+                                          'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/';
+                                      if (await canLaunchUrl(Uri.parse(url))) {
+                                        await launchUrl(Uri.parse(url),
+                                            mode:
+                                                LaunchMode.externalApplication);
+                                      }
+                                    },
+                                    child: const Text(
+                                      "Términos de uso",
+                                      style: TextStyle(
+                                        decoration: TextDecoration.underline,
+                                        color:
+                                            Color.fromARGB(255, 61, 132, 191),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const Text("."),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -574,14 +583,13 @@ Align(
                                       setState(() {
                                         isLoading = false;
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "El nombre ya está registrado"),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje: "El nombre ya está registrado",
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
+
                                       return;
                                     }
 
@@ -591,13 +599,12 @@ Align(
                                             'Este correo electrónico ya está registrado.';
                                         isLoading = false;
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "Este correo electrónico ya está registrado."),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje:
+                                            "Este correo electrónico ya está registrado.",
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
                                       return;
                                     }
@@ -608,16 +615,31 @@ Align(
                                             "Ya existe ese nombre de empresa.";
                                         isLoading = false;
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "El nombre de empresa ya existe."),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje:
+                                            "El nombre de empresa ya existe.",
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
                                       return;
                                     }
+
+                                    final esTelefonoValido = RegExp(r'^[0-9]{7,15}$').hasMatch(telefono);
+
+if (!esTelefonoValido) {
+  setState(() {
+    phoneError = "Número inválido. (ej: 1134272488)";
+    isLoading = false;
+  });
+  mostrarSnackBarAnimado(
+    context: context,
+    mensaje: "Número de teléfono inválido.",
+    colorFondo: Colors.red,
+  );
+  return;
+}
+
 
                                     if (existeTelefono) {
                                       setState(() {
@@ -625,13 +647,13 @@ Align(
                                             "Ese número ya está registrado.";
                                         isLoading = false;
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "Ese número ya está registrado."),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje: AppLocalizations.of(context)
+                                            .translate(
+                                                'allFieldsRequiredError'),
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
                                       return;
                                     }
@@ -645,18 +667,14 @@ Align(
                                       setState(() {
                                         isLoading = false;
                                       });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            AppLocalizations.of(context)
-                                                .translate(
-                                                    'allFieldsRequiredError'),
-                                            style: const TextStyle(
-                                                color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje: AppLocalizations.of(context)
+                                            .translate(
+                                                'allFieldsRequiredError'),
+
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
                                       return;
                                     }
@@ -693,13 +711,13 @@ Align(
                                     }
                                     if (!aceptaPoliticas) {
                                       setState(() => isLoading = false);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "Debés aceptar la Política de Privacidad para continuar."),
-                                          backgroundColor: Colors.red,
-                                        ),
+                                      mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje:
+                                            "Debés aceptar la Política de Privacidad para continuar.",
+
+                                        colorFondo:
+                                            Colors.red, // o verde si es éxito
                                       );
                                       return;
                                     }
@@ -761,17 +779,15 @@ Align(
 
                                       if (context.mounted) {
                                         context.go("/");
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(
-                                            AppLocalizations.of(context)
-                                                .translate(
-                                                    'workshopCreatedSuccess'),
-                                            style: const TextStyle(
-                                                color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.green,
-                                        ));
+                                        mostrarSnackBarAnimado(
+                                          context: context,
+                                          mensaje: AppLocalizations.of(context)
+                                              .translate(
+                                                  'workshopCreatedSuccess'),
+
+                                          colorFondo: Colors
+                                              .lightGreen, // o verde si es éxito
+                                        );
                                       }
                                     } catch (e) {
                                       final error = e.toString().toLowerCase();
@@ -792,15 +808,13 @@ Align(
                                       }
 
                                       if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(SnackBar(
-                                          content: Text(
-                                            mensajeError,
-                                            style: const TextStyle(
-                                                color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.red,
-                                        ));
+                                        mostrarSnackBarAnimado(
+                                          context: context,
+                                          mensaje: mensajeError,
+
+                                          colorFondo:
+                                              Colors.red, // o verde si es éxito
+                                        );
                                       }
                                     } finally {
                                       setState(() {

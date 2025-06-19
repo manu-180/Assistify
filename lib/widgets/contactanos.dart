@@ -126,7 +126,7 @@ class _ContactanosState extends State<Contactanos>
             const SizedBox(height: 16),
             TextField(
               controller: mensajeController,
-              maxLines: isWide ? 2: 5,
+              maxLines: isWide ? 2 : 5,
               decoration: const InputDecoration(
                 hintText: "Escribí tu mensaje acá...",
                 border: OutlineInputBorder(),
@@ -159,7 +159,7 @@ class _ContactanosState extends State<Contactanos>
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    final isWide = size.width > 600; 
+    final isWide = size.width > 600;
     final bool isKeyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
 
     return Stack(

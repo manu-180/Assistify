@@ -147,11 +147,11 @@ class CustomAppBarState extends State<CustomAppBar> {
         'label': AppLocalizations.of(context).translate('settingsLabel'),
       },
 
-      if (user?.userMetadata!["admin"] ) 
-      {
-        'value': '/subscription',
-        'label': "Suscribite",
-      },
+      if (user?.userMetadata!["admin"])
+        {
+          'value': '/subscription',
+          'label': "Suscribite",
+        },
       // if (user?.id == '668da4f9-3487-42c5-8f28-fe2da23806d4')
       // {
       //   'value': '/prueba',
@@ -227,7 +227,8 @@ class CustomAppBarState extends State<CustomAppBar> {
                 _isMenuOpen = false;
               });
             },
-            offset: Offset(isWide ? -size.width * 0.05 :  -size.width * 0.05, isWide ? size.height * 0.3 :  size.height * 0.07),
+            offset: Offset(isWide ? -size.width * 0.05 : -size.width * 0.05,
+                isWide ? size.height * 0.3 : size.height * 0.07),
           ),
         ],
       ),
@@ -256,31 +257,33 @@ class CustomAppBarState extends State<CustomAppBar> {
                 children: [
                   SizedBox(width: size.width * 0.02),
                   SizedBox(
-                    width: isWide ? size.width * 0.2 :size.width * 0.35,
+                    width: isWide ? size.width * 0.2 : size.width * 0.35,
                     height: isWide ? size.height * 0.1 : size.height * 0.044,
                     child: ElevatedButton(
-  onPressed: () async {
-    await Supabase.instance.client.auth.signOut();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('session');
+                      onPressed: () async {
+                        await Supabase.instance.client.auth.signOut();
+                        final prefs = await SharedPreferences.getInstance();
+                        await prefs.remove('session');
 
-    if (context.mounted) {
-      context.push('/');
-    }
-  },
-  style: ElevatedButton.styleFrom(
-    padding: EdgeInsets.zero, // 🔽 Quita el padding interno
-    minimumSize: Size.zero,   // 🔽 Permite que se achique lo más posible
-    tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 🔽 Evita expansión automática por accesibilidad
-    
-  ),
-  child: Text(
-    AppLocalizations.of(context).translate('logoutLabel'),
-    style: TextStyle(fontSize: isWide?  size.width * 0.015 : size.width * 0.035),
-  ),
-  
-),
-
+                        if (context.mounted) {
+                          context.push('/');
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        padding: EdgeInsets.zero, // 🔽 Quita el padding interno
+                        minimumSize: Size
+                            .zero, // 🔽 Permite que se achique lo más posible
+                        tapTargetSize: MaterialTapTargetSize
+                            .shrinkWrap, // 🔽 Evita expansión automática por accesibilidad
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context).translate('logoutLabel'),
+                        style: TextStyle(
+                            fontSize: isWide
+                                ? size.width * 0.015
+                                : size.width * 0.035),
+                      ),
+                    ),
                   ),
                 ],
               ),

@@ -21,6 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:taller_ceramica/models/clase_models.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:taller_ceramica/widgets/snackbar_animado.dart';
 
 import '../widgets/mostrar_dia_segun_fecha.dart';
 
@@ -328,35 +329,22 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
 
                           if (existingClass != null) {
                             if (mounted) {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    localizations.translate(
-                                        'classAlreadyExists',
-                                        params: {
-                                          'date': fechaStr,
-                                          'time': hora
-                                        }),
-                                  ),
+                              mostrarSnackBarAnimado(
+                                context: context,
+                                mensaje: localizations.translate(
+                                  'classAlreadyExists',
+                                  params: {'date': fechaStr, 'time': hora},
                                 ),
                               );
                             }
                             continue;
                           } else {
                             if (mounted) {
-                              ScaffoldMessenger.of(context)
-                                  .hideCurrentSnackBar();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    localizations.translate('classAddedSuccess',
-                                        params: {
-                                          'date': fechaStr,
-                                          'time': hora
-                                        }),
-                                  ),
+                              mostrarSnackBarAnimado(
+                                context: context,
+                                mensaje: localizations.translate(
+                                  'classAddedSuccess',
+                                  params: {'date': fechaStr, 'time': hora},
                                 ),
                               );
                             }
@@ -391,11 +379,10 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                         }
                       } catch (e) {
                         if (mounted) {
-                          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(e.toString()),
-                            ),
+                          mostrarSnackBarAnimado(
+                            context: context,
+                            mensaje: e.toString(),
+                            colorFondo: Colors.redAccent,
                           );
                         }
                       } finally {
@@ -597,17 +584,9 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                       .map((cl) =>
                                           '${cl.dia} ${cl.fecha} a las ${cl.hora}')
                                       .join('\n');
-
-                                  ScaffoldMessenger.of(context)
-                                      .hideCurrentSnackBar();
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('$mensaje\n\n$detalles'),
-                                      backgroundColor:
-                                          Theme.of(context).colorScheme.primary,
-                                      behavior: SnackBarBehavior.floating,
-                                      duration: const Duration(seconds: 4),
-                                    ),
+                                  mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje: '$mensaje\n\n$detalles',
                                   );
                                 }
                               },
@@ -874,20 +853,17 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
           ],
         ),
         floatingActionButton: SizedBox(
-          width: isWide?  size.width * 0.23:size.width * 0.5,
+          width: isWide ? size.width * 0.23 : size.width * 0.5,
           child: FloatingActionButton(
             backgroundColor: colors.secondaryContainer,
             onPressed: () {
               if (fechaSeleccionada == null) {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      AppLocalizations.of(context)
-                          .translate('selectDateBeforeAdding'),
-                    ),
-                  ),
+                mostrarSnackBarAnimado(
+                  context: context,
+                  mensaje: AppLocalizations.of(context)
+                      .translate('selectDateBeforeAdding'),
                 );
+
                 return;
               }
               mostrarDialogoAgregarClase(

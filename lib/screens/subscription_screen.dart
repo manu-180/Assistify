@@ -30,23 +30,20 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   StreamSubscription<List<PurchaseDetails>>? _subscription;
   bool _isProcessingPurchase = false;
   Timer? _purchaseTimeoutTimer;
-  
 
   final Map<String, Map<String, String>> planesCustom = {
-  'assistify_monthly': {
-    'titulo': 'Plan Mensual',
-    'beneficio': '1 MES GRATIS',
-    'descripcion':
-        'Suscripción mensual con acceso completo a todas las funcionalidades.',
-  },
-  'assistify_annual': {
-    'titulo': 'Plan Anual',
-    'beneficio': '2 MESES GRATIS',
-    'descripcion':
-        'Suscripción anual con acceso completo y ahorro especial.',
-  },
-};
-
+    'assistify_monthly': {
+      'titulo': 'Plan Mensual',
+      'beneficio': '1 MES GRATIS',
+      'descripcion':
+          'Suscripción mensual con acceso completo a todas las funcionalidades.',
+    },
+    'assistify_annual': {
+      'titulo': 'Plan Anual',
+      'beneficio': '2 MESES GRATIS',
+      'descripcion': 'Suscripción anual con acceso completo y ahorro especial.',
+    },
+  };
 
   String? extraerBeneficio(String description) {
     final exp = RegExp(r'(\d+)\s+mes(?:es)?\s+gratis', caseSensitive: false);
@@ -58,25 +55,21 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   void initState() {
     super.initState();
     final manager = SubscriptionManager();
-manager.listenToPurchaseUpdates(onPurchase: _handlePurchaseUpdates);
+    manager.listenToPurchaseUpdates(onPurchase: _handlePurchaseUpdates);
 
-WidgetsBinding.instance.addPostFrameCallback((_) {
-  manager.checkAndUpdateSubscription();
-});
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      manager.checkAndUpdateSubscription();
+    });
 
     _initializeStore();
-
-    
   }
 
   @override
-void dispose() {
-  _subscription?.cancel();
-  _purchaseTimeoutTimer?.cancel(); // ← esto es clave
-  super.dispose();
-}
-
+  void dispose() {
+    _subscription?.cancel();
+    _purchaseTimeoutTimer?.cancel(); // ← esto es clave
+    super.dispose();
+  }
 
   // Función para limpiar el título
   String cleanTitle(String title) {
@@ -109,51 +102,52 @@ void dispose() {
     }
   }
 
- void _subscribe(ProductDetails productDetails) async {
-  if (_isProcessingPurchase) {
-    debugPrint('⚠️ Ya hay una compra en proceso.');
-    return;
-  }
+  void _subscribe(ProductDetails productDetails) async {
+    if (_isProcessingPurchase) {
+      debugPrint('⚠️ Ya hay una compra en proceso.');
+      return;
+    }
 
-  if (mounted) {
-    setState(() {
-      _isProcessingPurchase = true;
-    });
-  }
+    if (mounted) {
+      setState(() {
+        _isProcessingPurchase = true;
+      });
+    }
 
-  try {
-    final PurchaseParam purchaseParam =
-        PurchaseParam(productDetails: productDetails);
-    debugPrint('Attempting to purchase: ${productDetails.id}');
-    _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
+    try {
+      final PurchaseParam purchaseParam =
+          PurchaseParam(productDetails: productDetails);
+      debugPrint('Attempting to purchase: ${productDetails.id}');
+      _inAppPurchase.buyNonConsumable(purchaseParam: purchaseParam);
 
-    // 🕒 Timeout para liberar el flag si no hay respuesta
-    _purchaseTimeoutTimer?.cancel();
-    _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
-      if (mounted && _isProcessingPurchase) {
-        debugPrint('🕒 Timeout: No se completó la compra, liberando bloqueo.');
+      // 🕒 Timeout para liberar el flag si no hay respuesta
+      _purchaseTimeoutTimer?.cancel();
+      _purchaseTimeoutTimer = Timer(const Duration(seconds: 15), () {
+        if (mounted && _isProcessingPurchase) {
+          debugPrint(
+              '🕒 Timeout: No se completó la compra, liberando bloqueo.');
+          setState(() {
+            _isProcessingPurchase = false;
+          });
+        }
+      });
+    } catch (e) {
+      debugPrint('❌ Error initiating purchase: $e');
+      if (mounted) {
         setState(() {
           _isProcessingPurchase = false;
         });
       }
-    });
-  } catch (e) {
-    debugPrint('❌ Error initiating purchase: $e');
-    if (mounted) {
-      setState(() {
-        _isProcessingPurchase = false;
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).translate(
+            'purchaseError',
+            params: {'error': e.toString()},
+          )),
+        ),
+      );
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context).translate(
-          'purchaseError',
-          params: {'error': e.toString()},
-        )),
-      ),
-    );
   }
-}
 
   void _handlePurchaseUpdates(List<PurchaseDetails> purchases) async {
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
@@ -194,19 +188,16 @@ void dispose() {
           );
 
           ScaffoldMessenger.of(context).showSnackBar(
-  SnackBar(
-    content: Text(
-      AppLocalizations.of(context).translate('purchaseSuccess'),
-    ),
-  ),
-);
+            SnackBar(
+              content: Text(
+                AppLocalizations.of(context).translate('purchaseSuccess'),
+              ),
+            ),
+          );
 
 // ✅ Redirigir al home del taller
-context.go("/home/$taller");
-return;
-
-          
-          
+          context.go("/home/$taller");
+          return;
         } catch (e) {
           debugPrint('❌ Error en acknowledgment o backend: $e');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -232,11 +223,10 @@ return;
       }
     }
     if (mounted) {
-  setState(() {
-    _isProcessingPurchase = false;
-  });
-}
-
+      setState(() {
+        _isProcessingPurchase = false;
+      });
+    }
   }
 
   @override
@@ -276,102 +266,105 @@ return;
               : SingleChildScrollView(
                   child: Center(
                     child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(vertical: size.height * 0.1),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                       children: _products.map((product) {
-  final custom = planesCustom[product.id];
+                        padding:
+                            EdgeInsets.symmetric(vertical: size.height * 0.1),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: _products.map((product) {
+                            final custom = planesCustom[product.id];
 
-  return GestureDetector(
-    onTap: () => _subscribe(product),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Container(
-        width: size.width * 0.8,
-        margin: const EdgeInsets.symmetric(vertical: 12),
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // 📦 Título
-            Text(
-              custom?['titulo'] ?? product.title,
-              style: TextStyle(
-                fontSize: size.width * 0.055,
-                fontWeight: FontWeight.w700,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 16),
+                            return GestureDetector(
+                              onTap: () => _subscribe(product),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 10),
+                                child: Container(
+                                  width: size.width * 0.8,
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  padding: const EdgeInsets.all(20),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // 📦 Título
+                                      Text(
+                                        custom?['titulo'] ?? product.title,
+                                        style: TextStyle(
+                                          fontSize: size.width * 0.055,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
 
-            // 🔥 Beneficio
-            if (custom?['beneficio'] != null)
-              Container(
-                padding: const EdgeInsets.symmetric(
-                    vertical: 6, horizontal: 12),
-                decoration: BoxDecoration(
-                  color: color.primary.withAlpha(130),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  custom!['beneficio']!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-              ),
-            const SizedBox(height: 8),
+                                      // 🔥 Beneficio
+                                      if (custom?['beneficio'] != null)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 6, horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: color.primary.withAlpha(130),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Text(
+                                            custom!['beneficio']!,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white,
+                                              letterSpacing: 1.2,
+                                            ),
+                                          ),
+                                        ),
+                                      const SizedBox(height: 8),
 
-            // 📝 Descripción
-            Text(
-              custom?['descripcion'] ?? product.description,
-              style: TextStyle(
-                fontSize: size.width * 0.04,
-                color: Colors.black54,
-              ),
-            ),
-            const SizedBox(height: 20),
+                                      // 📝 Descripción
+                                      Text(
+                                        custom?['descripcion'] ??
+                                            product.description,
+                                        style: TextStyle(
+                                          fontSize: size.width * 0.04,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
 
-            // 💰 Precio
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                product.price,
-                style: TextStyle(
-                  fontSize: size.width * 0.05,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}).toList(),
-                      )
-                    ),
+                                      // 💰 Precio
+                                      Align(
+                                        alignment: Alignment.centerRight,
+                                        child: Text(
+                                          product.price,
+                                          style: TextStyle(
+                                            fontSize: size.width * 0.05,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        )),
                   ),
                 )
           : Center(
-            
               child: CircularProgressIndicator(),
             ),
     );
