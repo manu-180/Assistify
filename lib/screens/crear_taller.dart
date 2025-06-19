@@ -625,21 +625,7 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                                       return;
                                     }
 
-                                    final esTelefonoValido = RegExp(r'^[0-9]{7,15}$').hasMatch(telefono);
-
-if (!esTelefonoValido) {
-  setState(() {
-    phoneError = "Número inválido. (ej: 1134272488)";
-    isLoading = false;
-  });
-  mostrarSnackBarAnimado(
-    context: context,
-    mensaje: "Número de teléfono inválido.",
-    colorFondo: Colors.red,
-  );
-  return;
-}
-
+                                    
 
                                     if (existeTelefono) {
                                       setState(() {

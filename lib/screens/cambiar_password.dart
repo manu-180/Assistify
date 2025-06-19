@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
+import 'package:taller_ceramica/widgets/snackbar_animado.dart';
 
 class CambiarPassword extends StatefulWidget {
   const CambiarPassword({super.key});
@@ -98,44 +99,32 @@ class _CambiarPasswordState extends State<CambiarPassword> {
 
                     // Validaciones
                     if (nuevaPassword.isEmpty || confirmarPassword.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)
-                                .translate('allFieldsRequiredError'),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                      mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:   AppLocalizations.of(context)
+                                .translate('allFieldsRequiredError'),colorFondo:
+                                            Colors.red, 
+                                  );
                       return;
                     }
 
                     if (nuevaPassword.length < 6) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)
-                                .translate('passwordLengthError'),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                        mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:   AppLocalizations.of(context)
+                                .translate('passwordLengthError'),colorFondo:
+                                            Colors.red, 
+                                  );
                       return;
                     }
 
                     if (nuevaPassword != confirmarPassword) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)
-                                .translate('passwordMismatchError'),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                       mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:    AppLocalizations.of(context)
+                                .translate('passwordMismatchError'),colorFondo:
+                                            Colors.red, 
+                                  );
                       return;
                     }
 
@@ -144,28 +133,20 @@ class _CambiarPasswordState extends State<CambiarPassword> {
                       await Supabase.instance.client.auth
                           .updateUser(UserAttributes(password: nuevaPassword));
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context)
-                                .translate('passwordUpdatedSuccess'),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
+                     mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:     AppLocalizations.of(context)
+                                .translate('passwordUpdatedSuccess'),colorFondo:
+                                            Colors.lightGreen, 
+                                  );
                     } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            AppLocalizations.of(context).translate(
+                     mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:     AppLocalizations.of(context).translate(
                                 'passwordUpdateError',
-                                params: {'error': e.toString()}),
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
+                                params: {'error': e.toString()}),colorFondo:
+                                            Colors.red, 
+                                  );
                     }
                   },
                   child: Text(

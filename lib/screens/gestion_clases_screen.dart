@@ -689,23 +689,10 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                                       '${cl.dia} ${cl.fecha} a las ${cl.hora}')
                                                   .join('\n');
 
-                                              ScaffoldMessenger.of(context)
-                                                  .hideCurrentSnackBar();
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                      '$mensaje\n\n$detalles'),
-                                                  backgroundColor:
-                                                      Theme.of(context)
-                                                          .colorScheme
-                                                          .primary,
-                                                  behavior:
-                                                      SnackBarBehavior.floating,
-                                                  duration: const Duration(
-                                                      seconds: 4),
-                                                ),
-                                              );
+                                              mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje:      '$mensaje\n\n$detalles'
+                                  );
                                             }
                                           },
                                           child: ListTile(
@@ -727,91 +714,57 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                             trailing: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                IconButton(
-                                                  icon: const Icon(Icons.add),
-                                                  onPressed: () async {
-                                                    final resultado =
-                                                        await mostrarDialogoConfirmacion(
-                                                      context,
-                                                      AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'addPlaceConfirmation'),
-                                                      clase: clase,
-                                                      clasesDisponibles:
-                                                          clasesDisponibles,
-                                                      clasesFiltradas:
-                                                          clasesFiltradas,
-                                                      fechaSeleccionada:
-                                                          fechaSeleccionada,
-                                                      onActualizar:
-                                                          (nuevasDisponibles,
-                                                              nuevasFiltradas) {
-                                                        setState(() {
-                                                          clasesDisponibles =
-                                                              nuevasDisponibles;
-                                                          clasesFiltradas =
-                                                              nuevasFiltradas;
-                                                        });
-                                                      },
-                                                    );
+                                               IconButton(
+  icon: const Icon(Icons.add),
+  onPressed: () async {
+    final resultado = await mostrarDialogoConfirmacion(
+      context,
+      AppLocalizations.of(context).translate('addPlaceConfirmation'),
+      clase: clase,
+      clasesDisponibles: clasesDisponibles,
+      clasesFiltradas: clasesFiltradas,
+      fechaSeleccionada: fechaSeleccionada,
+      onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+        setState(() {
+          clasesDisponibles = nuevasDisponibles;
+          clasesFiltradas = nuevasFiltradas;
+        });
+      },
+    );
 
-                                                    if (resultado is Map<String,
-                                                            dynamic> &&
-                                                        resultado[
-                                                                'confirmado'] ==
-                                                            true) {
-                                                      agregarLugar(clase.id);
-                                                      ModificarLugarDisponible()
-                                                          .agregarLugarDisponible(
-                                                              clase.id);
-                                                    }
-                                                  },
-                                                ),
-                                                IconButton(
-                                                  icon:
-                                                      const Icon(Icons.remove),
-                                                  onPressed: () async {
-                                                    final resultado =
-                                                        await mostrarDialogoConfirmacion(
-                                                      context,
-                                                      AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'removePlaceConfirmation'),
-                                                      clase: clase,
-                                                      clasesDisponibles:
-                                                          clasesDisponibles,
-                                                      clasesFiltradas:
-                                                          clasesFiltradas,
-                                                      fechaSeleccionada:
-                                                          fechaSeleccionada,
-                                                      onActualizar:
-                                                          (nuevasDisponibles,
-                                                              nuevasFiltradas) {
-                                                        setState(() {
-                                                          clasesDisponibles =
-                                                              nuevasDisponibles;
-                                                          clasesFiltradas =
-                                                              nuevasFiltradas;
-                                                        });
-                                                      },
-                                                    );
+    if (resultado is Map<String, dynamic> && resultado['confirmado'] == true) {
+      agregarLugar(clase.id);
+      ModificarLugarDisponible().agregarLugarDisponible(clase.id);
+    }
+  },
+),
+IconButton(
+  icon: const Icon(Icons.remove),
+  onPressed: () async {
+    final resultado = await mostrarDialogoConfirmacion(
+      context,
+      AppLocalizations.of(context).translate('removePlaceConfirmation'),
+      clase: clase,
+      clasesDisponibles: clasesDisponibles,
+      clasesFiltradas: clasesFiltradas,
+      fechaSeleccionada: fechaSeleccionada,
+      onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+        setState(() {
+          clasesDisponibles = nuevasDisponibles;
+          clasesFiltradas = nuevasFiltradas;
+        });
+      },
+    );
 
-                                                    if (resultado is Map<String,
-                                                            dynamic> &&
-                                                        resultado[
-                                                                'confirmado'] ==
-                                                            true &&
-                                                        clase.lugaresDisponibles >
-                                                            0) {
-                                                      quitarLugar(clase.id);
-                                                      ModificarLugarDisponible()
-                                                          .removerLugarDisponible(
-                                                              clase.id);
-                                                    }
-                                                  },
-                                                ),
+    if (resultado is Map<String, dynamic> &&
+        resultado['confirmado'] == true &&
+        clase.lugaresDisponibles > 0) {
+      quitarLugar(clase.id);
+      ModificarLugarDisponible().removerLugarDisponible(clase.id);
+    }
+  },
+),
+
                                               ],
                                             ),
                                           ),
@@ -1006,20 +959,12 @@ class _DialogoEliminarClaseConSwitchState
     final mensaje = '$titulo:\n\n$detalles';
 
     ScaffoldMessenger.of(widget.scaffoldContext).hideCurrentSnackBar();
-    print('Mostrando snackbar...'); // VERIFICACIÓN VISUAL
 
-    ScaffoldMessenger.of(widget.scaffoldContext).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Clase eliminada correctamente.',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
-        behavior: SnackBarBehavior
-            .floating, // o remove esto si querés el estilo clásico
-        duration: Duration(seconds: 3),
-      ),
-    );
+    mostrarSnackBarAnimado(
+    context: widget.scaffoldContext,
+    mensaje: mensaje,
+    colorFondo: colorFondo,
+  );
   }
 
   @override

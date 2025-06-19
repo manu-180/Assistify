@@ -121,48 +121,37 @@ class CustomAppBarState extends State<CustomAppBar> {
 
     final user = Supabase.instance.client.auth.currentUser;
 
-    final adminRoutes = [
-      {
-        'value': '/turnos/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('classesLabel'),
-      },
-      {
-        'value': '/misclases/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('myClassesLabel'),
-      },
-      {
-        'value': '/gestionhorarios/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
-      },
-      {
-        'value': '/gestionclases/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('manageClassesLabel'),
-      },
-      {
-        'value': '/usuarios/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('studentsLabel'),
-      },
-      {
-        'value': '/configuracion/${taller ?? ''}',
-        'label': AppLocalizations.of(context).translate('settingsLabel'),
-      },
+  final adminRoutes = [
+  {
+    'value': '/turnos/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('classesLabel'),
+  },
+  {
+    'value': '/misclases/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('myClassesLabel'),
+  },
+  {
+    'value': '/gestionhorarios/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
+  },
+  {
+    'value': '/gestionclases/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('manageClassesLabel'),
+  },
+  {
+    'value': '/usuarios/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('studentsLabel'),
+  },
+  {
+    'value': '/configuracion/${taller ?? ''}',
+    'label': AppLocalizations.of(context).translate('settingsLabel'),
+  },
+  {
+    'value': '/subscription',
+    'label': "Suscribite",
+  },
+];
 
-      if (user?.userMetadata!["admin"])
-        {
-          'value': '/subscription',
-          'label': "Suscribite",
-        },
-      // if (user?.id == '668da4f9-3487-42c5-8f28-fe2da23806d4')
-      // {
-      //   'value': '/prueba',
-      //   'label': AppLocalizations.of(context).translate('testLabel'),
-      // },
-      if (user?.id == '55529ccc-07c0-4af4-958c-9267af58e39f')
-        {
-          'value': '/soporte',
-          'label': "soporte",
-        },
-    ];
 
     final userRoutes = [
       {

@@ -23,6 +23,7 @@ import 'package:taller_ceramica/widgets/responsive_appbar.dart';
 import 'package:taller_ceramica/providers/auth_notifier.dart';
 import 'package:taller_ceramica/providers/theme_provider.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
+import 'package:taller_ceramica/widgets/snackbar_animado.dart';
 
 class Configuracion extends ConsumerStatefulWidget {
   const Configuracion({super.key, this.taller});
@@ -245,10 +246,11 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
     } catch (e) {
       print('❌ Error eliminando usuario: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Ocurrió un error al eliminar la cuenta."),
-          backgroundColor: Colors.red,
-        ));
+      mostrarSnackBarAnimado(
+                                    context: context,
+                                    mensaje: "Ocurrió un error al eliminar la cuenta.",colorFondo:
+                                            Colors.red, 
+                                  );
       }
     }
   }
