@@ -246,11 +246,11 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
     } catch (e) {
       print('❌ Error eliminando usuario: $e');
       if (context.mounted) {
-      mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje: "Ocurrió un error al eliminar la cuenta.",colorFondo:
-                                            Colors.red, 
-                                  );
+        mostrarSnackBarAnimado(
+          context: context,
+          mensaje: "Ocurrió un error al eliminar la cuenta.",
+          colorFondo: Colors.red,
+        );
       }
     }
   }

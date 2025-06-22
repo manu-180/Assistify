@@ -100,31 +100,31 @@ class _CambiarPasswordState extends State<CambiarPassword> {
                     // Validaciones
                     if (nuevaPassword.isEmpty || confirmarPassword.isEmpty) {
                       mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:   AppLocalizations.of(context)
-                                .translate('allFieldsRequiredError'),colorFondo:
-                                            Colors.red, 
-                                  );
+                        context: context,
+                        mensaje: AppLocalizations.of(context)
+                            .translate('allFieldsRequiredError'),
+                        colorFondo: Colors.red,
+                      );
                       return;
                     }
 
                     if (nuevaPassword.length < 6) {
-                        mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:   AppLocalizations.of(context)
-                                .translate('passwordLengthError'),colorFondo:
-                                            Colors.red, 
-                                  );
+                      mostrarSnackBarAnimado(
+                        context: context,
+                        mensaje: AppLocalizations.of(context)
+                            .translate('passwordLengthError'),
+                        colorFondo: Colors.red,
+                      );
                       return;
                     }
 
                     if (nuevaPassword != confirmarPassword) {
-                       mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:    AppLocalizations.of(context)
-                                .translate('passwordMismatchError'),colorFondo:
-                                            Colors.red, 
-                                  );
+                      mostrarSnackBarAnimado(
+                        context: context,
+                        mensaje: AppLocalizations.of(context)
+                            .translate('passwordMismatchError'),
+                        colorFondo: Colors.red,
+                      );
                       return;
                     }
 
@@ -133,20 +133,20 @@ class _CambiarPasswordState extends State<CambiarPassword> {
                       await Supabase.instance.client.auth
                           .updateUser(UserAttributes(password: nuevaPassword));
 
-                     mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:     AppLocalizations.of(context)
-                                .translate('passwordUpdatedSuccess'),colorFondo:
-                                            Colors.lightGreen, 
-                                  );
+                      mostrarSnackBarAnimado(
+                        context: context,
+                        mensaje: AppLocalizations.of(context)
+                            .translate('passwordUpdatedSuccess'),
+                        colorFondo: Colors.lightGreen,
+                      );
                     } catch (e) {
-                     mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:     AppLocalizations.of(context).translate(
-                                'passwordUpdateError',
-                                params: {'error': e.toString()}),colorFondo:
-                                            Colors.red, 
-                                  );
+                      mostrarSnackBarAnimado(
+                        context: context,
+                        mensaje: AppLocalizations.of(context).translate(
+                            'passwordUpdateError',
+                            params: {'error': e.toString()}),
+                        colorFondo: Colors.red,
+                      );
                     }
                   },
                   child: Text(

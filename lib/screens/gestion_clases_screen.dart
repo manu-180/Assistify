@@ -137,6 +137,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
   Future<Map<String, dynamic>?> mostrarDialogoConfirmacion(
     BuildContext context,
     String mensaje, {
+    required bool esEliminar,
     required ClaseModels clase,
     required List<ClaseModels> clasesDisponibles,
     required List<ClaseModels> clasesFiltradas,
@@ -145,23 +146,26 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
             List<ClaseModels> nuevasFiltradas)
         onActualizar,
   }) {
-    final localizations = AppLocalizations.of(context);
-    final esEliminar =
-        mensaje == localizations.translate('deleteClassConfirmation');
-
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (BuildContext context) {
-        return _DialogoEliminarClaseConSwitch(
-          mensaje: mensaje,
-          clase: clase,
-          esEliminar: esEliminar,
-          clasesDisponibles: clasesDisponibles,
-          clasesFiltradas: clasesFiltradas,
-          fechaSeleccionada: fechaSeleccionada,
-          onActualizar: onActualizar,
-          scaffoldContext: scaffoldContext,
-        );
+        if (esEliminar) {
+          return _DialogoEliminarClaseConSwitch(
+            mensaje: mensaje,
+            clase: clase,
+            esEliminar: true,
+            clasesDisponibles: clasesDisponibles,
+            clasesFiltradas: clasesFiltradas,
+            fechaSeleccionada: fechaSeleccionada,
+            onActualizar: onActualizar,
+            scaffoldContext: scaffoldContext,
+          );
+        } else {
+          return DialogoModificarLugarDisponible(
+            mensaje: mensaje,
+            esAgregar: mensaje.toLowerCase().contains('agregar'),
+          );
+        }
       },
     );
   }
@@ -557,6 +561,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                   context,
                                   AppLocalizations.of(context)
                                       .translate('deleteClassConfirmation'),
+                                  esEliminar: true,
                                   clase: clase,
                                   clasesDisponibles: clasesDisponibles,
                                   clasesFiltradas: clasesFiltradas,
@@ -653,6 +658,7 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                               AppLocalizations.of(context)
                                                   .translate(
                                                       'deleteClassConfirmation'),
+                                              esEliminar: true,
                                               clase: clase,
                                               clasesDisponibles:
                                                   clasesDisponibles,
@@ -690,9 +696,9 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                                   .join('\n');
 
                                               mostrarSnackBarAnimado(
-                                    context: context,
-                                    mensaje:      '$mensaje\n\n$detalles'
-                                  );
+                                                  context: context,
+                                                  mensaje:
+                                                      '$mensaje\n\n$detalles');
                                             }
                                           },
                                           child: ListTile(
@@ -714,57 +720,107 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                             trailing: Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                               IconButton(
-  icon: const Icon(Icons.add),
-  onPressed: () async {
-    final resultado = await mostrarDialogoConfirmacion(
-      context,
-      AppLocalizations.of(context).translate('addPlaceConfirmation'),
-      clase: clase,
-      clasesDisponibles: clasesDisponibles,
-      clasesFiltradas: clasesFiltradas,
-      fechaSeleccionada: fechaSeleccionada,
-      onActualizar: (nuevasDisponibles, nuevasFiltradas) {
-        setState(() {
-          clasesDisponibles = nuevasDisponibles;
-          clasesFiltradas = nuevasFiltradas;
-        });
-      },
-    );
+                                                IconButton(
+                                                  icon: const Icon(Icons.add),
+                                                  onPressed: () async {
+                                                    final resultado =
+                                                        await mostrarDialogoConfirmacion(
+                                                      context,
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'addPlaceConfirmation'),
+                                                      clase: clase,
+                                                      esEliminar: false,
+                                                      clasesDisponibles:
+                                                          clasesDisponibles,
+                                                      clasesFiltradas:
+                                                          clasesFiltradas,
+                                                      fechaSeleccionada:
+                                                          fechaSeleccionada,
+                                                      onActualizar:
+                                                          (nuevasDisponibles,
+                                                              nuevasFiltradas) {
+                                                        setState(() {
+                                                          clasesDisponibles =
+                                                              nuevasDisponibles;
+                                                          clasesFiltradas =
+                                                              nuevasFiltradas;
+                                                        });
+                                                      },
+                                                    );
 
-    if (resultado is Map<String, dynamic> && resultado['confirmado'] == true) {
-      agregarLugar(clase.id);
-      ModificarLugarDisponible().agregarLugarDisponible(clase.id);
-    }
-  },
-),
-IconButton(
-  icon: const Icon(Icons.remove),
-  onPressed: () async {
-    final resultado = await mostrarDialogoConfirmacion(
-      context,
-      AppLocalizations.of(context).translate('removePlaceConfirmation'),
-      clase: clase,
-      clasesDisponibles: clasesDisponibles,
-      clasesFiltradas: clasesFiltradas,
-      fechaSeleccionada: fechaSeleccionada,
-      onActualizar: (nuevasDisponibles, nuevasFiltradas) {
-        setState(() {
-          clasesDisponibles = nuevasDisponibles;
-          clasesFiltradas = nuevasFiltradas;
-        });
-      },
-    );
+                                                    if (resultado is Map<String,
+                                                            dynamic> &&
+                                                        resultado[
+                                                                'confirmado'] ==
+                                                            true) {
+                                                      await ModificarLugarDisponible()
+                                                          .agregarLugarDisponible(
+                                                              clase.id);
+                                                      await agregarLugar(
+                                                          clase.id);
 
-    if (resultado is Map<String, dynamic> &&
-        resultado['confirmado'] == true &&
-        clase.lugaresDisponibles > 0) {
-      quitarLugar(clase.id);
-      ModificarLugarDisponible().removerLugarDisponible(clase.id);
-    }
-  },
-),
+                                                      mostrarSnackBarAnimado(
+                                                        context: context,
+                                                        mensaje:
+                                                            'Se agregó un lugar disponible a la clase del  ${clase.dia} ${clase.fecha} a las ${clase.hora}',
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                                IconButton(
+                                                  icon:
+                                                      const Icon(Icons.remove),
+                                                  onPressed: () async {
+                                                    final resultado =
+                                                        await mostrarDialogoConfirmacion(
+                                                      context,
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'removePlaceConfirmation'),
+                                                      clase: clase,
+                                                      esEliminar: false,
+                                                      clasesDisponibles:
+                                                          clasesDisponibles,
+                                                      clasesFiltradas:
+                                                          clasesFiltradas,
+                                                      fechaSeleccionada:
+                                                          fechaSeleccionada,
+                                                      onActualizar:
+                                                          (nuevasDisponibles,
+                                                              nuevasFiltradas) {
+                                                        setState(() {
+                                                          clasesDisponibles =
+                                                              nuevasDisponibles;
+                                                          clasesFiltradas =
+                                                              nuevasFiltradas;
+                                                        });
+                                                      },
+                                                    );
 
+                                                    if (resultado is Map<String,
+                                                            dynamic> &&
+                                                        resultado[
+                                                                'confirmado'] ==
+                                                            true &&
+                                                        clase.lugaresDisponibles >
+                                                            0) {
+                                                      await ModificarLugarDisponible()
+                                                          .removerLugarDisponible(
+                                                              clase.id);
+                                                      await quitarLugar(
+                                                          clase.id);
+
+                                                      mostrarSnackBarAnimado(
+                                                        context: context,
+                                                        mensaje:
+                                                            'Se quitó un lugar disponible de la clase del  ${clase.dia} ${clase.fecha} a las ${clase.hora}',
+                                                      );
+                                                    }
+                                                  },
+                                                ),
                                               ],
                                             ),
                                           ),
@@ -961,10 +1017,10 @@ class _DialogoEliminarClaseConSwitchState
     ScaffoldMessenger.of(widget.scaffoldContext).hideCurrentSnackBar();
 
     mostrarSnackBarAnimado(
-    context: widget.scaffoldContext,
-    mensaje: mensaje,
-    colorFondo: colorFondo,
-  );
+      context: widget.scaffoldContext,
+      mensaje: mensaje,
+      colorFondo: colorFondo,
+    );
   }
 
   @override
@@ -1088,6 +1144,40 @@ class _DialogoEliminarClaseConSwitchState
           ],
         );
       },
+    );
+  }
+}
+
+class DialogoModificarLugarDisponible extends StatelessWidget {
+  final String mensaje;
+  final bool esAgregar;
+
+  const DialogoModificarLugarDisponible({
+    required this.mensaje,
+    required this.esAgregar,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context);
+
+    return AlertDialog(
+      title: Text(localizations.translate('confirmationDialogTitle')),
+      content: Text(mensaje),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop({'confirmado': false}),
+          child: Text(localizations.translate('noButton')),
+        ),
+        ElevatedButton(
+          onPressed: () => Navigator.of(context).pop({'confirmado': true}),
+          child: Text(
+            esAgregar
+                ? localizations.translate('addButtonLabel')
+                : localizations.translate('removeButtonLabel'),
+          ),
+        ),
+      ],
     );
   }
 }

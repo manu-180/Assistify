@@ -625,8 +625,6 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                                       return;
                                     }
 
-                                    
-
                                     if (existeTelefono) {
                                       setState(() {
                                         phoneError =

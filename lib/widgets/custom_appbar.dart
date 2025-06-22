@@ -121,37 +121,36 @@ class CustomAppBarState extends State<CustomAppBar> {
 
     final user = Supabase.instance.client.auth.currentUser;
 
-  final adminRoutes = [
-  {
-    'value': '/turnos/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('classesLabel'),
-  },
-  {
-    'value': '/misclases/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('myClassesLabel'),
-  },
-  {
-    'value': '/gestionhorarios/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
-  },
-  {
-    'value': '/gestionclases/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('manageClassesLabel'),
-  },
-  {
-    'value': '/usuarios/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('studentsLabel'),
-  },
-  {
-    'value': '/configuracion/${taller ?? ''}',
-    'label': AppLocalizations.of(context).translate('settingsLabel'),
-  },
-  {
-    'value': '/subscription',
-    'label': "Suscribite",
-  },
-];
-
+    final adminRoutes = [
+      {
+        'value': '/turnos/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('classesLabel'),
+      },
+      {
+        'value': '/misclases/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('myClassesLabel'),
+      },
+      {
+        'value': '/gestionhorarios/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('manageSchedulesLabel'),
+      },
+      {
+        'value': '/gestionclases/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('manageClassesLabel'),
+      },
+      {
+        'value': '/usuarios/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('studentsLabel'),
+      },
+      {
+        'value': '/configuracion/${taller ?? ''}',
+        'label': AppLocalizations.of(context).translate('settingsLabel'),
+      },
+      {
+        'value': '/subscription',
+        'label': "Suscribite",
+      },
+    ];
 
     final userRoutes = [
       {
