@@ -508,6 +508,7 @@ class AppLocalizations {
       "yesButton": "Sí",
       "confirmationDialogTitle": "Confirmación",
       "addButtonLabel": "Agregar",
+      "removeButtonLabel": "Remover",
       "appTitle": "Assistify",
       "createWorkshopIntro":
           "Antes de crear tu Empresa, te invitamos a leer brevemente más información sobre cómo funciona nuestra aplicación. Esto te ayudará a aprovechar al máximo todas sus funcionalidades.",
