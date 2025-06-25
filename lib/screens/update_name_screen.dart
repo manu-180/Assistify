@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
-import 'package:taller_ceramica/supabase/usuarios/update_user.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/utils/capitalize.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:assistify/supabase/usuarios/update_user.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/utils/capitalize.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
 
 class UpdateNameScreen extends StatefulWidget {
   const UpdateNameScreen({super.key, String? taller});

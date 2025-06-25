@@ -1,12 +1,13 @@
+import 'package:assistify/main.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_rubro.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/supabase/utiles/generar_id.dart';
+import 'package:assistify/utils/capitalize.dart';
+import 'package:assistify/utils/crear_usuario_desde_admin.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_rubro.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/utils/capitalize.dart';
-import 'package:taller_ceramica/utils/crear_usuario_desde_admin.dart';
 
 class CrearUsuarioDialog extends StatefulWidget {
   final Future<void> Function()? onUsuarioCreado;

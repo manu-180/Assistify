@@ -1,0 +1,2 @@
+C:/proyectos/Assistify/android/app/.cxx/Debug/2ez4s5q4/x86/CMakeFiles/edit_cache.dir
+C:/proyectos/Assistify/android/app/.cxx/Debug/2ez4s5q4/x86/CMakeFiles/rebuild_cache.dir

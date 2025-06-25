@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:taller_ceramica/config/theme/app_theme.dart';
+import 'package:assistify/config/theme/app_theme.dart';
 
 // Proveedor para la lista de colores disponibles
 final listTheColors = Provider((ref) => listColors);

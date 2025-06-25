@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
-import 'package:taller_ceramica/main.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:assistify/main.dart';
 
 class UpdateUser {
   final SupabaseClient supabaseClient;

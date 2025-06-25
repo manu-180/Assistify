@@ -3,18 +3,18 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:taller_ceramica/subscription/subscription_verifier.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/utils/utils_barril.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/models/clase_models.dart';
-import 'package:taller_ceramica/providers/auth_notifier.dart';
-import 'package:taller_ceramica/widgets/information_buton.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
+import 'package:assistify/subscription/subscription_verifier.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_mes.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/utils/utils_barril.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/models/clase_models.dart';
+import 'package:assistify/providers/auth_notifier.dart';
+import 'package:assistify/widgets/information_buton.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 
 class MisClasesScreen extends ConsumerStatefulWidget {
   const MisClasesScreen({super.key, String? taller});

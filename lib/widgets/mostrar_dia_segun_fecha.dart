@@ -1,8 +1,9 @@
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/utils/capitalize.dart';
+import 'package:assistify/utils/dia_con_fecha.dart';
+import 'package:assistify/widgets/custom_box.dart';
+import 'package:assistify/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:taller_ceramica/utils/dia_con_fecha.dart';
-import 'package:taller_ceramica/utils/utils_barril.dart';
-import 'package:taller_ceramica/widgets/custom_box.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
 
 class MostrarDiaSegunFecha extends StatelessWidget {
   const MostrarDiaSegunFecha({

@@ -3,13 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/supabase/utiles/redirijir_usuario_al_taller.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
+import 'package:assistify/supabase/utiles/redirijir_usuario_al_taller.dart';
+import 'package:assistify/l10n/app_localizations.dart';
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:taller_ceramica/utils/enviar_wpp.dart';
-import 'package:taller_ceramica/widgets/contactanos.dart';
-import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
+import 'package:assistify/utils/enviar_wpp.dart';
+import 'package:assistify/widgets/contactanos.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});

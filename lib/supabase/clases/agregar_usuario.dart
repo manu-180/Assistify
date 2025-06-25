@@ -1,14 +1,14 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_numero_admin.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/models/clase_models.dart';
-import 'package:taller_ceramica/supabase/modificar_datos/modificar_lugar_disponible.dart';
-import 'package:taller_ceramica/supabase/modificar_datos/modificar_credito.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
-import 'package:taller_ceramica/utils/enviar_wpp.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_numero_admin.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/models/clase_models.dart';
+import 'package:assistify/supabase/modificar_datos/modificar_lugar_disponible.dart';
+import 'package:assistify/supabase/modificar_datos/modificar_credito.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:assistify/utils/enviar_wpp.dart';
 import 'dart:ui' as ui;
 
 class AgregarUsuario {

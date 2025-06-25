@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/supabase/utiles/redirijir_usuario_al_taller.dart';
+import 'package:assistify/supabase/utiles/redirijir_usuario_al_taller.dart';
 import 'package:video_player/video_player.dart';
+import 'dart:io' show Platform;
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -12,7 +13,8 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  late List<VideoPlayerController> _controllers;
+  List<VideoPlayerController> _controllers = [];
+
   int _currentPage = 0;
   bool _allInitialized = false;
 
@@ -24,6 +26,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   Future<void> _initVideos() async {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      setState(() {
+        _allInitialized = true;
+      });
+      return;
+    }
+
     _controllers = [
       VideoPlayerController.asset('assets/videos/video1.mp4'),
       VideoPlayerController.asset('assets/videos/video2.mp4'),
@@ -36,8 +45,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       controller.setVolume(0.0);
     }
 
-    _controllers[_currentPage].play();
-    _controllers[_currentPage].addListener(_videoListener);
+    if (_controllers.isNotEmpty) {
+      _controllers[_currentPage].play();
+      _controllers[_currentPage].addListener(_videoListener);
+    }
 
     if (mounted) {
       setState(() {
@@ -47,11 +58,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   void _videoListener() {
+    if (_controllers.isEmpty) return;
     final controller = _controllers[_currentPage];
     if (controller.value.position >= controller.value.duration &&
         !controller.value.isPlaying) {
       controller.removeListener(_videoListener);
-
       final nextPage = (_currentPage + 1) % _controllers.length;
 
       setState(() {
@@ -59,8 +70,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       });
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _controllers[nextPage].play();
-        _controllers[nextPage].addListener(_videoListener);
+        if (_controllers.isNotEmpty) {
+          _controllers[nextPage].play();
+          _controllers[nextPage].addListener(_videoListener);
+        }
       });
     }
   }
@@ -164,10 +177,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                     duration: const Duration(milliseconds: 800),
                                     switchInCurve: Curves.easeIn,
                                     switchOutCurve: Curves.easeOut,
-                                    child: VideoPlayer(
-                                      _controllers[_currentPage],
-                                      key: UniqueKey(),
-                                    ),
+                                    child: _controllers.isNotEmpty
+                                        ? VideoPlayer(
+                                            _controllers[_currentPage],
+                                            key: UniqueKey(),
+                                          )
+                                        : const Center(
+                                            child:
+                                                Text("Vista previa no disponible"),
+                                          ),
                                   )
                                 : const Center(
                                     child: CircularProgressIndicator()),
@@ -204,10 +222,15 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                     duration: const Duration(milliseconds: 800),
                                     switchInCurve: Curves.easeIn,
                                     switchOutCurve: Curves.easeOut,
-                                    child: VideoPlayer(
-                                      _controllers[_currentPage],
-                                      key: UniqueKey(),
-                                    ),
+                                    child: _controllers.isNotEmpty
+                                        ? VideoPlayer(
+                                            _controllers[_currentPage],
+                                            key: UniqueKey(),
+                                          )
+                                        : const Center(
+                                            child:
+                                                Text("Vista previa no disponible"),
+                                          ),
                                   )
                                 : const Center(
                                     child: CircularProgressIndicator()),

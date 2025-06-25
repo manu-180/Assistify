@@ -1,8 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/models/clase_models.dart';
-import 'package:taller_ceramica/models/subscription_models.dart';
-import 'package:taller_ceramica/models/usuario_models.dart';
-import 'package:taller_ceramica/utils/internet.dart'; // Importa la clase Internet con hayConexionInternet
+import 'package:assistify/models/clase_models.dart';
+import 'package:assistify/models/subscription_models.dart';
+import 'package:assistify/models/usuario_models.dart';
+import 'package:assistify/utils/internet.dart'; // Importa la clase Internet con hayConexionInternet
 
 class ObtenerTotalInfo {
   final SupabaseClient supabase;

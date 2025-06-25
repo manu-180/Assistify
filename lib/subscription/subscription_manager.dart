@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'package:in_app_purchase/in_app_purchase.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/utils/internet.dart';
-import 'package:taller_ceramica/utils/verificar_suscripcion_con_backend.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/utils/internet.dart';
+import 'package:assistify/utils/verificar_suscripcion_con_backend.dart';
+import 'dart:io' show Platform;
 
 class SubscriptionManager {
   static final SubscriptionManager _instance = SubscriptionManager._internal();
@@ -78,30 +79,38 @@ class SubscriptionManager {
         .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
   }
 
-  void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
-    if (_isListening) return;
-    _isListening = true;
+  
+void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
+  if (_isListening) return;
 
-    _inAppPurchase.purchaseStream.listen(
-      (List<PurchaseDetails> purchaseDetailsList) {
-        for (var purchase in purchaseDetailsList) {
-          if (purchase.status == PurchaseStatus.purchased ||
-              purchase.status == PurchaseStatus.restored) {
-            if (!_purchases.any((p) => p.productID == purchase.productID)) {
-              _purchases.add(purchase);
-            }
+  // Evitar que se ejecute en plataformas no compatibles
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    print("InAppPurchase no está soportado en escritorio.");
+    return;
+  }
+
+  _isListening = true;
+
+  _inAppPurchase.purchaseStream.listen(
+    (List<PurchaseDetails> purchaseDetailsList) {
+      for (var purchase in purchaseDetailsList) {
+        if (purchase.status == PurchaseStatus.purchased ||
+            purchase.status == PurchaseStatus.restored) {
+          if (!_purchases.any((p) => p.productID == purchase.productID)) {
+            _purchases.add(purchase);
           }
         }
+      }
 
-        if (onPurchase != null) {
-          onPurchase(purchaseDetailsList);
-        }
-      },
-      onError: (error) {
-        print("Error en el stream de compras: $error");
-      },
-    );
-  }
+      if (onPurchase != null) {
+        onPurchase(purchaseDetailsList);
+      }
+    },
+    onError: (error) {
+      print("Error en el stream de compras: $error");
+    },
+  );
+}
 
   bool isUserSubscribed() {
     for (var purchase in _purchases) {
@@ -131,34 +140,41 @@ class SubscriptionManager {
     }
   }
 
-  Future<List<PurchaseDetails>> restorePurchases() async {
-    if (!await Internet().hayConexionInternet()) return [];
+ Future<List<PurchaseDetails>> restorePurchases() async {
+  if (!await Internet().hayConexionInternet()) return [];
 
-    final Completer<List<PurchaseDetails>> completer = Completer();
-    final List<PurchaseDetails> restored = [];
-
-    final Stream<List<PurchaseDetails>> purchaseUpdates =
-        _inAppPurchase.purchaseStream;
-
-    final subscription =
-        purchaseUpdates.listen((List<PurchaseDetails> purchases) {
-      for (var purchase in purchases) {
-        if (purchase.status == PurchaseStatus.restored ||
-            purchase.status == PurchaseStatus.purchased) {
-          restored.add(purchase);
-        }
-      }
-
-      if (!completer.isCompleted) {
-        completer.complete(restored);
-      }
-    });
-
-    await _inAppPurchase.restorePurchases();
-
-    return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
-      subscription.cancel();
-      return restored;
-    });
+  // No ejecutar en plataformas no compatibles
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    print("InAppPurchase no está soportado en escritorio.");
+    return [];
   }
+
+  final Completer<List<PurchaseDetails>> completer = Completer();
+  final List<PurchaseDetails> restored = [];
+
+  final Stream<List<PurchaseDetails>> purchaseUpdates =
+      _inAppPurchase.purchaseStream;
+
+  final subscription =
+      purchaseUpdates.listen((List<PurchaseDetails> purchases) {
+    for (var purchase in purchases) {
+      if (purchase.status == PurchaseStatus.restored ||
+          purchase.status == PurchaseStatus.purchased) {
+        restored.add(purchase);
+      }
+    }
+
+    if (!completer.isCompleted) {
+      completer.complete(restored);
+    }
+  });
+
+  await _inAppPurchase.restorePurchases();
+
+  return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
+    subscription.cancel();
+    return restored;
+  });
+}
+
 }

@@ -1,7 +1,7 @@
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/main.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_mes.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/main.dart';
 
 class EliminarClase {
   Future<void> eliminarClase(int id) async {

@@ -1,14 +1,15 @@
+import 'package:assistify/config/router/app_router.dart';
+import 'package:assistify/config/theme/app_theme.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/providers/theme_provider.dart';
+import 'package:assistify/subscription/subscription_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:taller_ceramica/config/router/app_router.dart';
-import 'package:taller_ceramica/config/theme/app_theme.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/providers/theme_provider.dart';
-import 'package:taller_ceramica/subscription/subscription_manager.dart';
+import 'dart:io' show Platform;
 
 // AssistifyPRUEBA MAIN
 Future<void> main() async {
@@ -25,12 +26,14 @@ Future<void> main() async {
 
   // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
+  if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
+  final subscriptionManager = SubscriptionManager();
   subscriptionManager.listenToPurchaseUpdates(
     onPurchase: (purchases) {
-      // Si necesitás manejar lógica global cuando se compra
       print("Se recibieron compras nuevas: $purchases");
     },
   );
+}
 
   // 🟢 PostFrame: ejecutamos todo lo demás después del arranque visual
   runApp(

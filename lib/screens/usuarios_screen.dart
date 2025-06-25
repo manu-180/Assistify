@@ -3,17 +3,17 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/subscription/subscription_verifier.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/models/usuario_models.dart';
-import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
-import 'package:taller_ceramica/widgets/information_buton.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/widgets/snackbar_animado.dart';
-import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/subscription/subscription_verifier.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/models/usuario_models.dart';
+import 'package:assistify/widgets/crear_usuario_dialog.dart';
+import 'package:assistify/widgets/information_buton.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/widgets/snackbar_animado.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 
 class UsuariosScreen extends StatefulWidget {
   const UsuariosScreen({super.key, String? taller});

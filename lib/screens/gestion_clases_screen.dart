@@ -3,25 +3,28 @@
 import 'dart:async';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:assistify/utils/dia_con_fecha.dart';
+import 'package:assistify/utils/encontrar_semana.dart';
+import 'package:assistify/utils/generar_fechas_del_mes.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/subscription/subscription_verifier.dart';
-import 'package:taller_ceramica/supabase/clases/eliminar_clase.dart';
-import 'package:taller_ceramica/supabase/modificar_datos/modificar_feriado.dart';
-import 'package:taller_ceramica/supabase/modificar_datos/modificar_lugar_disponible.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_mes.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_total_info.dart';
-import 'package:taller_ceramica/supabase/utiles/generar_id.dart';
-import 'package:taller_ceramica/utils/contar_dias_en_mes_actual.dart';
-import 'package:taller_ceramica/utils/utils_barril.dart';
-import 'package:taller_ceramica/main.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/subscription/subscription_verifier.dart';
+import 'package:assistify/supabase/clases/eliminar_clase.dart';
+import 'package:assistify/supabase/modificar_datos/modificar_feriado.dart';
+import 'package:assistify/supabase/modificar_datos/modificar_lugar_disponible.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_mes.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_total_info.dart';
+import 'package:assistify/supabase/utiles/generar_id.dart';
+import 'package:assistify/utils/contar_dias_en_mes_actual.dart';
+import 'package:assistify/utils/utils_barril.dart';
+import 'package:assistify/main.dart';
 import 'package:intl/intl.dart';
-import 'package:taller_ceramica/models/clase_models.dart';
-import 'package:taller_ceramica/widgets/information_buton.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/widgets/snackbar_animado.dart';
+import 'package:assistify/models/clase_models.dart';
+import 'package:assistify/widgets/information_buton.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/widgets/snackbar_animado.dart';
 
 import '../widgets/mostrar_dia_segun_fecha.dart';
 

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:ntp/ntp.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/created_at_user.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
-import 'package:taller_ceramica/supabase/suscribir/is_subscripto.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/obtener_datos/created_at_user.dart';
+import 'package:assistify/supabase/obtener_datos/is_admin.dart';
+import 'package:assistify/supabase/suscribir/is_subscripto.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
 
 class SubscriptionVerifier {
   static Future<DateTime?> verificarAdminYSuscripcion(

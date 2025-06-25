@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_nombre_con_telefono.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_nombre_con_telefono.dart';
 
 class TwilioService {
   final apiKeySid = dotenv.env['API_KEY_SID'] ?? '';

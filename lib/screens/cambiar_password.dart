@@ -2,9 +2,9 @@
 // funciona
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/widgets/snackbar_animado.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/widgets/snackbar_animado.dart';
 
 class CambiarPassword extends StatefulWidget {
   const CambiarPassword({super.key});

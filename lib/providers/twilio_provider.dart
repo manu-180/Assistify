@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taller_ceramica/utils/conversation_list_notifier.dart';
+import 'package:assistify/utils/conversation_list_notifier.dart';
 import '../services/twilio_service.dart';
 import '../utils/message_list_notifier.dart';
 

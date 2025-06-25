@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/supabase/utiles/actualizar_semanas.dart';
-import 'package:taller_ceramica/supabase/utiles/reset_clases.dart';
-import 'package:taller_ceramica/utils/actualizar_fechas_database.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/supabase/utiles/actualizar_semanas.dart';
+import 'package:assistify/supabase/utiles/reset_clases.dart';
+import 'package:assistify/utils/actualizar_fechas_database.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/l10n/app_localizations.dart';
 
 class Prueba extends StatelessWidget {
   const Prueba({super.key});

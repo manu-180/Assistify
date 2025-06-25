@@ -1,4 +1,4 @@
-import 'package:taller_ceramica/main.dart';
+import 'package:assistify/main.dart';
 
 class ObtenerTaller {
   Future<String> retornarTaller(String userUid) async {

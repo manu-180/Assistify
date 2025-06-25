@@ -1,4 +1,4 @@
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
 
 class FeriadosFalse {
   Future<void> feriadosFalse() async {

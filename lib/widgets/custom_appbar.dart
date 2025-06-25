@@ -1,12 +1,11 @@
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/supabase/obtener_datos/is_admin.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_taller.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/is_admin.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_taller.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   const CustomAppBar({super.key});
 

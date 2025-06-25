@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:http/http.dart' as http;
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
 import '../providers/twilio_provider.dart';
 import '../services/twilio_service.dart';
 

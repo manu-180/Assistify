@@ -1,14 +1,16 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:assistify/utils/capitalize.dart';
+import 'package:assistify/utils/enviar_wpp.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/main.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/utils/utils_barril.dart';
-import 'package:taller_ceramica/widgets/snackbar_animado.dart';
-import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/main.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/utils/utils_barril.dart';
+import 'package:assistify/widgets/snackbar_animado.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CrearTallerScreen extends StatefulWidget {

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart';
-import 'package:taller_ceramica/supabase/obtener_datos/obtener_rubro.dart';
-import 'package:taller_ceramica/supabase/supabase_barril.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
-import 'package:taller_ceramica/widgets/shimmer_loader.dart';
-import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
+import 'package:assistify/l10n/app_localizations.dart';
+import 'package:assistify/supabase/obtener_datos/obtener_rubro.dart';
+import 'package:assistify/supabase/supabase_barril.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
+import 'package:assistify/widgets/shimmer_loader.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 
 class HomeScreen extends StatelessWidget {
   final String? taller;

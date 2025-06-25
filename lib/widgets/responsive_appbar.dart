@@ -1,5 +1,5 @@
+import 'package:assistify/widgets/custom_appbar.dart';
 import 'package:flutter/material.dart';
-import 'package:taller_ceramica/widgets/custom_appbar.dart';
 
 class ResponsiveAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override

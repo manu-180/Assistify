@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:taller_ceramica/screens/soporte_chat_screen.dart';
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:assistify/screens/soporte_chat_screen.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
 import '../providers/twilio_provider.dart';
 
 class ConversationListScreen extends ConsumerWidget {

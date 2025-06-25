@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:assistify/utils/capitalize.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:taller_ceramica/utils/capitalize.dart';
 
 Future<String?> crearUsuarioAdmin({
   required String email,

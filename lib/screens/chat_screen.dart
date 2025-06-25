@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:assistify/widgets/responsive_appbar.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});

@@ -1,5 +1,5 @@
+import 'package:assistify/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
-import 'package:taller_ceramica/l10n/app_localizations.dart'; // Importar traducciones
 
 class DiaConFecha {
   String obtenerDiaDeLaSemana(String? fecha, AppLocalizations localizations) {
