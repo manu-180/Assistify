@@ -721,105 +721,87 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 IconButton(
-                                                  icon: const Icon(Icons.add),
-                                                  onPressed: () async {
-                                                    final resultado =
-                                                        await mostrarDialogoConfirmacion(
-                                                      context,
-                                                      AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'addPlaceConfirmation'),
-                                                      clase: clase,
-                                                      esEliminar: false,
-                                                      clasesDisponibles:
-                                                          clasesDisponibles,
-                                                      clasesFiltradas:
-                                                          clasesFiltradas,
-                                                      fechaSeleccionada:
-                                                          fechaSeleccionada,
-                                                      onActualizar:
-                                                          (nuevasDisponibles,
-                                                              nuevasFiltradas) {
-                                                        setState(() {
-                                                          clasesDisponibles =
-                                                              nuevasDisponibles;
-                                                          clasesFiltradas =
-                                                              nuevasFiltradas;
-                                                        });
-                                                      },
-                                                    );
+                                                  icon:  Icon(Icons.add, color: color),
+                                                 onPressed: () async {
+  final resultado = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('addPlaceConfirmation'),
+    clase: clase,
+    esEliminar: false,
+    clasesDisponibles: clasesDisponibles,
+    clasesFiltradas: clasesFiltradas,
+    fechaSeleccionada: fechaSeleccionada,
+    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+      setState(() {
+        clasesDisponibles = nuevasDisponibles;
+        clasesFiltradas = nuevasFiltradas;
+      });
+    },
+  );
 
-                                                    if (resultado is Map<String,
-                                                            dynamic> &&
-                                                        resultado[
-                                                                'confirmado'] ==
-                                                            true) {
-                                                      await ModificarLugarDisponible()
-                                                          .agregarLugarDisponible(
-                                                              clase.id);
-                                                      await agregarLugar(
-                                                          clase.id);
+  if (resultado is Map<String, dynamic> &&
+      resultado['confirmado'] == true &&
+      resultado['cantidad'] != null) {
+    final cantidad = resultado['cantidad'] as int;
+    for (int i = 0; i < cantidad; i++) {
+      await ModificarLugarDisponible().agregarLugarDisponible(clase.id);
+      await agregarLugar(clase.id);
+    }
 
-                                                      mostrarSnackBarAnimado(
-                                                        context: context,
-                                                        mensaje:
-                                                            'Se agregó un lugar disponible a la clase del  ${clase.dia} ${clase.fecha} a las ${clase.hora}',
-                                                      );
-                                                    }
-                                                  },
+    final mensaje = cantidad == 1
+        ? 'Se agregó 1 lugar disponible a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
+        : 'Se agregaron $cantidad lugares disponibles a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
+
+    mostrarSnackBarAnimado(context: context, mensaje: mensaje);
+  }
+}
+
                                                 ),
                                                 IconButton(
                                                   icon:
-                                                      const Icon(Icons.remove),
+                                                       Icon(Icons.remove, color: color),
                                                   onPressed: () async {
-                                                    final resultado =
-                                                        await mostrarDialogoConfirmacion(
-                                                      context,
-                                                      AppLocalizations.of(
-                                                              context)
-                                                          .translate(
-                                                              'removePlaceConfirmation'),
-                                                      clase: clase,
-                                                      esEliminar: false,
-                                                      clasesDisponibles:
-                                                          clasesDisponibles,
-                                                      clasesFiltradas:
-                                                          clasesFiltradas,
-                                                      fechaSeleccionada:
-                                                          fechaSeleccionada,
-                                                      onActualizar:
-                                                          (nuevasDisponibles,
-                                                              nuevasFiltradas) {
-                                                        setState(() {
-                                                          clasesDisponibles =
-                                                              nuevasDisponibles;
-                                                          clasesFiltradas =
-                                                              nuevasFiltradas;
-                                                        });
-                                                      },
-                                                    );
+  final resultado = await mostrarDialogoConfirmacion(
+    context,
+    AppLocalizations.of(context).translate('removePlaceConfirmation'),
+    clase: clase,
+    esEliminar: false,
+    clasesDisponibles: clasesDisponibles,
+    clasesFiltradas: clasesFiltradas,
+    fechaSeleccionada: fechaSeleccionada,
+    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
+      setState(() {
+        clasesDisponibles = nuevasDisponibles;
+        clasesFiltradas = nuevasFiltradas;
+      });
+    },
+  );
 
-                                                    if (resultado is Map<String,
-                                                            dynamic> &&
-                                                        resultado[
-                                                                'confirmado'] ==
-                                                            true &&
-                                                        clase.lugaresDisponibles >
-                                                            0) {
-                                                      await ModificarLugarDisponible()
-                                                          .removerLugarDisponible(
-                                                              clase.id);
-                                                      await quitarLugar(
-                                                          clase.id);
+  if (resultado is Map<String, dynamic> &&
+      resultado['confirmado'] == true &&
+      resultado['cantidad'] != null) {
+    final cantidad = resultado['cantidad'] as int;
+    int quitados = 0;
 
-                                                      mostrarSnackBarAnimado(
-                                                        context: context,
-                                                        mensaje:
-                                                            'Se quitó un lugar disponible de la clase del  ${clase.dia} ${clase.fecha} a las ${clase.hora}',
-                                                      );
-                                                    }
-                                                  },
+    for (int i = 0; i < cantidad; i++) {
+      final idx = clasesFiltradas.indexWhere((c) => c.id == clase.id);
+      if (idx != -1 && clasesFiltradas[idx].lugaresDisponibles > 0) {
+        await ModificarLugarDisponible().removerLugarDisponible(clase.id);
+        await quitarLugar(clase.id);
+        quitados++;
+      }
+    }
+
+    if (quitados > 0) {
+      final mensaje = quitados == 1
+          ? 'Se quitó 1 lugar disponible de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
+          : 'Se quitaron $quitados lugares disponibles de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
+
+      mostrarSnackBarAnimado(context: context, mensaje: mensaje);
+    }
+  }
+}
+
                                                 ),
                                               ],
                                             ),
@@ -840,24 +822,25 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                   90, // Lo subo un poco para no tapar el FloatingActionButton
               right: 20,
               child: InformationButon(text: '''
-        1️⃣ Primero seleccioná una fecha en el calendario.
-        Así el sistema sabe qué día de la semana (por ejemplo "martes") va a usar para crear las clases.
-        
-        2️⃣ Para crear una nueva clase, presioná el botón "Crear nueva clase".
-        Vas a tener que ingresar la hora y la cantidad de lugares disponibles.
-        Se generará automáticamente una clase cada semana en el día seleccionado.
-        
-        3️⃣ Desde cada clase podés:
-        
-        ➕ Aumentar los lugares disponibles.
-        
-        ➖ Reducir los lugares disponibles.
-        
-        🗑️ Eliminar la clase.
-        
-        4️⃣ Si mantenés presionada una clase, podés marcar esa clase como "feriado".
-        Así se indica que ese día no habrá clases.
-        '''),
+1️⃣ Primero seleccioná una fecha en el calendario.
+Así el sistema sabe qué día de la semana (por ejemplo "martes") va a usar para crear las clases.
+
+2️⃣ Para crear una nueva clase, presioná el botón "Crear nueva clase".
+Vas a tener que ingresar la hora y la cantidad de lugares disponibles.
+Se generará automáticamente una clase cada semana en el día seleccionado.
+
+3️⃣ Desde cada clase podés:
+
+➕ Aumentar los lugares disponibles.
+
+➖ Reducir los lugares disponibles.
+
+4️⃣ Si presionás en una clase, podés marcarla como "feriado".
+Así se indica que ese día no habrá clases.
+
+5️⃣ Si dejás presionada una clase, podés eliminarla.
+Y si activás el switch, se eliminarán todas las clases del mismo día y hora de ese mes.
+'''),
             ),
           ],
         ),
@@ -1148,7 +1131,7 @@ class _DialogoEliminarClaseConSwitchState
   }
 }
 
-class DialogoModificarLugarDisponible extends StatelessWidget {
+class DialogoModificarLugarDisponible extends StatefulWidget {
   final String mensaje;
   final bool esAgregar;
 
@@ -1158,24 +1141,74 @@ class DialogoModificarLugarDisponible extends StatelessWidget {
   });
 
   @override
+  State<DialogoModificarLugarDisponible> createState() =>
+      _DialogoModificarLugarDisponibleState();
+}
+
+class _DialogoModificarLugarDisponibleState
+    extends State<DialogoModificarLugarDisponible> {
+  int cantidad = 1;
+
+  void aumentar() {
+    setState(() {
+      cantidad++;
+    });
+  }
+
+  void disminuir() {
+    if (cantidad > 1) {
+      setState(() {
+        cantidad--;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final color = Theme.of(context).primaryColor;
     final localizations = AppLocalizations.of(context);
 
     return AlertDialog(
       title: Text(localizations.translate('confirmationDialogTitle')),
-      content: Text(mensaje),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(widget.mensaje),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: Icon(Icons.remove, color: color),
+                onPressed: disminuir,
+              ),
+              Text(
+                '$cantidad',
+                style: const TextStyle(fontSize: 20),
+              ),
+              IconButton(
+                icon: Icon(Icons.add, color: color),
+                onPressed: aumentar,
+              ),
+            ],
+          ),
+        ],
+      ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop({'confirmado': false}),
+          onPressed: () => Navigator.of(context).pop(null),
           child: Text(localizations.translate('noButton')),
         ),
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop({'confirmado': true}),
-          child: Text(
-            esAgregar
-                ? localizations.translate('addButtonLabel')
-                : localizations.translate('removeButtonLabel'),
-          ),
+          onPressed: () {
+            Navigator.of(context).pop({
+              'confirmado': true,
+              'cantidad': cantidad,
+            });
+          },
+          child: Text(widget.esAgregar
+              ? localizations.translate('addButtonLabel')
+              : localizations.translate('removeButtonLabel')),
         ),
       ],
     );

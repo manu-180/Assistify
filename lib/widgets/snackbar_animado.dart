@@ -17,6 +17,11 @@ void mostrarSnackBarAnimado({
       behavior: SnackBarBehavior.floating,
       backgroundColor: Colors.transparent,
       elevation: 0,
+      margin: const EdgeInsets.only(
+        bottom: 90, // espacio para evitar el FAB
+        left: 16,
+        right: 16,
+      ),
       content: GestureDetector(
         onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
         child: SlideInUp(

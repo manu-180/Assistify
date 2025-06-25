@@ -12,6 +12,8 @@ import 'package:taller_ceramica/models/usuario_models.dart';
 import 'package:taller_ceramica/widgets/crear_usuario_dialog.dart';
 import 'package:taller_ceramica/widgets/information_buton.dart';
 import 'package:taller_ceramica/widgets/responsive_appbar.dart';
+import 'package:taller_ceramica/widgets/snackbar_animado.dart';
+import 'package:taller_ceramica/widgets/titulo_seleccion.dart';
 
 class UsuariosScreen extends StatefulWidget {
   const UsuariosScreen({super.key, String? taller});
@@ -73,52 +75,29 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     await EliminarUsuario().eliminarDeBaseDatos(userUid);
     await EliminarUsuario().eliminarUsuarioAutenticado(userUid);
     await EliminarUsuario().eliminarDeBaseDatos(userUid);
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(
-              AppLocalizations.of(context).translate('userDeletedSuccess'))),
-    );
+    mostrarSnackBarAnimado(context: context, mensaje:  AppLocalizations.of(context).translate('userDeletedSuccess'));
     await cargarUsuarios();
   }
 
   Future<void> agregarCredito(String user) async {
     final resultado = await ModificarCredito().agregarCreditoUsuario(user);
     if (resultado) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('creditsAddedSuccess'))),
-      );
+     mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('creditsAddedSuccess'));
       await cargarUsuarios();
     } else {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                AppLocalizations.of(context).translate('errorAddingCredits'))),
-      );
+     mostrarSnackBarAnimado(context: context, mensaje:  AppLocalizations.of(context).translate('errorAddingCredits'));
     }
   }
 
   Future<void> removerCredito(String user) async {
     final resultado = await ModificarCredito().removerCreditoUsuario(user);
     if (resultado) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('creditsRemovedSuccess'))),
-      );
+      mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('creditsRemovedSuccess'));
       await cargarUsuarios();
     } else {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(AppLocalizations.of(context)
-                .translate('errorRemovingCredits'))),
-      );
+      mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('errorRemovingCredits'));
     }
   }
 
@@ -170,6 +149,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     required Function(int cantidad) onConfirmar,
   }) async {
     int contador = 1;
+    final color = Theme.of(context).colorScheme;
 
     final resultado = await showDialog<bool>(
       context: context,
@@ -187,7 +167,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.remove, color: Colors.orange),
+                        icon:  Icon(Icons.remove, color: color.primary),
                         onPressed: () {
                           if (contador > 1) {
                             setState(() {
@@ -203,7 +183,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                        icon: const Icon(Icons.add, color: Colors.green),
+                        icon:  Icon(Icons.add, color: color.primary),
                         onPressed: () {
                           setState(() {
                             contador++;
@@ -242,6 +222,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final usuarioActivo = Supabase.instance.client.auth.currentUser;
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar:
@@ -256,6 +237,14 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     child: Column(
                       children: [
                         const SizedBox(height: 50),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: TituloSeleccion(
+  texto:
+      "Listado de alumnos: ${usuarios.length - 1} registrados.",
+),
+
+                        ),
                         Expanded(
                           child: ListView.builder(
                             itemCount: usuarios.length,
@@ -283,8 +272,8 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon: const Icon(Icons.add,
-                                                color: Colors.green),
+                                            icon:  Icon(Icons.add,
+                                                color: colors.primary),
                                             onPressed: () =>
                                                 mostrarDialogoConContador(
                                               context: context,
@@ -306,8 +295,8 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                             ),
                                           ),
                                           IconButton(
-                                            icon: const Icon(Icons.remove,
-                                                color: Colors.orange),
+                                            icon:  Icon(Icons.remove,
+                                                color: colors.primary),
                                             onPressed: () =>
                                                 mostrarDialogoConContador(
                                               context: context,
@@ -340,33 +329,12 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                   try {
                                     final clases = await AlumnosEnClase()
                                         .clasesAlumno(alumno, columna);
-                                    ScaffoldMessenger.of(context)
-                                        .hideCurrentSnackBar();
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          clases.isNotEmpty
+                                    mostrarSnackBarAnimado(context: context, mensaje: clases.isNotEmpty
                                               ? "Clases de $alumno:\n${clases.join('\n')}"
-                                              : "$alumno no tiene clase asignadas.",
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        duration: const Duration(seconds: 7),
-                                      ),
-                                    );
+                                              : "$alumno no tiene clase asignadas.");
                                   } catch (e) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Error al obtener las clases: $e",
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        backgroundColor: Colors.red,
-                                        duration: const Duration(seconds: 7),
-                                      ),
-                                    );
+                                    mostrarSnackBarAnimado(context: context, mensaje: "Error al obtener las clases: $e", colorFondo: Colors.red);
+                                   
                                   }
                                 },
                                 onLongPress: () {
@@ -469,7 +437,9 @@ El alumno usará su correo y contraseña para iniciar sesión.
               style: TextStyle(fontSize: size.width * 0.030),
             ),
           ),
+          backgroundColor: colors.secondaryContainer,
         ),
+        
       ),
     );
   }

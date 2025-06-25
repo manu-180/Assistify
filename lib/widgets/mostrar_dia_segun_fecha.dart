@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:taller_ceramica/utils/dia_con_fecha.dart';
+import 'package:taller_ceramica/utils/utils_barril.dart';
 import 'package:taller_ceramica/widgets/custom_box.dart';
 import 'package:taller_ceramica/l10n/app_localizations.dart';
 
@@ -44,8 +45,8 @@ class MostrarDiaSegunFecha extends StatelessWidget {
           color2: colors.primary.withAlpha(60),
           text: text.isEmpty
               ? AppLocalizations.of(context).translate('selectDate')
-              : DiaConFecha()
-                  .obtenerDiaDeLaSemana(text, AppLocalizations.of(context)),
+              : Capitalize().capitalize(DiaConFecha()
+                  .obtenerDiaDeLaSemana(text, AppLocalizations.of(context))),
         ),
         SizedBox(width: screenWidth * 0.05),
         IconButton(
