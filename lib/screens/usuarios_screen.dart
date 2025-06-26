@@ -218,6 +218,34 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     }
   }
 
+    void incrementarCreditosLocales(String userUid, int cantidad) {
+  setState(() {
+    final index = usuarios.indexWhere((u) => u.userUid == userUid);
+    if (index != -1) {
+      final usuario = usuarios[index];
+      usuarios[index] = usuario.copyWith(
+        clasesDisponibles: usuario.clasesDisponibles + cantidad,
+      );
+    }
+  });
+}
+
+
+void disminuirCreditosLocales(String userUid, int cantidad) {
+  setState(() {
+    final index = usuarios.indexWhere((u) => u.userUid == userUid);
+    if (index != -1) {
+      final usuario = usuarios[index];
+      final nuevosCreditos = usuario.clasesDisponibles - cantidad;
+      usuarios[index] = usuario.copyWith(
+        clasesDisponibles: nuevosCreditos < 0 ? 0 : nuevosCreditos,
+      );
+    }
+  });
+}
+
+
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -238,13 +266,19 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                       children: [
                         const SizedBox(height: 50),
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: TituloSeleccion(
-  texto:
-      "Listado de alumnos: ${usuarios.length - 1} registrados.",
+  padding: const EdgeInsets.symmetric(horizontal: 10),
+  child: Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      TituloSeleccion(
+        texto: "Listado de alumnos: ${usuarios.length - 1} registrados.",
+      ),
+      const SizedBox(height: 3),
+      const Divider(thickness: 2),
+    ],
+  ),
 ),
 
-                        ),
                         Expanded(
                           child: ListView.builder(
                             itemCount: usuarios.length,
@@ -284,14 +318,35 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                                   AppLocalizations.of(context)
                                                       .translate(
                                                           'selectCreditsToAdd'),
-                                              onConfirmar: (cantidad) async {
-                                                for (int i = 0;
-                                                    i < cantidad;
-                                                    i++) {
-                                                  await agregarCredito(
-                                                      usuario.fullname);
-                                                }
-                                              },
+                                           onConfirmar: (cantidad) async {
+  bool exitoTotal = true;
+
+  for (int i = 0; i < cantidad; i++) {
+    final exito = await ModificarCredito().agregarCreditoUsuario(usuario.fullname);
+    if (!exito) {
+      exitoTotal = false;
+      break;
+    }
+    incrementarCreditosLocales(usuario.userUid, 1);
+  }
+
+  if (mounted) {
+   final mensaje = exitoTotal
+    ? (cantidad == 1
+        ? 'Se removió 1 crédito correctamente.'
+        : 'Se removieron $cantidad créditos correctamente.')
+    : AppLocalizations.of(context).translate('errorRemovingCredits');
+
+mostrarSnackBarAnimado(
+  context: context,
+  mensaje: mensaje,
+);
+
+  }
+},
+
+
+
                                             ),
                                           ),
                                           IconButton(
@@ -307,14 +362,34 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                                       context)
                                                   .translate(
                                                       'selectCreditsToRemove'),
-                                              onConfirmar: (cantidad) async {
-                                                for (int i = 0;
-                                                    i < cantidad;
-                                                    i++) {
-                                                  await removerCredito(
-                                                      usuario.fullname);
-                                                }
-                                              },
+                                       onConfirmar: (cantidad) async {
+  bool exitoTotal = true;
+  int cantidadRemovida = 0;
+
+  for (int i = 0; i < cantidad; i++) {
+    final index = usuarios.indexWhere((u) => u.userUid == usuario.userUid);
+    if (index != -1 && usuarios[index].clasesDisponibles > 0) {
+      final exito = await ModificarCredito().removerCreditoUsuario(usuario.fullname);
+      if (!exito) {
+        exitoTotal = false;
+        break;
+      }
+      disminuirCreditosLocales(usuario.userUid, 1);
+      cantidadRemovida++;
+    }
+  }
+
+  if (mounted) {
+    final mensaje = exitoTotal
+        ? (cantidadRemovida == 1
+            ? 'Se removió 1 crédito correctamente.'
+            : 'Se removieron $cantidadRemovida créditos correctamente.')
+        : AppLocalizations.of(context).translate('errorRemovingCredits');
+
+    mostrarSnackBarAnimado(context: context, mensaje: mensaje);
+  }
+},
+
                                             ),
                                           ),
                                         ],
@@ -395,7 +470,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
             bottom: 90, // Ajustado para no superponer el FloatingActionButton
             right: 20,
             child: InformationButon(text: '''
-1️⃣ Para crear un nuevo alumno, presioná el botón "Crear nuevo usuario".
+1️⃣ Para crear un nuevo usuario, presioná el botón "Crear nuevo usuario".
 Se abrirá un formulario donde vas a ingresar el nombre, el correo, el teléfono y la contraseña.
 El alumno usará su correo y contraseña para iniciar sesión.
 

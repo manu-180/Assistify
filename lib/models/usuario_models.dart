@@ -27,7 +27,6 @@ class UsuarioModels {
     required this.telefono,
   });
 
-  // Función para convertir el mapa a un objeto UsuarioModels
   factory UsuarioModels.fromMap(Map<String, dynamic> map) {
     return UsuarioModels(
       id: map['id'],
@@ -42,6 +41,36 @@ class UsuarioModels {
       createdAt: DateTime.parse(map['created_at']),
       rubro: map['rubro'],
       telefono: map['telefono'],
+    );
+  }
+
+  UsuarioModels copyWith({
+    int? id,
+    String? usuario,
+    String? fullname,
+    String? userUid,
+    String? sexo,
+    String? taller,
+    int? clasesDisponibles,
+    int? alertTrigger,
+    bool? admin,
+    DateTime? createdAt,
+    String? rubro,
+    String? telefono,
+  }) {
+    return UsuarioModels(
+      id: id ?? this.id,
+      usuario: usuario ?? this.usuario,
+      fullname: fullname ?? this.fullname,
+      userUid: userUid ?? this.userUid,
+      sexo: sexo ?? this.sexo,
+      taller: taller ?? this.taller,
+      clasesDisponibles: clasesDisponibles ?? this.clasesDisponibles,
+      alertTrigger: alertTrigger ?? this.alertTrigger,
+      admin: admin ?? this.admin,
+      createdAt: createdAt ?? this.createdAt,
+      rubro: rubro ?? this.rubro,
+      telefono: telefono ?? this.telefono,
     );
   }
 

@@ -497,6 +497,8 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
     });
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
@@ -1008,6 +1010,8 @@ class _DialogoEliminarClaseConSwitchState
       colorFondo: colorFondo,
     );
   }
+
+
 
   @override
   Widget build(BuildContext context) {

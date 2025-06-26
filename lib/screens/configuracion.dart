@@ -310,162 +310,250 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                             bottom: 100), // espacio para Contactanos
                         children: [
                           const SizedBox(height: 30),
-                          ExpansionTile(
-                            title: Text(
-                              AppLocalizations.of(context)
-                                  .translate('chooseColor'),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: colors.length,
-                                itemBuilder: (context, index) {
-                                  final color = colors[index];
-                                  return RadioListTile(
-                                    title: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Icon(Icons.palette_outlined,
-                                            color: color, size: 35),
-                                        const SizedBox(width: 15),
-                                        Icon(Icons.palette_outlined,
-                                            color: color, size: 35),
-                                        const SizedBox(width: 15),
-                                        Icon(Icons.palette_outlined,
-                                            color: color, size: 35),
-                                        const SizedBox(width: 15),
-                                      ],
-                                    ),
-                                    activeColor: color,
-                                    value: index,
-                                    groupValue: selectedColor,
-                                    onChanged: (value) {
-                                      ref
-                                          .read(themeNotifyProvider.notifier)
-                                          .changeColor(index);
-                                    },
-                                  );
-                                },
-                              ),
-                              ListTile(
-                                title: Text(
-                                  isDark
-                                      ? AppLocalizations.of(context)
-                                          .translate('lightMode')
-                                      : AppLocalizations.of(context)
-                                          .translate('darkMode'),
-                                ),
-                                onTap: () {
-                                  ref
-                                      .read(themeNotifyProvider.notifier)
-                                      .toggleDarkMode();
-                                },
-                                leading: isDark
-                                    ? const Icon(Icons.light_mode_outlined)
-                                    : const Icon(Icons.dark_mode_outlined),
-                              ),
-                            ],
-                          ), // Elige color
-                          ExpansionTile(
-                            title: Text(
-                              AppLocalizations.of(context)
-                                  .translate('updateData'),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            children: [
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: options.length,
-                                itemBuilder: (context, index) {
-                                  final option = options[index];
-                                  return ListTile(
-                                    title: Text(option['title']!),
-                                    onTap: () => context.push(option['route']!),
-                                  );
-                                },
-                              ),
-                            ],
-                          ), // Actualizar datos
+                         Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+      Card(
+  color: color.surfaceVariant.withOpacity(0.6),
+  elevation: 0,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    child: Text(
+      AppLocalizations.of(context).translate('chooseColor'),
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: color.primary,
+      ),
+    ),
+  ),
+),
+
+          const SizedBox(height: 12),
+          Wrap(
+  spacing: 12,
+  runSpacing: 12,
+  children: List.generate(colors.length, (index) {
+    final colorItem = colors[index];
+    return GestureDetector(
+      onTap: () => ref.read(themeNotifyProvider.notifier).changeColor(index),
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorItem,
+          borderRadius: BorderRadius.circular(12),
+          border: selectedColor == index
+              ? Border.all(color: Colors.white, width: 3)
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        width: 50,
+        height: 50,
+        child:  null,
+      ),
+    );
+  }),
+),
+
+          const Divider(),
+          ListTile(
+            title: Text(
+              isDark
+                  ? AppLocalizations.of(context).translate('lightMode')
+                  : AppLocalizations.of(context).translate('darkMode'),
+            ),
+            leading: Icon(
+              isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+            ),
+            onTap: () {
+              ref.read(themeNotifyProvider.notifier).toggleDarkMode();
+            },
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+
+                          Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+    Card(
+  color: color.surfaceVariant.withOpacity(0.6),
+  elevation: 0,
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(8),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    child: Text(
+      AppLocalizations.of(context).translate('updateData'),
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        color: Theme.of(context).textTheme.titleMedium!.color!.withOpacity(0.9),
+      ),
+    ),
+  ),
+),
+
+          const SizedBox(height: 12),
+          ...options.map((option) {
+            return Card(
+              margin: const EdgeInsets.symmetric(vertical: 6),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 2,
+              child: ListTile(
+                title: Text(option['title']!),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                onTap: () => context.push(option['route']!),
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    ),
+  ),
+),
+
 
                           // Botón para cambiar fechas
                           SizedBox(
                             height: 60,
                           ),
-                          if (user.userMetadata?["admin"] == true)
-                            Center(
-                              child: OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.red[700],
-                                  side: BorderSide(color: Colors.red[300]!),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: const Icon(Icons.warning_amber_rounded),
-                                label: const Text(
-                                  "Cambiar fechas al mes siguiente",
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                onPressed: () async {
-                                  final confirmed =
-                                      await mostrarDialogoConfirmacionCambiarMes(
-                                          context, user, color);
-                                  if (confirmed == true) {
-                                    await corregirDia();
-                                    await ResetClases().reset();
-                                    await ActualizarFechasDatabase()
-                                        .actualizarClasesAlNuevoMes(
-                                            user.userMetadata?['taller'], 2025);
-                                    await ActualizarSemanas()
-                                        .actualizarSemana();
-                                    await FeriadosFalse().feriadosFalse();
-                                  }
-                                },
-                              ),
-                            ),
+                          Padding(
+  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+  child: Card(
+    color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+    ),
+    elevation: 4,
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Título visual
+          Card(
+            color: color.surfaceVariant.withOpacity(0.6),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              child: Text(
+                "Configuraciones avanzadas",
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
 
-                          const SizedBox(height: 20),
+          if (user.userMetadata?["admin"] == true)
+            Center(
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.red[700],
+                  side: BorderSide(color: Colors.red[300]!),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                icon: const Icon(Icons.warning_amber_rounded),
+                label: const Text(
+                  "Cambiar fechas al mes siguiente",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () async {
+                  final confirmed =
+                      await mostrarDialogoConfirmacionCambiarMes(
+                          context, user, color);
+                  if (confirmed == true) {
+                    await corregirDia();
+                    await ResetClases().reset();
+                    await ActualizarFechasDatabase()
+                        .actualizarClasesAlNuevoMes(
+                            user.userMetadata?['taller'], 2025);
+                    await ActualizarSemanas().actualizarSemana();
+                    await FeriadosFalse().feriadosFalse();
+                  }
+                },
+              ),
+            ),
 
-                          // Botón para eliminar cuenta
-                          Center(
-                            child: OutlinedButton.icon(
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.red[700],
-                                side: BorderSide(color: Colors.red[300]!),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12)),
-                              ),
-                              icon: const Icon(Icons.delete_forever_rounded),
-                              label: const Text(
-                                "Eliminar mi cuenta",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              onPressed: () async {
-                                final confirmed =
-                                    await mostrarDialogoConfirmacionEliminarCuenta(
-                                        context, user, color);
-                                if (confirmed == true) {
-                                  await EliminarUsuario()
-                                      .eliminarUsuarioAutenticado(user.id);
-                                  await EliminarUsuario()
-                                      .eliminarDeBaseDatos(user.id);
-                                  if (context.mounted) {
-                                    context.go("/");
-                                  }
-                                }
-                              },
-                            ),
-                          ),
+          const SizedBox(height: 12),
+
+          Center(
+            child: OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.red[700],
+                side: BorderSide(color: Colors.red[300]!),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              icon: const Icon(Icons.delete_forever_rounded),
+              label: const Text(
+                "Eliminar mi cuenta",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              onPressed: () async {
+                final confirmed =
+                    await mostrarDialogoConfirmacionEliminarCuenta(
+                        context, user, color);
+                if (confirmed == true) {
+                  await EliminarUsuario().eliminarUsuarioAutenticado(user.id);
+                  await EliminarUsuario().eliminarDeBaseDatos(user.id);
+                  if (context.mounted) {
+                    context.go("/");
+                  }
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+
 
                           const SizedBox(height: 20),
                         ],
