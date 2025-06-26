@@ -270,31 +270,45 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
 
             const SizedBox(height: 16),
             TextField(
-              controller: phoneController,
-              decoration: InputDecoration(
-                labelText: 'Teléfono',
-                border: const OutlineInputBorder(),
-                errorText: phoneError.isEmpty ? null : phoneError,
-              ),
-              keyboardType: TextInputType.phone,
-              onChanged: (value) async {
-                final numero = value.trim();
-                if (!phoneRegex.hasMatch(numero)) {
-                  setState(() {
-                    phoneError = 'Teléfono inválido';
-                  });
-                  return;
-                }
+  controller: phoneController,
+  decoration: InputDecoration(
+    labelText: 'Teléfono (opcional)',
+    border: const OutlineInputBorder(),
+    errorText: phoneController.text.trim().isEmpty
+        ? null
+        : (phoneError.isEmpty ? null : phoneError),
+  ),
+  keyboardType: TextInputType.phone,
+  onChanged: (value) async {
+    final numero = value.trim();
 
-                final existe = await telefonoYaRegistrado(numero);
+    if (numero.isEmpty) {
+      setState(() {
+        phoneError = '';
+      });
+      return;
+    }
 
-                if (numero == phoneController.text.trim()) {
-                  setState(() {
-                    phoneError = existe ? 'Ese número ya está registrado' : '';
-                  });
-                }
-              },
-            ),
+    if (!phoneRegex.hasMatch(numero)) {
+      setState(() {
+        phoneError = 'Teléfono inválido';
+      });
+      return;
+    }
+
+    final existe = await telefonoYaRegistrado(numero);
+    if (existe) {
+      setState(() {
+        phoneError = 'Ese número ya está registrado';
+      });
+    } else {
+      setState(() {
+        phoneError = '';
+      });
+    }
+  },
+),
+
             const SizedBox(height: 16),
             TextField(
               controller: passwordController,
@@ -349,190 +363,180 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
           child: const Text("Cancelar"),
         ),
         ElevatedButton(
-          onPressed: () async {
-            final fullname = fullnameController.text.trim();
-            final email = emailController.text.trim();
-            final password = passwordController.text.trim();
-            final telefono = phoneController.text.trim();
+        onPressed: () async {
+  final fullname = fullnameController.text.trim();
+  final email = emailController.text.trim();
+  final password = passwordController.text.trim();
+  final telefono = phoneController.text.trim();
 
-            final yaExiste = await emailYaRegistrado(email);
-            final nombreYaExiste = await supabase
-                .from('usuarios')
-                .select('fullname')
-                .ilike('fullname', fullname)
-                .limit(1)
-                .maybeSingle();
-            final telExiste = await telefonoYaRegistrado(telefono);
+  final yaExiste = await emailYaRegistrado(email);
+  final nombreYaExiste = await supabase
+      .from('usuarios')
+      .select('fullname')
+      .ilike('fullname', fullname)
+      .limit(1)
+      .maybeSingle();
 
-            if (sexoSeleccionado == null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Seleccioná el sexo del usuario."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+  if (password != confirmarPassword) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text("Las contraseñas no coinciden."),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-            if (password != confirmarPassword) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Las contraseñas no coinciden."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+  if (telefono.isNotEmpty) {
+    final telExiste = await telefonoYaRegistrado(telefono);
+    if (telExiste) {
+      setState(() => phoneError = 'Ese número ya está registrado');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Ese número ya está registrado"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-            if (telExiste) {
-              setState(() => phoneError = 'Ese número ya está registrado');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Ese número ya está registrado"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+    if (!phoneRegex.hasMatch(telefono)) {
+      setState(() => phoneError = 'Teléfono inválido');
+      return;
+    }
+  }
 
-            if (nombreYaExiste != null) {
-              setState(() => fullnameError = 'Ya existe este nombre');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Ese nombre ya fue registrado"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+  if (nombreYaExiste != null) {
+    setState(() => fullnameError = 'Ya existe este nombre');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Ese nombre ya fue registrado"),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-            if (yaExiste) {
-              setState(() => emailError = 'Ese mail ya fue registrado');
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Ese mail ya fue registrado"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+  if (yaExiste) {
+    setState(() => emailError = 'Ese mail ya fue registrado');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Ese mail ya fue registrado"),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
 
-            if (fullname.isEmpty ||
-                email.isEmpty ||
-                password.isEmpty ||
-                phoneController.text.trim().isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Por favor, completá todos los campos."),
-                  backgroundColor: Colors.red,
-                ),
-              );
-              return;
-            }
+if (fullname.isEmpty || email.isEmpty || password.isEmpty) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text("Por favor, completá todos los campos obligatorios."),
+      backgroundColor: Colors.red,
+    ),
+  );
+  return;
+}
 
-            if (!emailRegex.hasMatch(email)) {
-              setState(() => emailError = 'Correo electrónico inválido');
-              return;
-            } else {
-              setState(() => emailError = '');
-            }
 
-            if (password.length < 6) {
-              setState(() => passwordError =
-                  'La contraseña debe tener al menos 6 caracteres');
-              return;
-            } else {
-              setState(() => passwordError = '');
-            }
+  if (!emailRegex.hasMatch(email)) {
+    setState(() => emailError = 'Correo electrónico inválido');
+    return;
+  }
 
-            if (!phoneRegex.hasMatch(phoneController.text.trim())) {
-              setState(() => phoneError = 'Teléfono inválido');
-              return;
-            } else {
-              setState(() => phoneError = '');
-            }
+  if (password.length < 6) {
+    setState(() => passwordError =
+        'La contraseña debe tener al menos 6 caracteres');
+    return;
+  }
 
-            final usuarioActivo = Supabase.instance.client.auth.currentUser;
-            final taller =
-                await ObtenerTaller().retornarTaller(usuarioActivo!.id);
+  final usuarioActivo = Supabase.instance.client.auth.currentUser;
+  final taller =
+      await ObtenerTaller().retornarTaller(usuarioActivo!.id);
 
-            final existingUsers = await supabase
-                .from('usuarios')
-                .select('fullname')
-                .eq('taller', taller)
-                .ilike('fullname', fullname);
+  final existingUsers = await supabase
+      .from('usuarios')
+      .select('fullname')
+      .eq('taller', taller)
+      .ilike('fullname', fullname);
 
-            if (existingUsers.isNotEmpty) {
-              setState(() {
-                fullnameError = 'Ya existe este nombre en tus usuarios';
-              });
-              return;
-            } else {
-              setState(() {
-                fullnameError = '';
-              });
-            }
+  if (existingUsers.isNotEmpty) {
+    setState(() {
+      fullnameError = 'Ya existe este nombre en tus usuarios';
+    });
+    return;
+  }
 
-            try {
-              final userId = await crearUsuarioAdmin(
-                  email: email,
-                  password: password,
-                  fullname: fullname,
-                  telefono: telefono,
-                  rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
-                  taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
-                  sexo: sexoSeleccionado);
+  try {
+    final userId = await crearUsuarioAdmin(
+      email: email,
+      password: password,
+      fullname: fullname,
+      telefono: telefono,
+      rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
+      taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
+      sexo: sexoSeleccionado,
+    );
 
-              await supabase.from('usuarios').insert({
-                'id': await GenerarId().generarIdUsuario(),
-                'usuario': email,
-                'fullname': Capitalize().capitalize(fullname),
-                'user_uid': userId,
-                'sexo': sexoSeleccionado, // 👈 esto es nuevo
-                'clases_disponibles': 0,
-                'trigger_alert': 0,
-                'clases_canceladas': [],
-                'taller': taller,
-                'telefono': telefono,
-                'rubro': await ObtenerRubro()
-                    .rubro(usuarioActivo.userMetadata?['fullname']),
-              });
+    final nuevoUsuario = {
+      'id': await GenerarId().generarIdUsuario(),
+      'usuario': email,
+      'fullname': Capitalize().capitalize(fullname),
+      'user_uid': userId,
+      'clases_disponibles': 0,
+      'trigger_alert': 0,
+      'clases_canceladas': [],
+      'taller': taller,
+      'rubro': await ObtenerRubro()
+          .rubro(usuarioActivo.userMetadata?['fullname']),
+    };
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "La cuenta de $fullname se creó exitosamente. ¡Ya puede iniciar sesión!.",
-                  ),
-                  backgroundColor: const Color(0xFF4CAF50),
-                  duration: const Duration(seconds: 9),
-                ),
-              );
+    if (telefono.isNotEmpty) {
+      nuevoUsuario['telefono'] = telefono;
+    }
 
-              final callback = widget.onUsuarioCreado;
-              Navigator.of(context).pop();
+    if (sexoSeleccionado != null) {
+      nuevoUsuario['sexo'] = sexoSeleccionado;
+    }
 
-              if (callback != null) {
-                Future.microtask(() async {
-                  await callback();
-                });
-              }
-            } on AuthException catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text("Ese mail ya fue registrado"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            } catch (e) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                      "Contactá a soporte. Ocurrió un error inesperado: $e"),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
+    await supabase.from('usuarios').insert(nuevoUsuario);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          "La cuenta de $fullname se creó exitosamente. ¡Ya puede iniciar sesión!.",
+        ),
+        backgroundColor: const Color(0xFF4CAF50),
+        duration: const Duration(seconds: 9),
+      ),
+    );
+
+    final callback = widget.onUsuarioCreado;
+    Navigator.of(context).pop();
+
+    if (callback != null) {
+      Future.microtask(() async {
+        await callback();
+      });
+    }
+  } on AuthException catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("Ese mail ya fue registrado"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            "Contactá a soporte. Ocurrió un error inesperado: $e"),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+},
+
           child: const Text("Crear Usuario"),
         ),
       ],

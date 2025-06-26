@@ -291,37 +291,54 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                       ),
                       const SizedBox(height: 16),
                       TextField(
-                        controller: phoneController,
-                        decoration: InputDecoration(
-                          labelText: "Teléfono",
-                          border: const OutlineInputBorder(),
-                          errorText: phoneError.isEmpty ? null : phoneError,
-                        ),
-                        keyboardType: TextInputType.phone,
-                        onChanged: (value) async {
-                          final phone = value.trim();
-                          final regex = RegExp(r'^[0-9]{7,15}$');
+  controller: phoneController,
+  decoration: InputDecoration(
+    labelText: "Teléfono (opcional)",
+    border: const OutlineInputBorder(),
+    errorText: phoneError.isEmpty ? null : phoneError,
+  ),
+  keyboardType: TextInputType.phone,
+  onChanged: (value) async {
+    final phone = value.trim();
+    if (phone.isEmpty) {
+      setState(() => phoneError = "");
+      return;
+    }
 
-                          if (!regex.hasMatch(phone)) {
-                            setState(() => phoneError =
-                                "Número inválido. (ej: 1134272488)");
-                            return;
-                          }
+    final regex = RegExp(r'^[0-9]{7,15}$');
+    if (!regex.hasMatch(phone)) {
+      setState(() => phoneError =
+          "Número inválido. (ej: 1134272488)");
+      return;
+    }
 
-                          final existe = await supabase
-                              .from('usuarios')
-                              .select('telefono')
-                              .eq('telefono', phone)
-                              .limit(1)
-                              .maybeSingle();
+    final existe = await supabase
+        .from('usuarios')
+        .select('telefono')
+        .eq('telefono', phone)
+        .limit(1)
+        .maybeSingle();
 
-                          setState(() {
-                            phoneError = existe != null
-                                ? "Ese número ya está registrado."
-                                : "";
-                          });
-                        },
-                      ),
+    setState(() {
+      phoneError = existe != null
+          ? "Ese número ya está registrado."
+          : "";
+    });
+  },
+),
+const SizedBox(height: 4),
+Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    "Usado para enviar mensajes automáticos por WhatsApp",
+    style: TextStyle(
+      fontSize: 12,
+      color: Colors.black54,
+      fontStyle: FontStyle.italic,
+    ),
+  ),
+),
+
                       const SizedBox(height: 16),
                       Row(
                         children: ['Hombre', 'Mujer', 'Indefinido']
@@ -627,27 +644,22 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                                       return;
                                     }
 
-                                    if (existeTelefono) {
-                                      setState(() {
-                                        phoneError =
-                                            "Ese número ya está registrado.";
-                                        isLoading = false;
-                                      });
-                                      mostrarSnackBarAnimado(
-                                        context: context,
-                                        mensaje: AppLocalizations.of(context)
-                                            .translate(
-                                                'allFieldsRequiredError'),
-                                        colorFondo:
-                                            Colors.red, // o verde si es éxito
-                                      );
-                                      return;
-                                    }
+                                 if (telefono.isNotEmpty && existeTelefono) {
+  setState(() {
+    phoneError = "Ese número ya está registrado.";
+    isLoading = false;
+  });
+  mostrarSnackBarAnimado(
+    context: context,
+    mensaje: "Ese número ya está registrado.",
+    colorFondo: Colors.red,
+  );
+  return;
+}
 
                                     if (fullname.isEmpty ||
                                         email.isEmpty ||
                                         taller.isEmpty ||
-                                        telefono.isEmpty ||
                                         password.isEmpty ||
                                         confirmPassword.isEmpty) {
                                       setState(() {
@@ -714,18 +726,16 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                                           await supabase.auth.signUp(
                                         email: email,
                                         password: password,
-                                        data: {
-                                          'fullname':
-                                              Capitalize().capitalize(fullname),
-                                          "rubro": selectedRubro,
-                                          "taller":
-                                              Capitalize().capitalize(taller),
-                                          "telefono": telefono,
-                                          "sexo": sexoSeleccionado,
-                                          "admin": true,
-                                          "created_at":
-                                              DateTime.now().toIso8601String(),
-                                        },
+                                       data: {
+  'fullname': Capitalize().capitalize(fullname),
+  "rubro": selectedRubro,
+  "taller": Capitalize().capitalize(taller),
+  if (telefono.isNotEmpty) "telefono": telefono,
+  "sexo": sexoSeleccionado,
+  "admin": true,
+  "created_at": DateTime.now().toIso8601String(),
+},
+
                                       );
 
                                       if (res.user != null) {
@@ -735,25 +745,22 @@ class _CrearTallerScreenState extends State<CrearTallerScreen> {
                                         print("❌ No se creó el usuario.");
                                       }
 
-                                      await supabase.from('usuarios').insert({
-                                        'id': await GenerarId()
-                                            .generarIdUsuario(),
-                                        'usuario': email,
-                                        'fullname':
-                                            Capitalize().capitalize(fullname),
-                                        'user_uid': res.user?.id,
-                                        "sexo": sexoSeleccionado,
-                                        'clases_disponibles': 0,
-                                        'trigger_alert': 0,
-                                        'clases_canceladas': [],
-                                        'taller':
-                                            Capitalize().capitalize(taller),
-                                        "admin": true,
-                                        "created_at":
-                                            DateTime.now().toIso8601String(),
-                                        "rubro": selectedRubro,
-                                        "telefono": telefono,
-                                      });
+                                    await supabase.from('usuarios').insert({
+  'id': await GenerarId().generarIdUsuario(),
+  'usuario': email,
+  'fullname': Capitalize().capitalize(fullname),
+  'user_uid': res.user?.id,
+  "sexo": sexoSeleccionado,
+  'clases_disponibles': 0,
+  'trigger_alert': 0,
+  'clases_canceladas': [],
+  'taller': Capitalize().capitalize(taller),
+  "admin": true,
+  "created_at": DateTime.now().toIso8601String(),
+  "rubro": selectedRubro,
+  if (telefono.isNotEmpty) "telefono": telefono,
+});
+
 
                                       await crearTablaTaller(
                                           Capitalize().capitalize(taller));
