@@ -509,7 +509,7 @@ final fullName = user?.userMetadata?['fullname'] ?? '';
               child: ListTile(
                 title: Text('Sexo: ${sexo ?? "Sin especificar"}'),
                 onTap: () async {
-                  String? sexoSeleccionado = sexo ?? 'Indefinido';
+                  String? sexoSeleccionado = sexo ?? 'Otro';
                   await showDialog(
                     context: context,
                     builder: (context) {
@@ -518,7 +518,7 @@ final fullName = user?.userMetadata?['fullname'] ?? '';
                         content: StatefulBuilder(
                           builder: (context, setState) {
                             return Row(
-                              children: ['Hombre', 'Mujer', 'Indefinido']
+                              children: ['Hombre', 'Mujer', 'Otro']
                                   .asMap()
                                   .entries
                                   .map((entry) {

@@ -363,7 +363,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.transparent,
                       elevation: 0,
                       content: SlideInUp(
@@ -574,7 +573,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.transparent,
           elevation: 0,
           content: SlideInUp(
@@ -816,7 +814,6 @@ class ClasesScreenState extends ConsumerState<ClasesScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             duration: const Duration(seconds: 7),
-                            behavior: SnackBarBehavior.floating,
                             backgroundColor: Colors.transparent,
                             elevation: 0,
                             content: SlideInUp(

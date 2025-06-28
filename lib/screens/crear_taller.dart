@@ -341,7 +341,7 @@ Align(
 
                       const SizedBox(height: 16),
                       Row(
-                        children: ['Hombre', 'Mujer', 'Indefinido']
+                        children: ['Hombre', 'Mujer', 'Otro']
                             .asMap()
                             .entries
                             .map((entry) {

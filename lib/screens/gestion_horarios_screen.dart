@@ -162,47 +162,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     });
   }
 
-  void mostrarSnackBarEliminacion({
-    required BuildContext context,
-    required String titulo,
-    required List<ClaseModels> clases,
-    required Color colorFondo,
-  }) {
-    final detalles =
-        clases.map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}').join('\n');
-    final mensaje = '$titulo:\n\n$detalles';
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        duration: const Duration(seconds: 7),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        content: GestureDetector(
-          onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-          child: SlideInUp(
-            duration: const Duration(milliseconds: 500),
-            child: Material(
-              color: Colors.transparent,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: colorFondo,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  mensaje,
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   String _obtenerDia(String? fecha) {
     if (fecha == null || fecha.isEmpty) return '';
@@ -215,6 +174,7 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     required String titulo,
     required List<ClaseModels> clases,
     required Color colorFondo,
+    
   }) {
     final detalles =
         clases.map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}').join('\n');
@@ -224,27 +184,24 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 7),
-        behavior: SnackBarBehavior.floating,
+
         backgroundColor: Colors.transparent,
         elevation: 0,
         content: GestureDetector(
           onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-          child: SlideInUp(
-            duration: const Duration(milliseconds: 500),
-            child: Material(
-              // 👈 clave para que el tap funcione bien
-              color: Colors.transparent,
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: colorFondo,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  mensaje,
-                  style: const TextStyle(color: Colors.white),
-                ),
+          child: Material(
+            // 👈 clave para que el tap funcione bien
+            color: Colors.transparent,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: colorFondo,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                mensaje,
+                style: const TextStyle(color: Colors.white),
               ),
             ),
           ),
@@ -398,32 +355,28 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                         .showSnackBar(
                                       SnackBar(
                                         duration: const Duration(seconds: 7),
-                                        behavior: SnackBarBehavior.floating,
+                                    
                                         backgroundColor: Colors.transparent,
                                         elevation: 0,
                                         content: GestureDetector(
                                           onTap: () => ScaffoldMessenger.of(
                                                   scaffoldContext)
                                               .hideCurrentSnackBar(),
-                                          child: SlideInUp(
-                                            duration: const Duration(
-                                                milliseconds: 500),
-                                            child: Material(
-                                              color: Colors.transparent,
-                                              child: Container(
-                                                width: double.infinity,
-                                                padding:
-                                                    const EdgeInsets.all(16),
-                                                decoration: BoxDecoration(
-                                                  color: color.primary,
-                                                  borderRadius:
-                                                      BorderRadius.circular(12),
-                                                ),
-                                                child: Text(
-                                                  mensaje,
-                                                  style: const TextStyle(
-                                                      color: Colors.white),
-                                                ),
+                                          child: Material(
+                                            color: Colors.transparent,
+                                            child: Container(
+                                              width: double.infinity,
+                                              padding:
+                                                  const EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: color.primary,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              child: Text(
+                                                mensaje,
+                                                style: const TextStyle(
+                                                    color: Colors.white),
                                               ),
                                             ),
                                           ),
