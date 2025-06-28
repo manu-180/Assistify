@@ -13,8 +13,6 @@ import 'package:assistify/screens/clases_screen.dart';
 import 'package:assistify/screens/subscription_screen.dart';
 import 'package:assistify/screens/usuarios_screen.dart';
 import 'package:assistify/screens/configuracion.dart';
-import 'package:assistify/screens/cambiar_password.dart';
-import 'package:assistify/screens/update_name_screen.dart';
 import 'package:assistify/screens/welcome_screen.dart';
 
 final appRouter = GoRouter(
@@ -85,17 +83,7 @@ final appRouter = GoRouter(
         return GestionDeClasesScreen(taller: tallerParam);
       },
     ),
-    GoRoute(
-      path: "/cambiarpassword",
-      builder: (context, state) => const CambiarPassword(),
-    ),
-    GoRoute(
-      path: "/cambiarfullname/:taller",
-      builder: (context, state) {
-        final tallerParam = state.pathParameters['taller'];
-        return UpdateNameScreen(taller: tallerParam);
-      },
-    ),
+
     GoRoute(
       path: "/creartaller",
       builder: (context, state) => const CrearTallerScreen(),

@@ -14,31 +14,23 @@ void mostrarSnackBarAnimado({
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       duration: Duration(seconds: duracionSegundos),
-      behavior: SnackBarBehavior.floating,
+      behavior: SnackBarBehavior.fixed, // Usar fixed para evitar errores de layout
       backgroundColor: Colors.transparent,
       elevation: 0,
-      margin: const EdgeInsets.only(
-        bottom: 90, // espacio para evitar el FAB
-        left: 16,
-        right: 16,
-      ),
-      content: GestureDetector(
-        onTap: () => ScaffoldMessenger.of(context).hideCurrentSnackBar(),
-        child: SlideInUp(
-          duration: const Duration(milliseconds: 500),
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: colorFondo ?? theme.colorScheme.primary,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                mensaje,
-                style: const TextStyle(color: Colors.white),
-              ),
+      content: SlideInUp(
+        duration: const Duration(milliseconds: 500),
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: colorFondo ?? theme.colorScheme.primary,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              mensaje,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ),
