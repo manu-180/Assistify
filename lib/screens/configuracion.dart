@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:assistify/supabase/obtener_datos/obtener_numero_admin.dart';
 import 'package:assistify/utils/capitalize.dart';
+import 'package:assistify/widgets/titulo_seleccion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -313,6 +314,21 @@ final fullName = user?.userMetadata?['fullname'] ?? '';
             : ListView(
                 padding: const EdgeInsets.only(bottom: 100),
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 40),
+                        TituloSeleccion(
+                                texto: "Personalizar mi cuenta ",
+                              ),
+                                const SizedBox(height: 3),
+      const Divider(thickness: 2),
+                      ],
+                    ),
+                  ),
+    
                   const SizedBox(height: 30),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

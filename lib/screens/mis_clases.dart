@@ -286,6 +286,7 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                     ),
                   )
                 : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
                       Padding(

@@ -264,7 +264,7 @@ void disminuirCreditosLocales(String userUid, int cantidad) {
                     constraints: const BoxConstraints(maxWidth: 600),
                     child: Column(
                       children: [
-                        const SizedBox(height: 50),
+                        const SizedBox(height: 40),
                         Padding(
   padding: const EdgeInsets.symmetric(horizontal: 10),
   child: Column(
