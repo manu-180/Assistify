@@ -75,29 +75,43 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     await EliminarUsuario().eliminarDeBaseDatos(userUid);
     await EliminarUsuario().eliminarUsuarioAutenticado(userUid);
     await EliminarUsuario().eliminarDeBaseDatos(userUid);
-    mostrarSnackBarAnimado(context: context, mensaje:  AppLocalizations.of(context).translate('userDeletedSuccess'));
+    mostrarSnackBarAnimado(
+        context: context,
+        mensaje: AppLocalizations.of(context).translate('userDeletedSuccess'));
     await cargarUsuarios();
   }
 
   Future<void> agregarCredito(String user) async {
     final resultado = await ModificarCredito().agregarCreditoUsuario(user);
     if (resultado) {
-     mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('creditsAddedSuccess'));
+      mostrarSnackBarAnimado(
+          context: context,
+          mensaje:
+              AppLocalizations.of(context).translate('creditsAddedSuccess'));
       await cargarUsuarios();
     } else {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-     mostrarSnackBarAnimado(context: context, mensaje:  AppLocalizations.of(context).translate('errorAddingCredits'));
+      mostrarSnackBarAnimado(
+          context: context,
+          mensaje:
+              AppLocalizations.of(context).translate('errorAddingCredits'));
     }
   }
 
   Future<void> removerCredito(String user) async {
     final resultado = await ModificarCredito().removerCreditoUsuario(user);
     if (resultado) {
-      mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('creditsRemovedSuccess'));
+      mostrarSnackBarAnimado(
+          context: context,
+          mensaje:
+              AppLocalizations.of(context).translate('creditsRemovedSuccess'));
       await cargarUsuarios();
     } else {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
-      mostrarSnackBarAnimado(context: context, mensaje: AppLocalizations.of(context).translate('errorRemovingCredits'));
+      mostrarSnackBarAnimado(
+          context: context,
+          mensaje:
+              AppLocalizations.of(context).translate('errorRemovingCredits'));
     }
   }
 
@@ -167,7 +181,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(
-                        icon:  Icon(Icons.remove, color: color.primary),
+                        icon: Icon(Icons.remove, color: color.primary),
                         onPressed: () {
                           if (contador > 1) {
                             setState(() {
@@ -183,7 +197,7 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                       ),
                       const SizedBox(width: 10),
                       IconButton(
-                        icon:  Icon(Icons.add, color: color.primary),
+                        icon: Icon(Icons.add, color: color.primary),
                         onPressed: () {
                           setState(() {
                             contador++;
@@ -218,33 +232,30 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
     }
   }
 
-    void incrementarCreditosLocales(String userUid, int cantidad) {
-  setState(() {
-    final index = usuarios.indexWhere((u) => u.userUid == userUid);
-    if (index != -1) {
-      final usuario = usuarios[index];
-      usuarios[index] = usuario.copyWith(
-        clasesDisponibles: usuario.clasesDisponibles + cantidad,
-      );
-    }
-  });
-}
+  void incrementarCreditosLocales(String userUid, int cantidad) {
+    setState(() {
+      final index = usuarios.indexWhere((u) => u.userUid == userUid);
+      if (index != -1) {
+        final usuario = usuarios[index];
+        usuarios[index] = usuario.copyWith(
+          clasesDisponibles: usuario.clasesDisponibles + cantidad,
+        );
+      }
+    });
+  }
 
-
-void disminuirCreditosLocales(String userUid, int cantidad) {
-  setState(() {
-    final index = usuarios.indexWhere((u) => u.userUid == userUid);
-    if (index != -1) {
-      final usuario = usuarios[index];
-      final nuevosCreditos = usuario.clasesDisponibles - cantidad;
-      usuarios[index] = usuario.copyWith(
-        clasesDisponibles: nuevosCreditos < 0 ? 0 : nuevosCreditos,
-      );
-    }
-  });
-}
-
-
+  void disminuirCreditosLocales(String userUid, int cantidad) {
+    setState(() {
+      final index = usuarios.indexWhere((u) => u.userUid == userUid);
+      if (index != -1) {
+        final usuario = usuarios[index];
+        final nuevosCreditos = usuario.clasesDisponibles - cantidad;
+        usuarios[index] = usuario.copyWith(
+          clasesDisponibles: nuevosCreditos < 0 ? 0 : nuevosCreditos,
+        );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -266,19 +277,19 @@ void disminuirCreditosLocales(String userUid, int cantidad) {
                       children: [
                         const SizedBox(height: 40),
                         Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 10),
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      TituloSeleccion(
-        texto: "Listado de alumnos: ${usuarios.length - 1} registrados.",
-      ),
-      const SizedBox(height: 3),
-      const Divider(thickness: 2),
-    ],
-  ),
-),
-
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              TituloSeleccion(
+                                texto:
+                                    "Listado de alumnos: ${usuarios.length - 1} registrados.",
+                              ),
+                              const SizedBox(height: 3),
+                              const Divider(thickness: 2),
+                            ],
+                          ),
+                        ),
                         Expanded(
                           child: ListView.builder(
                             itemCount: usuarios.length,
@@ -306,7 +317,7 @@ void disminuirCreditosLocales(String userUid, int cantidad) {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                            icon:  Icon(Icons.add,
+                                            icon: Icon(Icons.add,
                                                 color: colors.primary),
                                             onPressed: () =>
                                                 mostrarDialogoConContador(
@@ -318,39 +329,44 @@ void disminuirCreditosLocales(String userUid, int cantidad) {
                                                   AppLocalizations.of(context)
                                                       .translate(
                                                           'selectCreditsToAdd'),
-                                           onConfirmar: (cantidad) async {
-  bool exitoTotal = true;
+                                              onConfirmar: (cantidad) async {
+                                                bool exitoTotal = true;
 
-  for (int i = 0; i < cantidad; i++) {
-    final exito = await ModificarCredito().agregarCreditoUsuario(usuario.fullname);
-    if (!exito) {
-      exitoTotal = false;
-      break;
-    }
-    incrementarCreditosLocales(usuario.userUid, 1);
-  }
+                                                for (int i = 0;
+                                                    i < cantidad;
+                                                    i++) {
+                                                  final exito =
+                                                      await ModificarCredito()
+                                                          .agregarCreditoUsuario(
+                                                              usuario.fullname);
+                                                  if (!exito) {
+                                                    exitoTotal = false;
+                                                    break;
+                                                  }
+                                                  incrementarCreditosLocales(
+                                                      usuario.userUid, 1);
+                                                }
 
-  if (mounted) {
-   final mensaje = exitoTotal
-    ? (cantidad == 1
-        ? 'Se removió 1 crédito correctamente.'
-        : 'Se removieron $cantidad créditos correctamente.')
-    : AppLocalizations.of(context).translate('errorRemovingCredits');
+                                                if (mounted) {
+                                                  final mensaje = exitoTotal
+                                                      ? (cantidad == 1
+                                                          ? 'Se removió 1 crédito correctamente.'
+                                                          : 'Se removieron $cantidad créditos correctamente.')
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'errorRemovingCredits');
 
-mostrarSnackBarAnimado(
-  context: context,
-  mensaje: mensaje,
-);
-
-  }
-},
-
-
-
+                                                  mostrarSnackBarAnimado(
+                                                    context: context,
+                                                    mensaje: mensaje,
+                                                  );
+                                                }
+                                              },
                                             ),
                                           ),
                                           IconButton(
-                                            icon:  Icon(Icons.remove,
+                                            icon: Icon(Icons.remove,
                                                 color: colors.primary),
                                             onPressed: () =>
                                                 mostrarDialogoConContador(
@@ -362,34 +378,51 @@ mostrarSnackBarAnimado(
                                                       context)
                                                   .translate(
                                                       'selectCreditsToRemove'),
-                                       onConfirmar: (cantidad) async {
-  bool exitoTotal = true;
-  int cantidadRemovida = 0;
+                                              onConfirmar: (cantidad) async {
+                                                bool exitoTotal = true;
+                                                int cantidadRemovida = 0;
 
-  for (int i = 0; i < cantidad; i++) {
-    final index = usuarios.indexWhere((u) => u.userUid == usuario.userUid);
-    if (index != -1 && usuarios[index].clasesDisponibles > 0) {
-      final exito = await ModificarCredito().removerCreditoUsuario(usuario.fullname);
-      if (!exito) {
-        exitoTotal = false;
-        break;
-      }
-      disminuirCreditosLocales(usuario.userUid, 1);
-      cantidadRemovida++;
-    }
-  }
+                                                for (int i = 0;
+                                                    i < cantidad;
+                                                    i++) {
+                                                  final index =
+                                                      usuarios.indexWhere((u) =>
+                                                          u.userUid ==
+                                                          usuario.userUid);
+                                                  if (index != -1 &&
+                                                      usuarios[index]
+                                                              .clasesDisponibles >
+                                                          0) {
+                                                    final exito =
+                                                        await ModificarCredito()
+                                                            .removerCreditoUsuario(
+                                                                usuario
+                                                                    .fullname);
+                                                    if (!exito) {
+                                                      exitoTotal = false;
+                                                      break;
+                                                    }
+                                                    disminuirCreditosLocales(
+                                                        usuario.userUid, 1);
+                                                    cantidadRemovida++;
+                                                  }
+                                                }
 
-  if (mounted) {
-    final mensaje = exitoTotal
-        ? (cantidadRemovida == 1
-            ? 'Se removió 1 crédito correctamente.'
-            : 'Se removieron $cantidadRemovida créditos correctamente.')
-        : AppLocalizations.of(context).translate('errorRemovingCredits');
+                                                if (mounted) {
+                                                  final mensaje = exitoTotal
+                                                      ? (cantidadRemovida == 1
+                                                          ? 'Se removió 1 crédito correctamente.'
+                                                          : 'Se removieron $cantidadRemovida créditos correctamente.')
+                                                      : AppLocalizations.of(
+                                                              context)
+                                                          .translate(
+                                                              'errorRemovingCredits');
 
-    mostrarSnackBarAnimado(context: context, mensaje: mensaje);
-  }
-},
-
+                                                  mostrarSnackBarAnimado(
+                                                      context: context,
+                                                      mensaje: mensaje);
+                                                }
+                                              },
                                             ),
                                           ),
                                         ],
@@ -404,12 +437,17 @@ mostrarSnackBarAnimado(
                                   try {
                                     final clases = await AlumnosEnClase()
                                         .clasesAlumno(alumno, columna);
-                                    mostrarSnackBarAnimado(context: context, mensaje: clases.isNotEmpty
-                                              ? "Clases de $alumno:\n${clases.join('\n')}"
-                                              : "$alumno no tiene clase asignadas.");
+                                    mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje: clases.isNotEmpty
+                                            ? "Clases de $alumno:\n${clases.join('\n')}"
+                                            : "$alumno no tiene clase asignadas.");
                                   } catch (e) {
-                                    mostrarSnackBarAnimado(context: context, mensaje: "Error al obtener las clases: $e", colorFondo: Colors.red);
-                                   
+                                    mostrarSnackBarAnimado(
+                                        context: context,
+                                        mensaje:
+                                            "Error al obtener las clases: $e",
+                                        colorFondo: Colors.red);
                                   }
                                 },
                                 onLongPress: () {
@@ -514,7 +552,6 @@ El alumno usará su correo y contraseña para iniciar sesión.
           ),
           backgroundColor: colors.secondaryContainer,
         ),
-        
       ),
     );
   }

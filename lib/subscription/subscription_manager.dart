@@ -79,38 +79,37 @@ class SubscriptionManager {
         .update({'is_active': isSubscribed}).eq('user_id', currentUser.id);
   }
 
-  
-void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
-  if (_isListening) return;
+  void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
+    if (_isListening) return;
 
-  // Evitar que se ejecute en plataformas no compatibles
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    print("InAppPurchase no está soportado en escritorio.");
-    return;
-  }
+    // Evitar que se ejecute en plataformas no compatibles
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      print("InAppPurchase no está soportado en escritorio.");
+      return;
+    }
 
-  _isListening = true;
+    _isListening = true;
 
-  _inAppPurchase.purchaseStream.listen(
-    (List<PurchaseDetails> purchaseDetailsList) {
-      for (var purchase in purchaseDetailsList) {
-        if (purchase.status == PurchaseStatus.purchased ||
-            purchase.status == PurchaseStatus.restored) {
-          if (!_purchases.any((p) => p.productID == purchase.productID)) {
-            _purchases.add(purchase);
+    _inAppPurchase.purchaseStream.listen(
+      (List<PurchaseDetails> purchaseDetailsList) {
+        for (var purchase in purchaseDetailsList) {
+          if (purchase.status == PurchaseStatus.purchased ||
+              purchase.status == PurchaseStatus.restored) {
+            if (!_purchases.any((p) => p.productID == purchase.productID)) {
+              _purchases.add(purchase);
+            }
           }
         }
-      }
 
-      if (onPurchase != null) {
-        onPurchase(purchaseDetailsList);
-      }
-    },
-    onError: (error) {
-      print("Error en el stream de compras: $error");
-    },
-  );
-}
+        if (onPurchase != null) {
+          onPurchase(purchaseDetailsList);
+        }
+      },
+      onError: (error) {
+        print("Error en el stream de compras: $error");
+      },
+    );
+  }
 
   bool isUserSubscribed() {
     for (var purchase in _purchases) {
@@ -140,41 +139,40 @@ void listenToPurchaseUpdates({Function(List<PurchaseDetails>)? onPurchase}) {
     }
   }
 
- Future<List<PurchaseDetails>> restorePurchases() async {
-  if (!await Internet().hayConexionInternet()) return [];
+  Future<List<PurchaseDetails>> restorePurchases() async {
+    if (!await Internet().hayConexionInternet()) return [];
 
-  // No ejecutar en plataformas no compatibles
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    print("InAppPurchase no está soportado en escritorio.");
-    return [];
-  }
+    // No ejecutar en plataformas no compatibles
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      print("InAppPurchase no está soportado en escritorio.");
+      return [];
+    }
 
-  final Completer<List<PurchaseDetails>> completer = Completer();
-  final List<PurchaseDetails> restored = [];
+    final Completer<List<PurchaseDetails>> completer = Completer();
+    final List<PurchaseDetails> restored = [];
 
-  final Stream<List<PurchaseDetails>> purchaseUpdates =
-      _inAppPurchase.purchaseStream;
+    final Stream<List<PurchaseDetails>> purchaseUpdates =
+        _inAppPurchase.purchaseStream;
 
-  final subscription =
-      purchaseUpdates.listen((List<PurchaseDetails> purchases) {
-    for (var purchase in purchases) {
-      if (purchase.status == PurchaseStatus.restored ||
-          purchase.status == PurchaseStatus.purchased) {
-        restored.add(purchase);
+    final subscription =
+        purchaseUpdates.listen((List<PurchaseDetails> purchases) {
+      for (var purchase in purchases) {
+        if (purchase.status == PurchaseStatus.restored ||
+            purchase.status == PurchaseStatus.purchased) {
+          restored.add(purchase);
+        }
       }
-    }
 
-    if (!completer.isCompleted) {
-      completer.complete(restored);
-    }
-  });
+      if (!completer.isCompleted) {
+        completer.complete(restored);
+      }
+    });
 
-  await _inAppPurchase.restorePurchases();
+    await _inAppPurchase.restorePurchases();
 
-  return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
-    subscription.cancel();
-    return restored;
-  });
-}
-
+    return completer.future.timeout(const Duration(seconds: 8), onTimeout: () {
+      subscription.cancel();
+      return restored;
+    });
+  }
 }

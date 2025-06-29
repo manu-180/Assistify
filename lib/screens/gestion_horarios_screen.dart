@@ -162,7 +162,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     });
   }
 
-
   String _obtenerDia(String? fecha) {
     if (fecha == null || fecha.isEmpty) return '';
     return DiaConFecha()
@@ -174,7 +173,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     required String titulo,
     required List<ClaseModels> clases,
     required Color colorFondo,
-    
   }) {
     final detalles =
         clases.map((cl) => '${cl.dia} ${cl.fecha} a las ${cl.hora}').join('\n');
@@ -184,7 +182,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         duration: const Duration(seconds: 7),
-
         backgroundColor: Colors.transparent,
         elevation: 0,
         content: GestureDetector(
@@ -355,7 +352,6 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                         .showSnackBar(
                                       SnackBar(
                                         duration: const Duration(seconds: 7),
-                                    
                                         backgroundColor: Colors.transparent,
                                         elevation: 0,
                                         content: GestureDetector(
@@ -366,8 +362,7 @@ class _GestionHorariosScreenState extends State<GestionHorariosScreen> {
                                             color: Colors.transparent,
                                             child: Container(
                                               width: double.infinity,
-                                              padding:
-                                                  const EdgeInsets.all(16),
+                                              padding: const EdgeInsets.all(16),
                                               decoration: BoxDecoration(
                                                 color: color.primary,
                                                 borderRadius:

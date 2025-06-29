@@ -16,7 +16,6 @@ import 'package:assistify/utils/verificar_suscripcion_con_backend.dart';
 import 'package:assistify/widgets/responsive_appbar.dart';
 import 'dart:io' show Platform;
 
-
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
 
@@ -57,10 +56,9 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
   void initState() {
     super.initState();
     final manager = SubscriptionManager();
-if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
-  manager.listenToPurchaseUpdates(onPurchase: _handlePurchaseUpdates);
-}
-
+    if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
+      manager.listenToPurchaseUpdates(onPurchase: _handlePurchaseUpdates);
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       manager.checkAndUpdateSubscription();
@@ -83,38 +81,37 @@ if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
   }
 
   Future<void> _initializeStore() async {
-  // ❌ Evita ejecutar en plataformas no soportadas
-  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    setState(() {
-      _isAvailable = false;
-    });
-    return;
+    // ❌ Evita ejecutar en plataformas no soportadas
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      setState(() {
+        _isAvailable = false;
+      });
+      return;
+    }
+
+    final bool isAvailable = await _inAppPurchase.isAvailable();
+    if (isAvailable) {
+      final ProductDetailsResponse response =
+          await _inAppPurchase.queryProductDetails(
+        {
+          "assistify_monthly",
+          "assistify_annual",
+        }.toSet(),
+      );
+
+      if (!mounted) return;
+
+      setState(() {
+        _isAvailable = isAvailable;
+        _products = response.productDetails;
+        _products.sort((a, b) => a.price.compareTo(b.price));
+
+        for (var product in _products) {
+          hovering[product.id] = false;
+        }
+      });
+    }
   }
-
-  final bool isAvailable = await _inAppPurchase.isAvailable();
-  if (isAvailable) {
-    final ProductDetailsResponse response =
-        await _inAppPurchase.queryProductDetails(
-      {
-        "assistify_monthly",
-        "assistify_annual",
-      }.toSet(),
-    );
-
-    if (!mounted) return;
-
-    setState(() {
-      _isAvailable = isAvailable;
-      _products = response.productDetails;
-      _products.sort((a, b) => a.price.compareTo(b.price));
-
-      for (var product in _products) {
-        hovering[product.id] = false;
-      }
-    });
-  }
-}
-
 
   void _subscribe(ProductDetails productDetails) async {
     if (_isProcessingPurchase) {

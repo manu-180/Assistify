@@ -83,7 +83,6 @@ final appRouter = GoRouter(
         return GestionDeClasesScreen(taller: tallerParam);
       },
     ),
-
     GoRoute(
       path: "/creartaller",
       builder: (context, state) => const CrearTallerScreen(),

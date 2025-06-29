@@ -27,13 +27,13 @@ Future<void> main() async {
   // Solo escuchamos las compras desde el arranque
   final subscriptionManager = SubscriptionManager();
   if (!Platform.isWindows && !Platform.isLinux && !Platform.isMacOS) {
-  final subscriptionManager = SubscriptionManager();
-  subscriptionManager.listenToPurchaseUpdates(
-    onPurchase: (purchases) {
-      print("Se recibieron compras nuevas: $purchases");
-    },
-  );
-}
+    final subscriptionManager = SubscriptionManager();
+    subscriptionManager.listenToPurchaseUpdates(
+      onPurchase: (purchases) {
+        print("Se recibieron compras nuevas: $purchases");
+      },
+    );
+  }
 
   // 🟢 PostFrame: ejecutamos todo lo demás después del arranque visual
   runApp(

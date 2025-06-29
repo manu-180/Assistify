@@ -286,7 +286,7 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                     ),
                   )
                 : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
                       Padding(
@@ -331,10 +331,10 @@ class MisClasesScreenState extends ConsumerState<MisClasesScreen> {
                           // const SizedBox(height: 30),
                           : SizedBox(),
 
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: const Divider(thickness: 2),
-                          ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: const Divider(thickness: 2),
+                      ),
 
                       // Show message if no classes and no waitlist, otherwise show the lists
                       (clasesDelUsuario.isEmpty &&

@@ -13,7 +13,6 @@ const List<Color> listColors = [
   Color(0xFFFF6B81), // Rosa coral vibrante
 ];
 
-
 class AppTheme {
   final int selectedColor;
   final bool isDarkMode;

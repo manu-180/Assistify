@@ -183,8 +183,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                             key: UniqueKey(),
                                           )
                                         : const Center(
-                                            child:
-                                                Text("Vista previa no disponible"),
+                                            child: Text(
+                                                "Vista previa no disponible"),
                                           ),
                                   )
                                 : const Center(
@@ -228,8 +228,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                             key: UniqueKey(),
                                           )
                                         : const Center(
-                                            child:
-                                                Text("Vista previa no disponible"),
+                                            child: Text(
+                                                "Vista previa no disponible"),
                                           ),
                                   )
                                 : const Center(

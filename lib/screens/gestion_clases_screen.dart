@@ -497,8 +497,6 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
     });
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
@@ -726,88 +724,149 @@ class _GestionDeClasesScreenState extends State<GestionDeClasesScreen> {
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 IconButton(
-                                                  icon:  Icon(Icons.add, color: color),
-                                                 onPressed: () async {
-  final resultado = await mostrarDialogoConfirmacion(
-    context,
-    AppLocalizations.of(context).translate('addPlaceConfirmation'),
-    clase: clase,
-    esEliminar: false,
-    clasesDisponibles: clasesDisponibles,
-    clasesFiltradas: clasesFiltradas,
-    fechaSeleccionada: fechaSeleccionada,
-    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
-      setState(() {
-        clasesDisponibles = nuevasDisponibles;
-        clasesFiltradas = nuevasFiltradas;
-      });
-    },
-  );
+                                                    icon: Icon(Icons.add,
+                                                        color: color),
+                                                    onPressed: () async {
+                                                      final resultado =
+                                                          await mostrarDialogoConfirmacion(
+                                                        context,
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'addPlaceConfirmation'),
+                                                        clase: clase,
+                                                        esEliminar: false,
+                                                        clasesDisponibles:
+                                                            clasesDisponibles,
+                                                        clasesFiltradas:
+                                                            clasesFiltradas,
+                                                        fechaSeleccionada:
+                                                            fechaSeleccionada,
+                                                        onActualizar:
+                                                            (nuevasDisponibles,
+                                                                nuevasFiltradas) {
+                                                          setState(() {
+                                                            clasesDisponibles =
+                                                                nuevasDisponibles;
+                                                            clasesFiltradas =
+                                                                nuevasFiltradas;
+                                                          });
+                                                        },
+                                                      );
 
-  if (resultado is Map<String, dynamic> &&
-      resultado['confirmado'] == true &&
-      resultado['cantidad'] != null) {
-    final cantidad = resultado['cantidad'] as int;
-    for (int i = 0; i < cantidad; i++) {
-      await ModificarLugarDisponible().agregarLugarDisponible(clase.id);
-      await agregarLugar(clase.id);
-    }
+                                                      if (resultado is Map<
+                                                              String,
+                                                              dynamic> &&
+                                                          resultado[
+                                                                  'confirmado'] ==
+                                                              true &&
+                                                          resultado[
+                                                                  'cantidad'] !=
+                                                              null) {
+                                                        final cantidad =
+                                                            resultado[
+                                                                    'cantidad']
+                                                                as int;
+                                                        for (int i = 0;
+                                                            i < cantidad;
+                                                            i++) {
+                                                          await ModificarLugarDisponible()
+                                                              .agregarLugarDisponible(
+                                                                  clase.id);
+                                                          await agregarLugar(
+                                                              clase.id);
+                                                        }
 
-    final mensaje = cantidad == 1
-        ? 'Se agregó 1 lugar disponible a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
-        : 'Se agregaron $cantidad lugares disponibles a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
+                                                        final mensaje = cantidad ==
+                                                                1
+                                                            ? 'Se agregó 1 lugar disponible a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
+                                                            : 'Se agregaron $cantidad lugares disponibles a la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
 
-    mostrarSnackBarAnimado(context: context, mensaje: mensaje);
-  }
-}
-
-                                                ),
+                                                        mostrarSnackBarAnimado(
+                                                            context: context,
+                                                            mensaje: mensaje);
+                                                      }
+                                                    }),
                                                 IconButton(
-                                                  icon:
-                                                       Icon(Icons.remove, color: color),
-                                                  onPressed: () async {
-  final resultado = await mostrarDialogoConfirmacion(
-    context,
-    AppLocalizations.of(context).translate('removePlaceConfirmation'),
-    clase: clase,
-    esEliminar: false,
-    clasesDisponibles: clasesDisponibles,
-    clasesFiltradas: clasesFiltradas,
-    fechaSeleccionada: fechaSeleccionada,
-    onActualizar: (nuevasDisponibles, nuevasFiltradas) {
-      setState(() {
-        clasesDisponibles = nuevasDisponibles;
-        clasesFiltradas = nuevasFiltradas;
-      });
-    },
-  );
+                                                    icon: Icon(Icons.remove,
+                                                        color: color),
+                                                    onPressed: () async {
+                                                      final resultado =
+                                                          await mostrarDialogoConfirmacion(
+                                                        context,
+                                                        AppLocalizations.of(
+                                                                context)
+                                                            .translate(
+                                                                'removePlaceConfirmation'),
+                                                        clase: clase,
+                                                        esEliminar: false,
+                                                        clasesDisponibles:
+                                                            clasesDisponibles,
+                                                        clasesFiltradas:
+                                                            clasesFiltradas,
+                                                        fechaSeleccionada:
+                                                            fechaSeleccionada,
+                                                        onActualizar:
+                                                            (nuevasDisponibles,
+                                                                nuevasFiltradas) {
+                                                          setState(() {
+                                                            clasesDisponibles =
+                                                                nuevasDisponibles;
+                                                            clasesFiltradas =
+                                                                nuevasFiltradas;
+                                                          });
+                                                        },
+                                                      );
 
-  if (resultado is Map<String, dynamic> &&
-      resultado['confirmado'] == true &&
-      resultado['cantidad'] != null) {
-    final cantidad = resultado['cantidad'] as int;
-    int quitados = 0;
+                                                      if (resultado is Map<
+                                                              String,
+                                                              dynamic> &&
+                                                          resultado[
+                                                                  'confirmado'] ==
+                                                              true &&
+                                                          resultado[
+                                                                  'cantidad'] !=
+                                                              null) {
+                                                        final cantidad =
+                                                            resultado[
+                                                                    'cantidad']
+                                                                as int;
+                                                        int quitados = 0;
 
-    for (int i = 0; i < cantidad; i++) {
-      final idx = clasesFiltradas.indexWhere((c) => c.id == clase.id);
-      if (idx != -1 && clasesFiltradas[idx].lugaresDisponibles > 0) {
-        await ModificarLugarDisponible().removerLugarDisponible(clase.id);
-        await quitarLugar(clase.id);
-        quitados++;
-      }
-    }
+                                                        for (int i = 0;
+                                                            i < cantidad;
+                                                            i++) {
+                                                          final idx =
+                                                              clasesFiltradas
+                                                                  .indexWhere((c) =>
+                                                                      c.id ==
+                                                                      clase.id);
+                                                          if (idx != -1 &&
+                                                              clasesFiltradas[
+                                                                          idx]
+                                                                      .lugaresDisponibles >
+                                                                  0) {
+                                                            await ModificarLugarDisponible()
+                                                                .removerLugarDisponible(
+                                                                    clase.id);
+                                                            await quitarLugar(
+                                                                clase.id);
+                                                            quitados++;
+                                                          }
+                                                        }
 
-    if (quitados > 0) {
-      final mensaje = quitados == 1
-          ? 'Se quitó 1 lugar disponible de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
-          : 'Se quitaron $quitados lugares disponibles de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
+                                                        if (quitados > 0) {
+                                                          final mensaje = quitados ==
+                                                                  1
+                                                              ? 'Se quitó 1 lugar disponible de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}'
+                                                              : 'Se quitaron $quitados lugares disponibles de la clase del ${clase.dia} ${clase.fecha} a las ${clase.hora}';
 
-      mostrarSnackBarAnimado(context: context, mensaje: mensaje);
-    }
-  }
-}
-
-                                                ),
+                                                          mostrarSnackBarAnimado(
+                                                              context: context,
+                                                              mensaje: mensaje);
+                                                        }
+                                                      }
+                                                    }),
                                               ],
                                             ),
                                           ),
@@ -1010,8 +1069,6 @@ class _DialogoEliminarClaseConSwitchState
       colorFondo: colorFondo,
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
