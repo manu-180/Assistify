@@ -6,6 +6,7 @@ import 'package:assistify/supabase/utiles/generar_id.dart';
 import 'package:assistify/utils/capitalize.dart';
 import 'package:assistify/utils/crear_usuario_desde_admin.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:assistify/widgets/snackbar_animado.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
@@ -200,6 +201,7 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
             const SizedBox(height: 16),
 
             // Selector de sexo
+
             Row(
               children: ['Hombre', 'Mujer'].asMap().entries.map((entry) {
                 final index = entry.key;
@@ -210,7 +212,11 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                   child: GestureDetector(
                     onTap: () {
                       setState(() {
-                        sexoSeleccionado = opcion;
+                        if (esSeleccionado) {
+                          sexoSeleccionado = null;
+                        } else {
+                          sexoSeleccionado = opcion;
+                        }
                       });
                     },
                     child: Container(
@@ -221,23 +227,18 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                       decoration: BoxDecoration(
                         color: esSeleccionado
                             ? color.primary.withOpacity(0.1)
-                            : const Color.fromARGB(255, 229, 233,
-                                239), // Fondo suave gris-azulado moderno
+                            : const Color.fromARGB(255, 229, 233, 239),
                         border: Border.all(
                           color: esSeleccionado
                               ? color.primary
-                              : const Color.fromARGB(255, 119, 119,
-                                  120), // Gris claro para el borde no activo
+                              : const Color.fromARGB(255, 119, 119, 120),
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       child: Padding(
                         padding: const EdgeInsets.only(left: 8),
-                        // 6
-
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Icon(
                               esSeleccionado
@@ -246,18 +247,30 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                               color: Theme.of(context).colorScheme.primary,
                             ),
                             const SizedBox(width: 10),
-                            Text(
-                              opcion,
-                              style: TextStyle(
-                                fontWeight: esSeleccionado
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: esSeleccionado
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onBackground,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  opcion,
+                                  style: TextStyle(
+                                    fontWeight: esSeleccionado
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: esSeleccionado
+                                        ? Theme.of(context).colorScheme.primary
+                                        : Theme.of(context)
+                                            .colorScheme
+                                            .onBackground,
+                                  ),
+                                ),
+                                const Text(
+                                  '(opcional)',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -272,7 +285,25 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
             TextField(
               controller: phoneController,
               decoration: InputDecoration(
-                labelText: 'Teléfono (opcional)',
+                label: RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Teléfono ',
+                        style: TextStyle(
+                          color: Colors.black, // Negro para "Teléfono"
+                        ),
+                      ),
+                      TextSpan(
+                        text: '(opcional)',
+                        style: TextStyle(
+                          color: Colors.grey, // Gris para "(opcional)"
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
                 border: const OutlineInputBorder(),
                 errorText: phoneController.text.trim().isEmpty
                     ? null
@@ -468,6 +499,8 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
             }
 
             try {
+              final sexoParaGuardar = sexoSeleccionado ?? 'Indefinido';
+
               final userId = await crearUsuarioAdmin(
                 email: email,
                 password: password,
@@ -475,7 +508,7 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
                 telefono: telefono,
                 rubro: usuarioActivo.userMetadata?['rubro'] ?? 'Sin rubro',
                 taller: usuarioActivo.userMetadata?['taller'] ?? 'Sin taller',
-                sexo: sexoSeleccionado,
+                sexo: sexoParaGuardar,
               );
 
               final nuevoUsuario = {
@@ -497,19 +530,17 @@ class _CrearUsuarioDialogState extends State<CrearUsuarioDialog> {
 
               if (sexoSeleccionado != null) {
                 nuevoUsuario['sexo'] = sexoSeleccionado;
+              } else {
+                nuevoUsuario['sexo'] = 'Indefinido';
               }
 
               await supabase.from('usuarios').insert(nuevoUsuario);
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    "La cuenta de $fullname se creó exitosamente. ¡Ya puede iniciar sesión!.",
-                  ),
-                  backgroundColor: const Color(0xFF4CAF50),
-                  duration: const Duration(seconds: 9),
-                ),
-              );
+              mostrarSnackBarAnimado(
+                  context: context,
+                  mensaje:
+                      "La cuenta de $fullname se creó exitosamente. ¡Ya puede iniciar sesión!.",
+                  colorFondo: const Color(0xFF4CAF50));
 
               final callback = widget.onUsuarioCreado;
               Navigator.of(context).pop();

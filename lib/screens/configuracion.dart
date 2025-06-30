@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:assistify/models/usuario_models.dart';
 import 'package:assistify/supabase/obtener_datos/obtener_numero_admin.dart';
 import 'package:assistify/utils/capitalize.dart';
 import 'package:assistify/widgets/titulo_seleccion.dart';
@@ -40,14 +41,19 @@ class Configuracion extends ConsumerStatefulWidget {
 class _ConfiguracionState extends ConsumerState<Configuracion> {
   User? user;
   String? taller;
+  late Future<List<UsuarioModels>> _usuariosFuture;
 
   @override
   void initState() {
     super.initState();
-    // Establece el usuario actual y el taller al inicializar
     user = ref.read(authProvider);
     _obtenerTallerUsuario();
     SubscriptionVerifier.verificarAdminYSuscripcion(context);
+    _usuariosFuture = ObtenerTotalInfo(
+      supabase: supabase,
+      usuariosTable: 'usuarios',
+      clasesTable: taller ?? '',
+    ).obtenerUsuarios();
   }
 
   Future<void> _obtenerTallerUsuario() async {
@@ -56,6 +62,11 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
         await ObtenerTaller().retornarTaller(usuarioActivo!.id);
     setState(() {
       taller = tallerObtenido;
+      _usuariosFuture = ObtenerTotalInfo(
+        supabase: supabase,
+        usuariosTable: 'usuarios',
+        clasesTable: tallerObtenido,
+      ).obtenerUsuarios();
     });
   }
 
@@ -327,7 +338,6 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                               ],
                             ),
                           ),
-
                           const SizedBox(height: 30),
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -335,7 +345,6 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                             child: ExpandibleCard(
                               titulo: AppLocalizations.of(context)
                                   .translate('chooseColor'),
-                                  
                               contenido: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -414,7 +423,6 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const SizedBox(height: 12),
                                       // Nombre
                                       Card(
                                         margin: const EdgeInsets.symmetric(
@@ -434,6 +442,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
 
                                             await showDialog(
                                               context: context,
+                                              barrierDismissible: false,
                                               builder: (context) {
                                                 return StatefulBuilder(
                                                   builder: (context, setState) {
@@ -608,6 +617,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                             String? sexoSeleccionado =
                                                 sexo ?? 'Otro';
                                             await showDialog(
+                                              barrierDismissible: false,
                                               context: context,
                                               builder: (context) {
                                                 return AlertDialog(
@@ -655,15 +665,23 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                                                           .primary
                                                                           .withOpacity(
                                                                               0.1)
-                                                                      : color
-                                                                          .background,
+                                                                      : const Color
+                                                                          .fromARGB(
+                                                                          255,
+                                                                          229,
+                                                                          233,
+                                                                          239),
                                                                   border: Border
                                                                       .all(
                                                                     color: esSeleccionado
                                                                         ? color
                                                                             .primary
-                                                                        : Colors
-                                                                            .black54,
+                                                                        : const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            119,
+                                                                            119,
+                                                                            120),
                                                                   ),
                                                                   borderRadius:
                                                                       BorderRadius
@@ -727,17 +745,41 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                                     ),
                                                     TextButton(
                                                       onPressed: () async {
+                                                        final valorAGuardar =
+                                                            sexoSeleccionado ==
+                                                                    "Otro"
+                                                                ? "Indefinido"
+                                                                : sexoSeleccionado;
                                                         await Supabase.instance
                                                             .client.auth
                                                             .updateUser(
                                                           UserAttributes(data: {
                                                             'sexo':
-                                                                sexoSeleccionado
+                                                                valorAGuardar
                                                           }),
                                                         );
-                                                        if (context.mounted)
+                                                        await Supabase
+                                                            .instance.client
+                                                            .from('usuarios')
+                                                            .update({
+                                                          'sexo': sexoSeleccionado ==
+                                                                  'Otro'
+                                                              ? 'Indefinido'
+                                                              : sexoSeleccionado
+                                                        }).eq('user_uid',
+                                                                user.id);
+
+                                                        if (context.mounted) {
                                                           Navigator.pop(
                                                               context);
+                                                          mostrarSnackBarAnimado(
+                                                            context: context,
+                                                            mensaje:
+                                                                'Sexo actualizado correctamente',
+                                                            colorFondo: Colors
+                                                                .lightGreen,
+                                                          );
+                                                        }
                                                       },
                                                       child:
                                                           const Text('Guardar'),
@@ -771,6 +813,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                                     TextEditingController(
                                                         text: telefono);
                                                 await showDialog(
+                                                  barrierDismissible: false,
                                                   context: context,
                                                   builder: (context) {
                                                     return AlertDialog(
@@ -796,6 +839,16 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                                         ),
                                                         TextButton(
                                                           onPressed: () async {
+                                                            Supabase.instance
+                                                                .client.auth
+                                                                .updateUser(
+                                                              UserAttributes(
+                                                                  data: {
+                                                                    'telefono':
+                                                                        controller
+                                                                            .text
+                                                                  }),
+                                                            );
                                                             await Supabase
                                                                 .instance.client
                                                                 .from(
@@ -806,9 +859,19 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                                                       .text
                                                             }).eq('fullname',
                                                                     fullName);
-                                                            if (context.mounted)
+                                                            if (context
+                                                                .mounted) {
                                                               Navigator.pop(
                                                                   context);
+                                                              mostrarSnackBarAnimado(
+                                                                context:
+                                                                    context,
+                                                                mensaje:
+                                                                    'Teléfono actualizado correctamente',
+                                                                colorFondo: Colors
+                                                                    .lightGreen,
+                                                              );
+                                                            }
                                                           },
                                                           child: const Text(
                                                               'Guardar'),
@@ -842,6 +905,7 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                                             String confirmPasswordError = '';
 
                                             await showDialog(
+                                              barrierDismissible: false,
                                               context: context,
                                               builder: (context) {
                                                 return StatefulBuilder(
@@ -1032,76 +1096,105 @@ class _ConfiguracionState extends ConsumerState<Configuracion> {
                               ),
                             ),
                           ),
-                        Padding(
-  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-  child: ExpandibleCard(
-    titulo: "Funciones sensibles",
-    contenido: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (user.userMetadata?["admin"] == true)
-          Align(
-            alignment: Alignment.centerLeft,
-            child: OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: Colors.red[700],
-                side: BorderSide(color: Colors.red[300]!),
-                padding: const EdgeInsets.only(right: 25, left: 10, top: 12, bottom: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              icon: const Icon(Icons.warning_amber_rounded),
-              label: const Text(
-                "Cambiar fechas al mes siguiente",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              onPressed: () async {
-                final confirmed = await mostrarDialogoConfirmacionCambiarMes(context, user, color);
-                if (confirmed == true) {
-                  await corregirDia();
-                  await ResetClases().reset();
-                  await ActualizarFechasDatabase().actualizarClasesAlNuevoMes(user.userMetadata?['taller'], 2025);
-                  await ActualizarSemanas().actualizarSemana();
-                  await FeriadosFalse().feriadosFalse();
-                }
-              },
-            ),
-          ),
-        const SizedBox(height: 12),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.red[700],
-              side: BorderSide(color: Colors.red[300]!),
-              padding: const EdgeInsets.only(right: 25, left: 10, top: 12, bottom: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            icon: const Icon(Icons.delete_forever_rounded),
-            label: const Text(
-              "Eliminar mi cuenta",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            onPressed: () async {
-              final confirmed = await mostrarDialogoConfirmacionEliminarCuenta(context, user, color);
-              if (confirmed == true) {
-                await EliminarUsuario().eliminarUsuarioAutenticado(user.id);
-                await EliminarUsuario().eliminarDeBaseDatos(user.id);
-                if (context.mounted) {
-                  context.go("/");
-                }
-              }
-            },
-          ),
-        ),
-      ],
-    ),
-  ),
-),
-
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: ExpandibleCard(
+                              titulo: "Funciones sensibles",
+                              contenido: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (user.userMetadata?["admin"] == true)
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: OutlinedButton.icon(
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.red[700],
+                                          side: BorderSide(
+                                              color: Colors.red[300]!),
+                                          padding: const EdgeInsets.only(
+                                              right: 25,
+                                              left: 10,
+                                              top: 12,
+                                              bottom: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                          ),
+                                        ),
+                                        icon: const Icon(
+                                            Icons.warning_amber_rounded),
+                                        label: const Text(
+                                          "Cambiar fechas al mes siguiente",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        onPressed: () async {
+                                          final confirmed =
+                                              await mostrarDialogoConfirmacionCambiarMes(
+                                                  context, user, color);
+                                          if (confirmed == true) {
+                                            await corregirDia();
+                                            await ResetClases().reset();
+                                            await ActualizarFechasDatabase()
+                                                .actualizarClasesAlNuevoMes(
+                                                    user.userMetadata?[
+                                                        'taller'],
+                                                    2025);
+                                            await ActualizarSemanas()
+                                                .actualizarSemana();
+                                            await FeriadosFalse()
+                                                .feriadosFalse();
+                                          }
+                                        },
+                                      ),
+                                    ),
+                                  const SizedBox(height: 12),
+                                  Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: OutlinedButton.icon(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.red[700],
+                                        side:
+                                            BorderSide(color: Colors.red[300]!),
+                                        padding: const EdgeInsets.only(
+                                            right: 25,
+                                            left: 10,
+                                            top: 12,
+                                            bottom: 12),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                          Icons.delete_forever_rounded),
+                                      label: const Text(
+                                        "Eliminar mi cuenta",
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      onPressed: () async {
+                                        final confirmed =
+                                            await mostrarDialogoConfirmacionEliminarCuenta(
+                                                context, user, color);
+                                        if (confirmed == true) {
+                                          await EliminarUsuario()
+                                              .eliminarUsuarioAutenticado(
+                                                  user.id);
+                                          await EliminarUsuario()
+                                              .eliminarDeBaseDatos(user.id);
+                                          if (context.mounted) {
+                                            context.go("/");
+                                          }
+                                        }
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                           const SizedBox(height: 20),
                         ],
                       ),
@@ -1136,24 +1229,25 @@ Al presionar se despliegan tres opciones:
   }
 }
 
-
-
 class ExpandibleCard extends StatefulWidget {
   final String titulo;
   final Widget contenido;
+  final bool? expandInitially;
 
   const ExpandibleCard({
     super.key,
     required this.titulo,
     required this.contenido,
+    this.expandInitially,
   });
 
   @override
   State<ExpandibleCard> createState() => _ExpandibleCardState();
 }
 
-class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProviderStateMixin {
-  bool _expanded = false;
+class _ExpandibleCardState extends State<ExpandibleCard>
+    with SingleTickerProviderStateMixin {
+  late bool _expanded;
   double? _fullWidth;
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -1161,6 +1255,7 @@ class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProvid
   @override
   void initState() {
     super.initState();
+    _expanded = widget.expandInitially ?? false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final textPainter = TextPainter(
         text: TextSpan(
@@ -1178,6 +1273,7 @@ class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProvid
     _controller = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
+      value: _expanded ? 1 : 0,
     );
 
     _animation = CurvedAnimation(
@@ -1186,10 +1282,15 @@ class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProvid
     );
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  void toggle() {
+    setState(() {
+      _expanded = !_expanded;
+      if (_expanded) {
+        _controller.forward();
+      } else {
+        _controller.reverse();
+      }
+    });
   }
 
   @override
@@ -1206,21 +1307,20 @@ class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProvid
                 topRight: Radius.circular(16),
               ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(widget.titulo),
-                SizedBox(
-                  height: 2,
-                ),
+                const SizedBox(height: 2),
                 AnimatedBuilder(
                   animation: _animation,
                   builder: (context, child) {
-                    final height = 0 * _animation.value;
-                    final width = _fullWidth != null ? _fullWidth! * _animation.value : 0;
+                    final width =
+                        _fullWidth != null ? _fullWidth! * _animation.value : 0;
                     return SizedBox(
-                      height: height,
+                      height: 1.1,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: SizedBox(
@@ -1234,34 +1334,26 @@ class _ExpandibleCardState extends State<ExpandibleCard> with SingleTickerProvid
               ],
             ),
             trailing: RotationTransition(
-  turns: Tween<double>(begin: 0, end: 0.5).animate(_controller),
-  child: const Icon(Icons.expand_more),
-),
-onTap: () {
-  setState(() => _expanded = !_expanded);
-  _expanded ? _controller.forward() : _controller.reverse();
-},
-
+              turns: Tween<double>(begin: 0, end: 0.5).animate(_controller),
+              child: const Icon(Icons.expand_more),
+            ),
+            onTap: toggle,
           ),
-       AnimatedSize(
-  duration: const Duration(milliseconds: 300),
-  curve: Curves.easeInOut,
-  child: _expanded
-      ? FutureBuilder(
-          future: Future.delayed(const Duration(milliseconds: 70)),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              return Padding(
-                padding: const EdgeInsets.all(16),
-                child: widget.contenido,
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        )
-      : const SizedBox.shrink(),
-),
-
+          ClipRect(
+            child: AnimatedSize(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              child: ConstrainedBox(
+                constraints: _expanded
+                    ? const BoxConstraints()
+                    : const BoxConstraints(maxHeight: 0),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: widget.contenido,
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );

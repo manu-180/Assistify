@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
@@ -450,52 +452,117 @@ class _UsuariosScreenState extends State<UsuariosScreen> {
                                         colorFondo: Colors.red);
                                   }
                                 },
-                                onLongPress: () {
-                                  final alumno = usuario.fullname;
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Row(
-                                          children: [
-                                            const FaIcon(
-                                                FontAwesomeIcons
-                                                    .triangleExclamation,
-                                                size: 30),
-                                            const SizedBox(width: 10),
-                                            Flexible(
-                                                child: Text(
-                                              "¿Quieres eliminar a $alumno?",
-                                            )),
-                                          ],
-                                        ),
-                                        actions: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              Navigator.of(context)
-                                                  .pop(); // Cierra diálogo
-                                            },
-                                            child: const Text("Cancelar"),
-                                          ),
-                                          const SizedBox(width: 2),
-                                          FilledButton(
-                                            style: FilledButton.styleFrom(
-                                              backgroundColor:
-                                                  Colors.red.shade700,
-                                            ),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                              eliminarUsuario(
-                                                usuario.userUid,
-                                              );
-                                            },
-                                            child: const Text("Eliminar"),
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
+                              onLongPress: () async {
+  final alumno = usuario.fullname;
+  int countdown = 3;
+  bool isButtonEnabled = false;
+  late StateSetter dialogSetState;
+  late Timer countdownTimer;
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          dialogSetState = setState;
+
+          if (countdown == 3) {
+            countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+              if (countdown == 1) {
+                timer.cancel();
+                dialogSetState(() {
+                  isButtonEnabled = true;
+                });
+              } else {
+                dialogSetState(() {
+                  countdown--;
+                });
+              }
+            });
+          }
+
+          return WillPopScope(
+            onWillPop: () async {
+              countdownTimer.cancel();
+              return true;
+            },
+            child: AlertDialog(
+              title: Text("¿Quieres eliminar a $alumno?"),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    countdownTimer.cancel();
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text("Cancelar"),
+                ),
+                FilledButton(
+                  onPressed: isButtonEnabled
+                      ? () => Navigator.of(context).pop(true)
+                      : null,
+                  child: Text(isButtonEnabled ? "Eliminar" : "Eliminar ($countdown)"),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+
+  if (confirmed == true) {
+    int puntos = 1;
+    bool activo = true;
+    late StateSetter actualizarDialogo;
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        final timer = Timer.periodic(const Duration(milliseconds: 500), (t) {
+          if (activo) {
+            actualizarDialogo(() {
+              puntos = (puntos % 3) + 1;
+            });
+          }
+        });
+
+        eliminarUsuario(usuario.userUid).then((_) {
+          activo = false;
+          timer.cancel();
+          if (context.mounted) Navigator.of(context).pop();
+        });
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            actualizarDialogo = setState;
+            return AlertDialog(
+              content: SizedBox(
+                height: 100,
+                child: Center(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Eliminando a $alumno${'.' * puntos}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(fontSize: 22),
+                        ),
+                      ),
+                  
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
                               );
                             },
                           ),
