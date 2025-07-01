@@ -310,62 +310,58 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // 📦 Título
-                                      Text(
-                                        custom?['titulo'] ?? product.title,
-                                        style: TextStyle(
-                                          fontSize: size.width * 0.055,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 16),
+                                     // 💰 Precio primero
+Center(
+  child: Text(
+    product.price,
+    style: TextStyle(
+      fontSize: size.width * 0.07,
+      fontWeight: FontWeight.bold,
+      color: Colors.black,
+    ),
+  ),
+),
+const SizedBox(height: 12),
 
-                                      // 🔥 Beneficio
-                                      if (custom?['beneficio'] != null)
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 6, horizontal: 12),
-                                          decoration: BoxDecoration(
-                                            color: color.primary.withAlpha(130),
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Text(
-                                            custom!['beneficio']!,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              letterSpacing: 1.2,
-                                            ),
-                                          ),
-                                        ),
-                                      const SizedBox(height: 8),
+// 📦 Título (más chico que el precio)
+Text(
+  custom?['titulo'] ?? product.title,
+  style: TextStyle(
+    fontSize: size.width * 0.05,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  ),
+),
+const SizedBox(height: 8),
 
-                                      // 📝 Descripción
-                                      Text(
-                                        custom?['descripcion'] ??
-                                            product.description,
-                                        style: TextStyle(
-                                          fontSize: size.width * 0.04,
-                                          color: Colors.black54,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 20),
+// 📝 Descripción
+Text(
+  custom?['descripcion'] ?? product.description,
+  style: TextStyle(
+    fontSize: size.width * 0.04,
+    color: Colors.black54,
+  ),
+),
+const SizedBox(height: 12),
 
-                                      // 💰 Precio
-                                      Align(
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          product.price,
-                                          style: TextStyle(
-                                            fontSize: size.width * 0.05,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                      ),
+// 🔥 Beneficio como info extra (más chico)
+if (custom?['beneficio'] != null)
+  Container(
+    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
+    decoration: BoxDecoration(
+      color: color.primary.withAlpha(100),
+      borderRadius: BorderRadius.circular(6),
+    ),
+    child: Text(
+      custom!['beneficio']!,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: Colors.white,
+      ),
+    ),
+  ),
+
                                     ],
                                   ),
                                 ),
