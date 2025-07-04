@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:assistify/supabase/utiles/redirijir_usuario_al_taller.dart';
 import 'package:video_player/video_player.dart';
@@ -187,8 +190,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                 "Vista previa no disponible"),
                                           ),
                                   )
-                                : const Center(
-                                    child: CircularProgressIndicator()),
+                                : Shimmer.fromColors(
+  baseColor: const Color.fromARGB(255, 33, 33, 33),
+  highlightColor: Colors.grey.shade700,
+  child: Container(
+    color: Colors.black,
+  ),
+)
+,
                           ),
                         ),
                       ),
@@ -232,8 +241,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                                                 "Vista previa no disponible"),
                                           ),
                                   )
-                                : const Center(
-                                    child: CircularProgressIndicator()),
+                                :Shimmer.fromColors(
+  baseColor: const Color.fromARGB(255, 33, 33, 33),
+  highlightColor: Colors.grey.shade700,
+  child: Container(
+    color: Colors.black,
+  ),
+)
+
+
+
+,
                           ),
                         ),
                       ),

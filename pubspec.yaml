@@ -27,8 +27,9 @@ dependencies:
   googleapis_auth: ^1.6.0
   http: ^1.2.2
   in_app_purchase: ^3.0.0
-  in_app_purchase_android: ^0.3.0+6 
+  in_app_purchase_android: ^0.3.0+6
   intl: ^0.20.2
+  lottie: ^3.3.1
   ntp: ^2.0.0
   path: ^1.9.0
   shared_preferences: ^2.1.1
@@ -62,14 +63,11 @@ flutter_native_splash:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
-
 flutter:
   fonts:
     - family: Oxanium
       fonts:
         - asset: assets/fonts/Oxanium-VariableFont_wght.ttf
-
-
 
   uses-material-design: true
   generate: true
@@ -78,10 +76,9 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/videos/
+    - assets/animations/
     - assets/onboarding/
     - .env
-
-
 
 l10n:
   arb-dir: lib/l10n

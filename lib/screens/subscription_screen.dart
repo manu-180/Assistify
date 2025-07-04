@@ -269,111 +269,137 @@ class SubscriptionScreenState extends State<SubscriptionScreen> {
         backgroundColor: color.primary,
       ),
       body: _isAvailable
-          ? _products.isEmpty
-              ? Center(
-                  child: Text(AppLocalizations.of(context)
-                      .translate('noProductsAvailable')),
-                )
-              : SingleChildScrollView(
-                  child: Center(
-                    child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: size.height * 0.1),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: _products.map((product) {
-                            final custom = planesCustom[product.id];
+    ? _products.isEmpty
+        ? Center(
+            child: Text(AppLocalizations.of(context)
+                .translate('noProductsAvailable')),
+          )
+        : SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                  vertical: size.height * 0.08, horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: _products.map((product) {
+                  final isAnnual = product.id == 'assistify_annual';
 
-                            return GestureDetector(
-                              onTap: () => _subscribe(product),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Container(
-                                  width: size.width * 0.8,
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                  padding: const EdgeInsets.all(20),
-                                  decoration: BoxDecoration(
+                  return GestureDetector(
+                    onTap: () => _subscribe(product),
+                    child: Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isAnnual ? Colors.red : Colors.transparent,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (isAnnual)
+                            Align(
+                              alignment: Alignment.topRight,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  'Más popular',
+                                  style: TextStyle(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(16),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        blurRadius: 12,
-                                        offset: const Offset(0, 6),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                     // 💰 Precio primero
-Center(
-  child: Text(
-    product.price,
-    style: TextStyle(
-      fontSize: size.width * 0.07,
-      fontWeight: FontWeight.bold,
-      color: Colors.black,
-    ),
-  ),
-),
-const SizedBox(height: 12),
-
-// 📦 Título (más chico que el precio)
-Text(
-  custom?['titulo'] ?? product.title,
-  style: TextStyle(
-    fontSize: size.width * 0.05,
-    fontWeight: FontWeight.w600,
-    color: Colors.black87,
-  ),
-),
-const SizedBox(height: 8),
-
-// 📝 Descripción
-Text(
-  custom?['descripcion'] ?? product.description,
-  style: TextStyle(
-    fontSize: size.width * 0.04,
-    color: Colors.black54,
-  ),
-),
-const SizedBox(height: 12),
-
-// 🔥 Beneficio como info extra (más chico)
-if (custom?['beneficio'] != null)
-  Container(
-    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-    decoration: BoxDecoration(
-      color: color.primary.withAlpha(100),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Text(
-      custom!['beneficio']!,
-      style: const TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: Colors.white,
-      ),
-    ),
-  ),
-
-                                    ],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ),
-                            );
-                          }).toList(),
-                        )),
-                  ),
-                )
-          : Center(
-              child: CircularProgressIndicator(),
+                            ),
+                          const SizedBox(height: 8),
+                          Text(
+                            isAnnual ? 'Plan Anual' : 'Plan Mensual',
+                            style: const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            product.price +
+                                (isAnnual ? ' /año' : ' /mes'),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            isAnnual
+                                ? '• Acceso total a todas las funcionalidades\n'
+                                    '• Cancelación de clases con crédito recuperable\n'
+                                    '• Inscripción a clases de forma autónoma\n'
+                                    '• Notificaciones automáticas por WhatsApp\n'
+                                    '• Gestión de clases, horarios y alumnos\n'
+                                    '• Personalización de cuenta y soporte\n'
+                                    '• Sistema de lista de espera\n'
+                                    '• Ahorro frente al plan mensual\n'
+                                    '• Renovación automática. Cancelable en cualquier momento'
+                                : '• Acceso total a todas las funcionalidades\n'
+                                    '• Cancelación de clases con crédito recuperable\n'
+                                    '• Inscripción a clases de forma autónoma\n'
+                                    '• Notificaciones automáticas por WhatsApp\n'
+                                    '• Gestión de clases, horarios y alumnos\n'
+                                    '• Personalización de cuenta y soporte\n'
+                                    '• Sistema de lista de espera\n'
+                                    '• Renovación automática. Cancelable en cualquier momento',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              height: 1.6,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade100,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              isAnnual ? '2 MESES GRATIS' : '1 MES GRATIS',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
+          )
+    : const Center(
+        child: CircularProgressIndicator(),
+      ),
+
     );
   }
 }
